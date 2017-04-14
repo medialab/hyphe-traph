@@ -33,7 +33,7 @@ class Traph(object):
             return node
 
         while node.hasNext():
-            node = self.read_lru_trie_node(node.next())
+            node = self.storage.read_lru_trie_node(node.next())
 
             if node.char() == char:
                 return node
@@ -55,8 +55,9 @@ class Traph(object):
     def add_page(self, lru):
         walk_history = WalkHistory()
 
-        i = 0
-        node = self.storage
+        block = 0
 
-        self.__require_char_from_siblings(i, ord(lru[0]))
+        for char in lru:
+            char = ord(char)
+            node = self.__require_char_from_siblings(block, char)
 

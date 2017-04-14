@@ -13,7 +13,7 @@ LRU_TRIE_NODE_BLOCK_SIZE = 40
 
 # Positions
 LRU_TRIE_NODE_CHAR = 0
-LRU_TRIE_NODE_NEXT_BLOCK = 2
+LRU_TRIE_NODE_NEXT_BLOCK = 4
 
 
 class LRUTrieNode(object):
@@ -30,7 +30,7 @@ class LRUTrieNode(object):
                 0,    # Flags
                 0,    # Flags
                 0,    # Next block
-                0,
+                0,    # Child block
                 0,
                 0,
                 0,

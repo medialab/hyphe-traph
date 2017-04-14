@@ -46,5 +46,6 @@ class FileStorage(object):
         self.lru_trie_file.write(node.pack())
 
         block = self.lru_trie_file.tell() / LRU_TRIE_NODE_BLOCK_SIZE
+        node.block = block
 
         return block
