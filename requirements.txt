@@ -1,6 +1,3 @@
-# Dependencies
-numpy
-
 # Dev Dependencies
 pep8
 pymongo
