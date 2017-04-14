@@ -5,7 +5,7 @@
 # Trying to make this whole thing work...
 #
 import os
-from traph import FileStorage, Traph
+from traph import Traph
 
 # Constants
 PAGES = [
@@ -21,8 +21,7 @@ if not os.path.isdir('./scripts/data'):
 # Truncating the file for our purpose
 lruTrieFile = open('./scripts/data/lru_trie.dat', 'wb+')
 
-storage = FileStorage(lruTrieFile)
-traph = Traph(storage)
+traph = Traph(lru_trie_file=lruTrieFile)
 
 for page in PAGES:
     traph.add_page(page)

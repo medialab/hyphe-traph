@@ -5,59 +5,36 @@
 # Main class representing the Traph data structure.
 #
 from walk_history import WalkHistory
+from file_storage import FileStorage
+from memory_storage import MemoryStorage
+from lru_trie import LRUTrie
+from lru_trie_node import LRU_TRIE_NODE_BLOCK_SIZE
 
 
 class Traph(object):
 
-    def __init__(self, storage):
+    # =========================================================================
+    # Constructor
+    # =========================================================================
+    def __init__(self, lru_trie_file=None, links_file=None):
 
         # Properties
-        self.storage = storage
+        if lru_trie_file:
+            self.lru_trie_storage = FileStorage(
+                LRU_TRIE_NODE_BLOCK_SIZE,
+                lru_trie_file
+            )
+        else:
+            self.lru_trie_storage = MemoryStorage(LRU_TRIE_NODE_BLOCK_SIZE)
 
-    # Method used to ensure a char is set within the siblings of the
-    # current node
-    def __require_char_from_siblings(self, block, char):
+        self.lru_trie = LRUTrie(self.lru_trie_storage)
 
-        # Reading the block
-        node = self.storage.read_lru_trie_node(block)
+    # =========================================================================
+    # Internal methods
+    # =========================================================================
 
-        # If the node does not exist, just create it
-        if not node:
-            node = self.storage.create_lru_trie_node(char)
-            self.storage.write_lru_trie_node(node)
-            return node
-
-        # Else we follow the linked list to see if we can find the
-        # relevant sibling
-        if node.char() == char:
-            return node
-
-        while node.hasNext():
-            node = self.storage.read_lru_trie_node(node.next())
-
-            if node.char() == char:
-                return node
-
-        # A relevant node was not found, let's append a sibling to the list
-        sibling = self.storage.create_lru_trie_node(char)
-        block = self.storage.write_lru_trie_node(sibling)
-
-        # Updating the pointer of the last node
-        # TODO: find a way to anticipate move to update the node before we
-        # create the other one, this would be better for the cursor
-        node.setNext(block)
-        self.storage.write_lru_trie_node(node)
-
-        return sibling
-
-
-    # Method used to add a single page to the Traph
+    # =========================================================================
+    # Public interface
+    # =========================================================================
     def add_page(self, lru):
-        walk_history = WalkHistory()
-
-        block = 0
-
-        for char in lru:
-            char = ord(char)
-            node = self.__require_char_from_siblings(block, char)
-
+        self.lru_trie.add_page(lru)

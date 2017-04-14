@@ -5,47 +5,44 @@
 # Class abstracting random access file handling for the Traph.
 #
 import os
-from lru_trie_node import LRUTrieNode, LRU_TRIE_NODE_BLOCK_SIZE
 
 
-# Function computing the offset for the given block in the LRU trie
-def lru_trie_block_offset(block):
-    return block * LRU_TRIE_NODE_BLOCK_SIZE
-
-
+# Main class
 class FileStorage(object):
 
-    def __init__(self, lru_trie_file):
+    def __init__(self, block_size, file):
 
         # Properties
-        self.lru_trie_file = lru_trie_file
-        self.lru_trie_file_cursor = 0
+        self.block_size = block_size
+        self.file = file
 
-    def read_lru_trie_node(self, block):
-        offset = lru_trie_block_offset(block)
+    # Method returning a block offset in the file
+    def __block_offset(self, block):
+        return self.block_size * block
 
-        self.lru_trie_file.seek(offset)
+    # Method reading a block in the file and returning the contained node
+    def read(self, block):
+        offset = self.__block_offset(block)
 
-        binary_data = self.lru_trie_file.read(LRU_TRIE_NODE_BLOCK_SIZE)
+        self.file.seek(offset)
 
-        if not binary_data:
+        data = self.file.read(self.block_size)
+
+        if not data:
             return None
 
-        return LRUTrieNode(binary_data=binary_data, block=block)
+        return data
 
-    def create_lru_trie_node(self, char):
-        return LRUTrieNode(char)
-
-    def write_lru_trie_node(self, node):
-        if node.block:
-            offset = lru_trie_block_offset(block)
-            self.lru_trie_file.seek(offset)
+    # Method writing a node
+    def write(self, data, block=None):
+        if block is not None:
+            offset = self.__block_offset(block)
+            self.file.seek(offset)
         else:
-            self.lru_trie_file.seek(0, os.SEEK_END)
+            self.file.seek(0, os.SEEK_END)
 
-        self.lru_trie_file.write(node.pack())
+        self.file.write(data)
 
-        block = self.lru_trie_file.tell() / LRU_TRIE_NODE_BLOCK_SIZE
-        node.block = block
+        block = (self.file.tell() - self.block_size) / self.block_size
 
         return block
