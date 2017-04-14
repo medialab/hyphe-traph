@@ -4,6 +4,9 @@
 #
 # Class representing a single node from the LRU trie.
 #
+# Note that it should be possible to speed up targeted updates by only
+# writing the updated fields (typically when setting a pointer).
+#
 import struct
 
 # Binary format
@@ -13,8 +16,25 @@ LRU_TRIE_NODE_BLOCK_SIZE = 40
 
 # Positions
 LRU_TRIE_NODE_CHAR = 0
+LRU_TRIE_NODE_FLAGS = 1
 LRU_TRIE_NODE_NEXT_BLOCK = 4
 LRU_TRIE_NODE_CHILD_BLOCK = 5
+
+# Flags
+LRU_TRIE_NODE_FLAG_PAGE = 0
+
+
+# Helpers
+def flag(data, register, pos):
+    data[register] |= (1 << pos)
+
+
+def unflag(data, register, pos):
+    data[register] &= ~(1 << pos)
+
+
+def test(data, register, pos):
+    return bool((data[register] >> pos) & 1)
 
 
 # Main class
@@ -73,6 +93,7 @@ class LRUTrieNode(object):
             self.exists = False
             self.__set_default_data()
         else:
+            self.exists = True
             self.data = self.unpack(data)
             self.block = block
 
@@ -82,7 +103,21 @@ class LRUTrieNode(object):
 
     # Method used to write the node's data to storage
     def write(self):
-        self.storage.write(self.pack(), self.block)
+        block = self.storage.write(self.pack(), self.block)
+        self.block = block
+        self.exists = True
+
+    # =========================================================================
+    # Flags related-methods
+    # =========================================================================
+    def is_page(self):
+        return test(self.data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_PAGE)
+
+    def flag_as_page(self):
+        flag(self.data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_PAGE)
+
+    def unflag_as_page(self):
+        unflag(self.data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_PAGE)
 
     # =========================================================================
     # Character-related methods
@@ -91,6 +126,10 @@ class LRUTrieNode(object):
     # Method used to retrieve the node's char
     def char(self):
         return self.data[LRU_TRIE_NODE_CHAR]
+
+    # Method used to retrieve the node's char as a string
+    def char_as_str(self):
+        return chr(self.char())
 
     # Method used to set the node's char
     def set_char(self, char):
@@ -125,6 +164,14 @@ class LRUTrieNode(object):
 
         self.read(self.next())
 
+    # Method used to get next node
+    def next_node(self):
+        if not self.has_next():
+            print "TODO: traversal exception"
+            return
+
+        return LRUTrieNode(self.storage, block=self.next())
+
     # =========================================================================
     # Child block related-methods
     # =========================================================================
@@ -153,6 +200,14 @@ class LRUTrieNode(object):
             return
 
         self.read(self.child())
+
+    # Method used to get child node
+    def child_node(self):
+        if not self.has_child():
+            print "TODO: traversal exception"
+            return
+
+        return LRUTrieNode(self.storage, block=self.child())
 
 # Static properties
 LRUTrieNode.block_fmt = LRU_TRIE_NODE_FORMAT
