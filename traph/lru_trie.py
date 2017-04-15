@@ -112,7 +112,7 @@ class LRUTrie(object):
                 stack.append((node.child_node(), lru + node.char_as_str()))
 
             if node.has_next():
-                stack.append((node.next_node(), lru + node.char_as_str()))
+                stack.append((node.next_node(), lru))
 
     # =========================================================================
     # Debug methods
