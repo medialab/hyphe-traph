@@ -37,6 +37,11 @@ def test(data, register, pos):
     return bool((data[register] >> pos) & 1)
 
 
+# Exceptions
+class LRUTrieNodeTraversalException(Exception):
+    pass
+
+
 # Main class
 class LRUTrieNode(object):
 
@@ -159,16 +164,14 @@ class LRUTrieNode(object):
     # Method used to read the next sibling
     def read_next(self):
         if not self.has_next():
-            print "TODO: traversal exception"
-            return
+            raise LRUTrieNodeTraversalException('Node has no next sibling.')
 
         self.read(self.next())
 
     # Method used to get next node
     def next_node(self):
         if not self.has_next():
-            print "TODO: traversal exception"
-            return
+            raise LRUTrieNodeTraversalException('Node has no next sibling.')
 
         return LRUTrieNode(self.storage, block=self.next())
 
@@ -196,16 +199,14 @@ class LRUTrieNode(object):
     # Method used to read the next sibling
     def read_child(self):
         if not self.has_child():
-            print "TODO: traversal exception"
-            return
+            raise LRUTrieNodeTraversalException('Node has no child.')
 
         self.read(self.child())
 
     # Method used to get child node
     def child_node(self):
         if not self.has_child():
-            print "TODO: traversal exception"
-            return
+            raise LRUTrieNodeTraversalException('Node has no child.')
 
         return LRUTrieNode(self.storage, block=self.child())
 
