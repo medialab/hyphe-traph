@@ -209,7 +209,3 @@ class LRUTrieNode(object):
             raise LRUTrieNodeTraversalException('Node has no child.')
 
         return LRUTrieNode(self.storage, block=self.child())
-
-# Static properties
-LRUTrieNode.block_fmt = LRU_TRIE_NODE_FORMAT
-LRUTrieNode.block_size = LRU_TRIE_NODE_BLOCK_SIZE
