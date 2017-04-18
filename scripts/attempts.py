@@ -28,7 +28,7 @@ for page in PAGES:
 
 # traph.lru_trie.log()
 
-for page in traph.lru_trie.pages_iter():
-    print page
+# for page in traph.lru_trie.pages_iter():
+#     print page
 
 lruTrieFile.close()

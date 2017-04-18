@@ -79,7 +79,10 @@ class LRUTrie(object):
             node = self.__require_char_from_siblings(node, char)
 
             # Need to link a created child to the parent?
+            # TODO: this part can probably be rewritten to better write data
             if parent_node:
+                node.set_parent(parent_node.block)
+                node.write()
                 parent_node.set_child(node.block)
                 parent_node.write()
 
@@ -99,34 +102,43 @@ class LRUTrie(object):
     # =========================================================================
     # Iteration methods
     # =========================================================================
+    def dfs_iter(self):
+        node = self.__root()
+
+        if not node.exists:
+            return
+
+        descending = True
+        lru = ''
+
+        while True:
+
+            # When descending, we yield the node
+            if descending:
+                yield node, lru + node.char_as_str()
+
+            # Descending to the child
+            if descending and node.has_child():
+                lru = lru + node.char_as_str()
+                node.read_child()
+                continue
+
+            # Following next sibling
+            if not descending and node.has_next():
+                descending = True
+                node.read_next()
+                continue
+
+            # Ascending to the parent again
+            if not node.is_root():
+                descending = False
+                lru = lru[:-1]
+                node.read_parent()
+                continue
+
+            return
+
     def pages_iter(self):
-        stack = [(self.__root(), '')]
-
-        while len(stack):
-            node, lru = stack.pop()
-
+        for node, lru in self.dfs_iter():
             if node.is_page():
-                yield lru + node.char_as_str()
-
-            if node.has_child():
-                stack.append((node.child_node(), lru + node.char_as_str()))
-
-            if node.has_next():
-                stack.append((node.next_node(), lru))
-
-    # =========================================================================
-    # Debug methods
-    # =========================================================================
-    def log(self):
-
-        stack = [(self.__root(), 0)]
-
-        while len(stack):
-            node, level = stack.pop()
-            print '-' * level, node.char_as_str()
-
-            if node.has_next():
-                stack.append((node.next_node(), level))
-
-            if node.has_child():
-                stack.append((node.child_node(), level + 1))
+                yield lru

@@ -19,6 +19,7 @@ LRU_TRIE_NODE_CHAR = 0
 LRU_TRIE_NODE_FLAGS = 1
 LRU_TRIE_NODE_NEXT_BLOCK = 4
 LRU_TRIE_NODE_CHILD_BLOCK = 5
+LRU_TRIE_NODE_PARENT_BLOCK = 6
 
 # Flags
 LRU_TRIE_NODE_FLAG_PAGE = 0
@@ -73,7 +74,7 @@ class LRUTrieNode(object):
             0,          # Flags
             0,          # Next block
             0,          # Child block
-            0,
+            0,          # Parent block
             0,
             0,
             0,
@@ -111,6 +112,10 @@ class LRUTrieNode(object):
         block = self.storage.write(self.pack(), self.block)
         self.block = block
         self.exists = True
+
+    # Method returning whether this node is the root
+    def is_root(self):
+        return self.block == 0
 
     # =========================================================================
     # Flags related-methods
@@ -192,11 +197,11 @@ class LRUTrieNode(object):
 
         return block
 
-    # Method used to set a sibling
+    # Method used to set a child
     def set_child(self, block):
         self.data[LRU_TRIE_NODE_CHILD_BLOCK] = block
 
-    # Method used to read the next sibling
+    # Method used to read the child
     def read_child(self):
         if not self.has_child():
             raise LRUTrieNodeTraversalException('Node has no child.')
@@ -209,3 +214,25 @@ class LRUTrieNode(object):
             raise LRUTrieNodeTraversalException('Node has no child.')
 
         return LRUTrieNode(self.storage, block=self.child())
+
+    # =========================================================================
+    # Parent block related-methods
+    # =========================================================================
+
+    # Method used to retrieve the parent block
+    def parent(self):
+        block = self.data[LRU_TRIE_NODE_PARENT_BLOCK]
+
+        return block
+
+    # Method used to set a parent
+    def set_parent(self, block):
+        self.data[LRU_TRIE_NODE_PARENT_BLOCK] = block
+
+    # Method used to read the parent
+    def read_parent(self):
+        self.read(self.parent())
+
+    # Method used to get parent node
+    def parent_node(self):
+        return LRUTrieNode(self.storage, block=self.parent())
