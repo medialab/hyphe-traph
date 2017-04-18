@@ -102,6 +102,13 @@ class LRUTrie(object):
     # =========================================================================
     # Iteration methods
     # =========================================================================
+    def nodes_iter(self):
+        node = self.__root()
+
+        while node.exists:
+            yield node
+            node.read(block=node.block + 1)
+
     def dfs_iter(self):
         node = self.__root()
 
@@ -119,12 +126,13 @@ class LRUTrie(object):
 
             # Descending to the child
             if descending and node.has_child():
+                descending = True
                 lru = lru + node.char_as_str()
                 node.read_child()
                 continue
 
             # Following next sibling
-            if not descending and node.has_next():
+            if node.has_next():
                 descending = True
                 node.read_next()
                 continue

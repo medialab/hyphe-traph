@@ -24,8 +24,11 @@ collection = client['hyphe']['AXA.pages']
 i = 0
 for page in collection.find({}, sort=[("_job", 1)]):
     i += 1
-    print '(%i) [%i] - %s' % (i, len(page['lrulinks']), page['lru'])
+
     traph.add_page(page['lru'])
+
+    if i % 1000 == 0:
+        print '(%i) [%i] - %s' % (i, len(page['lrulinks']), page['lru'])
 
     # for link in page['lrulinks']:
     #     traph.add_page(link)
