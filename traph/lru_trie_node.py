@@ -10,16 +10,24 @@
 import struct
 
 # Binary format
-# NOTE: the format may induce some padding to avoid odd numbers for performance
-LRU_TRIE_NODE_FORMAT = 'BBBBIIIIIIIII'
-LRU_TRIE_NODE_BLOCK_SIZE = 40
+# -
+# NOTE: Since python mimics C struct, the block size should be respecting
+# some rules (namely have even addresses or addresses divisble by 4 on some
+# architecture).
+# -
+# Reference: http://stackoverflow.com/questions/2611858/struct-error-unpack-requires-a-string-argument-of-length-4
+# -
+# TODO: When the format is stabilized, we should order the bytes correctly as
+# with a C struct to optimize block size & save up some space.
+LRU_TRIE_NODE_FORMAT = '2B3Q'
+LRU_TRIE_NODE_BLOCK_SIZE = struct.calcsize(LRU_TRIE_NODE_FORMAT)
 
 # Positions
 LRU_TRIE_NODE_CHAR = 0
 LRU_TRIE_NODE_FLAGS = 1
-LRU_TRIE_NODE_NEXT_BLOCK = 4
-LRU_TRIE_NODE_CHILD_BLOCK = 5
-LRU_TRIE_NODE_PARENT_BLOCK = 6
+LRU_TRIE_NODE_NEXT_BLOCK = 2
+LRU_TRIE_NODE_CHILD_BLOCK = 3
+LRU_TRIE_NODE_PARENT_BLOCK = 4
 
 # Flags
 LRU_TRIE_NODE_FLAG_PAGE = 0
@@ -70,17 +78,9 @@ class LRUTrieNode(object):
         self.data = [
             char or 0,  # Character
             0,          # Flags
-            0,          # Flags
-            0,          # Flags
             0,          # Next block
             0,          # Child block
-            0,          # Parent block
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
+            0           # Parent block
         ]
 
     # =========================================================================
