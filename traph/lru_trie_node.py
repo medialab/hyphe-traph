@@ -51,6 +51,10 @@ class LRUTrieNodeTraversalException(Exception):
     pass
 
 
+class LRUTrieNodeUsageException(Exception):
+    pass
+
+
 # Main class
 class LRUTrieNode(object):
 
@@ -164,6 +168,9 @@ class LRUTrieNode(object):
 
     # Method used to set a sibling
     def set_next(self, block):
+        if block == 0:
+            raise LRUTrieNodeUsageException('Next node cannot be the root.')
+
         self.data[LRU_TRIE_NODE_NEXT_BLOCK] = block
 
     # Method used to read the next sibling
@@ -199,6 +206,9 @@ class LRUTrieNode(object):
 
     # Method used to set a child
     def set_child(self, block):
+        if block == 0:
+            raise LRUTrieNodeUsageException('Child node cannot be the root.')
+
         self.data[LRU_TRIE_NODE_CHILD_BLOCK] = block
 
     # Method used to read the child

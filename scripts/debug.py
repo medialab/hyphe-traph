@@ -15,20 +15,8 @@ if not os.path.isdir('./scripts/data'):
 lruTrieFile = open('./scripts/data/lru_trie.dat', 'rb')
 
 traph = Traph(lru_trie_file=lruTrieFile)
+trie = traph.lru_trie
 
-count = 0
-
-for node in traph.lru_trie.nodes_iter():
-    count += 1
-
-print count
-
-# for node, lru in traph.lru_trie.dfs_iter():
-#     print lru
-
-# print ''
-
-# for page in traph.lru_trie.pages_iter():
-#     print page
+print len(list(trie.pages_iter()))
 
 lruTrieFile.close()

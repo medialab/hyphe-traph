@@ -53,6 +53,9 @@ class LRUTrie(object):
 
         # We did not find a relevant sibling, let's add it
         sibling = self.__node(char=char)
+
+        # The new sibling's parent is the same, obviously
+        sibling.set_parent(node.parent())
         sibling.write()
 
         node.set_next(sibling.block)
@@ -70,7 +73,6 @@ class LRUTrie(object):
         l = len(lru)
 
         node = self.__root()
-        parent_node = None
 
         # Iterating over the lru's characters
         for i in range(l):
@@ -78,22 +80,17 @@ class LRUTrie(object):
 
             node = self.__require_char_from_siblings(node, char)
 
-            # Need to link a created child to the parent?
-            # TODO: this part can probably be rewritten to better write data
-            if parent_node:
-                node.set_parent(parent_node.block)
-                node.write()
-                parent_node.set_child(node.block)
-                parent_node.write()
-
             # Following up through the child
             if i < l - 1:
                 if node.has_child():
-                    parent_node = None
                     node.read_child()
                 else:
                     parent_node = node
-                    node = self.__node()
+                    node = self.__node(char=ord(lru[i + 1]))
+                    node.set_parent(parent_node.block)
+                    node.write()
+                    parent_node.set_child(node.block)
+                    parent_node.write()
 
         # Flagging the node as a page
         node.flag_as_page()
@@ -107,11 +104,24 @@ class LRUTrie(object):
 
         while node.exists:
             yield node
-            node.read(block=node.block + 1)
+            node.read(node.block + 1)
+
+    def node_siblings_iter(self, node):
+        if not node.has_next():
+            return
+
+        sibling = node.next_node()
+
+        yield sibling
+
+        while sibling.has_next():
+            sibling.read_next()
+            yield sibling
 
     def dfs_iter(self):
         node = self.__root()
 
+        # If there is no root node, we can stop right there
         if not node.exists:
             return
 
@@ -120,24 +130,24 @@ class LRUTrie(object):
 
         while True:
 
-            # When descending, we yield the node
+            # When descending, we yield
             if descending:
                 yield node, lru + node.char_as_str()
 
-            # Descending to the child
+            # If we have a child, we descend
             if descending and node.has_child():
                 descending = True
                 lru = lru + node.char_as_str()
                 node.read_child()
                 continue
 
-            # Following next sibling
+            # If we have no child, we follow the next sibling
             if node.has_next():
                 descending = True
                 node.read_next()
                 continue
 
-            # Ascending to the parent again
+            # Else we bubble up
             if not node.is_root():
                 descending = False
                 lru = lru[:-1]
