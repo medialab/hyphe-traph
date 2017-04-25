@@ -18,7 +18,7 @@ class Traph(object):
     # =========================================================================
     # Constructor
     # =========================================================================
-    def __init__(self, lru_trie_file=None, links_store_file=None):
+    def __init__(self, lru_trie_file=None, link_store_file=None):
 
         # LRU Trie initialization
         if lru_trie_file:
@@ -32,14 +32,16 @@ class Traph(object):
         self.lru_trie = LRUTrie(self.lru_trie_storage)
 
         # Link Store initialization
-        if links_store_file:
+        if link_store_file:
             self.links_store_storage = FileStorage(
                 LINK_STORE_NODE_BLOCK_SIZE,
-                links_store_file
+                link_store_file
             )
         else:
             self.links_store_storage = MemoryStorage(
                 LINK_STORE_NODE_BLOCK_SIZE)
+
+        self.link_store = LinkStore(self.links_store_storage)
 
     # =========================================================================
     # Public interface

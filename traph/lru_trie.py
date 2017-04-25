@@ -47,7 +47,6 @@ class LRUTrie(object):
 
             header_block += 1
 
-
     # Method ensuring that a sibling with the desired char exists
     def __ensure_char_from_siblings(self, node, char):
 

@@ -23,6 +23,11 @@ import struct
 # with a C struct to optimize block size & save up some space.
 LINK_STORE_NODE_FORMAT = '2Q1H'
 LINK_STORE_NODE_BLOCK_SIZE = struct.calcsize(LINK_STORE_NODE_FORMAT)
+
+# Header blocks
+# -
+# We are retaining at least one header block so we can keep the 0 block address
+# as a NULL pointer and be able to store some metadata about the structure.
 LINK_STORE_NODE_HEADER_BLOCKS = 1
 
 # Positions
@@ -56,7 +61,54 @@ class LinkStoreNode(object):
 
     def __set_default_data(self):
         self.data = [
-            char or 0,  # Target
-            0,          # Next
-            0           # Weight
+            0,  # Target
+            0,  # Next
+            0   # Weight
         ]
+
+    def __repr__(self):
+        class_name = self.__class__.__name__
+
+        return (
+            '<%(class_name) target=%(target)s'
+            ' next=%(next)s weight=%(weight)s>'
+        ) % {
+            'class_name': class_name,
+            'target': self.target(),
+            'next': self.next(),
+            'weight': self.weight()
+        }
+
+    # =========================================================================
+    # Utilities
+    # =========================================================================
+
+    # Method used to unpack data
+    def unpack(self, data):
+        return list(struct.unpack(LINK_STORE_NODE_FORMAT, data))
+
+    # Method used to set a switch to another block
+    def read(self, block):
+        data = self.storage.read(block)
+
+        if data is None:
+            self.exists = False
+            self.__set_default_data()
+        else:
+            self.exists = True
+            self.data = self.unpack(data)
+            self.block = block
+
+    # Method used to pack the node to binary form
+    def pack(self):
+        return struct.pack(LINK_STORE_NODE_FORMAT, *self.data)
+
+    # Method used to write the node's data to storage
+    def write(self):
+        block = self.storage.write(self.pack(), self.block)
+        self.block = block
+        self.exists = True
+
+    # Method returning whether this node is the root
+    def is_root(self):
+        return self.block == LINK_STORE_NODE_HEADER_BLOCKS
