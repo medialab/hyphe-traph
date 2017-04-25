@@ -86,18 +86,19 @@ class LRUTrie(object):
     # Method adding a lru to the trie
     def add_lru(self, lru):
 
+        # Iteration state
         l = len(lru)
+        i = 0
         history = LRUTrieWalkHistory()
-
         node = self.__root()
 
-        # Iterating over the lru's characters
-        for i in range(l):
+        # Descending the trie
+        while i < l:
             char = ord(lru[i])
 
             node = self.__ensure_char_from_siblings(node, char)
 
-            # Tracking webentities etc.
+            # Tracking webentities
             if node.has_webentity():
                 history.update_webentity(
                     node.webentity(),
@@ -105,23 +106,35 @@ class LRUTrie(object):
                     i
                 )
 
+            # Tracking webentity creation rules
             if node.has_webentity_creation_rule():
                 history.update_webentity_creation_rule(
                     node.webentity_creation_rule(),
                     i
                 )
 
-            # Following up through the child
-            if i < l - 1:
-                if node.has_child():
-                    node.read_child()
-                else:
-                    parent_node = node
-                    node = self.__node(char=ord(lru[i + 1]))
-                    node.set_parent(parent_node.block)
-                    node.write()
-                    parent_node.set_child(node.block)
-                    parent_node.write()
+            i += 1
+
+            if i < l and node.has_child():
+                node.read_child()
+            else:
+                break
+
+        # We went as far as possible, now we add the missing part
+        while i < l:
+            char = ord(lru[i])
+
+            # Creating the child
+            child = self.__node(char=char)
+            child.set_parent(node.block)
+            child.write()
+
+            # Linking the child to its parent
+            node.set_child(child.block)
+            node.write()
+
+            node = child
+            i += 1
 
         return node
 
