@@ -116,7 +116,7 @@ class LRUTrie(object):
     # =========================================================================
     # Read methods
     # =========================================================================
-    def get_lru_node(self, lru):
+    def lru_node(self, lru):
         node = self.__root()
 
         l = len(lru)

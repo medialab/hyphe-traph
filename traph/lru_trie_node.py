@@ -20,7 +20,7 @@ import struct
 # -
 # TODO: When the format is stabilized, we should order the bytes correctly as
 # with a C struct to optimize block size & save up some space.
-LRU_TRIE_NODE_FORMAT = '2B3Q'
+LRU_TRIE_NODE_FORMAT = '2B4Q'
 LRU_TRIE_NODE_BLOCK_SIZE = struct.calcsize(LRU_TRIE_NODE_FORMAT)
 
 # Header blocks
@@ -35,6 +35,7 @@ LRU_TRIE_NODE_FLAGS = 1
 LRU_TRIE_NODE_NEXT_BLOCK = 2
 LRU_TRIE_NODE_CHILD_BLOCK = 3
 LRU_TRIE_NODE_PARENT_BLOCK = 4
+LRU_TRIE_NODE_OUTLINKS_BLOCK = 5
 
 # Flags (Currently allocating 4/8 bits)
 LRU_TRIE_NODE_FLAG_PAGE = 0
@@ -94,16 +95,18 @@ class LRUTrieNode(object):
             0,          # Flags
             0,          # Next block
             0,          # Child block
-            0           # Parent block
+            0,          # Parent block
+            0,          # Outlinks block
         ]
 
     def __repr__(self):
         class_name = self.__class__.__name__
 
         return (
-            '<%(class_name)s(%(char)s)'
+            '<%(class_name)s "%(char)s"'
             ' block=%(block)s exists=%(exists)s'
-            ' parent=%(parent)s child=%(child)s next=%(next)s>'
+            ' parent=%(parent)s child=%(child)s next=%(next)s'
+            ' outlinks=%(outlinks)s>'
         ) % {
             'class_name': class_name,
             'char': self.char_as_str(),
@@ -111,7 +114,8 @@ class LRUTrieNode(object):
             'exists': str(self.exists),
             'parent': self.parent(),
             'child': self.child(),
-            'next': self.next()
+            'next': self.next(),
+            'outlinks': self.outlinks()
         }
 
     # =========================================================================
@@ -188,14 +192,14 @@ class LRUTrieNode(object):
     def next(self):
         block = self.data[LRU_TRIE_NODE_NEXT_BLOCK]
 
-        if block <= LRU_TRIE_NODE_HEADER_BLOCKS:
+        if block < LRU_TRIE_NODE_HEADER_BLOCKS:
             return None
 
         return block
 
     # Method used to set a sibling
     def set_next(self, block):
-        if block <= LRU_TRIE_NODE_HEADER_BLOCKS:
+        if block < LRU_TRIE_NODE_HEADER_BLOCKS:
             raise LRUTrieNodeUsageException('Next node cannot be the root.')
 
         self.data[LRU_TRIE_NODE_NEXT_BLOCK] = block
@@ -226,14 +230,14 @@ class LRUTrieNode(object):
     def child(self):
         block = self.data[LRU_TRIE_NODE_CHILD_BLOCK]
 
-        if block <= LRU_TRIE_NODE_HEADER_BLOCKS:
+        if block < LRU_TRIE_NODE_HEADER_BLOCKS:
             return None
 
         return block
 
     # Method used to set a child
     def set_child(self, block):
-        if block <= LRU_TRIE_NODE_HEADER_BLOCKS:
+        if block < LRU_TRIE_NODE_HEADER_BLOCKS:
             raise LRUTrieNodeUsageException('Child node cannot be the root.')
 
         self.data[LRU_TRIE_NODE_CHILD_BLOCK] = block
@@ -273,3 +277,20 @@ class LRUTrieNode(object):
     # Method used to get parent node
     def parent_node(self):
         return LRUTrieNode(self.storage, block=self.parent())
+
+    # =========================================================================
+    # Outlinks block related-methods
+    # =========================================================================
+
+    # Method used to know whether the outlinks block is set
+    def has_outlinks(self):
+        return self.data[LRU_TRIE_NODE_OUTLINKS_BLOCK] != 0
+
+    # Method used to retrieve the outlinks block
+    def outlinks(self):
+        block = self.data[LRU_TRIE_NODE_OUTLINKS_BLOCK]
+        return block
+
+    # Method used to set the outlinks block
+    def set_outlinks(self, block):
+        self.data[LRU_TRIE_NODE_OUTLINKS_BLOCK] = block

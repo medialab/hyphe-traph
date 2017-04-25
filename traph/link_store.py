@@ -53,28 +53,43 @@ class LinkStore(object):
     # =========================================================================
     # Mutation methods
     # =========================================================================
-    def add_first_link(target_block):
+    def add_first_link(self, target_block):
         node = self.__node()
         node.set_target(target_block)
         node.write()
 
         return node.block
 
-    def add_link(block, target_block):
+    def add_link(self, block, target_block):
         node = self.__node(block=block)
 
         if not node.exists:
             raise LinkStoreTraversalException('Block does not exist.')
 
-        while node.target() != target:
+        while node.target() != target_block and node.has_next():
             node.read_next()
 
-        if node.target() != target:
+        if node.target() != target_block:
             sibling = self.__node()
-            sibling.set_target(target)
+            sibling.set_target(target_block)
             sibling.write()
             node.set_next(sibling.block)
             node.write()
         else:
             node.increment_weight()
             node.write()
+
+    # =========================================================================
+    # Iteration methods
+    # =========================================================================
+    def link_nodes_iter(self, block):
+        node = self.__node(block=block)
+
+        if not node.exists:
+            raise LinkStoreTraversalException('Block does not exist.')
+
+        yield node
+
+        while node.has_next():
+            node.read_next()
+            yield node

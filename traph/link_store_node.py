@@ -80,10 +80,12 @@ class LinkStoreNode(object):
         class_name = self.__class__.__name__
 
         return (
-            '<%(class_name) target=%(target)s'
-            ' next=%(next)s weight=%(weight)s>'
+            '<%(class_name)s block=%(block)s exists=%(exists)s'
+            ' target=%(target)s next=%(next)s weight=%(weight)s>'
         ) % {
             'class_name': class_name,
+            'block': self.block,
+            'exists': self.exists,
             'target': self.target(),
             'next': self.next(),
             'weight': self.weight()
@@ -135,14 +137,14 @@ class LinkStoreNode(object):
     def next(self):
         block = self.data[LINK_STORE_NODE_NEXT]
 
-        if block <= LINK_STORE_NODE_HEADER_BLOCKS:
+        if block < LINK_STORE_NODE_HEADER_BLOCKS:
             return None
 
         return block
 
     # Method used to set a sibling
     def set_next(self, block):
-        if block <= LINK_STORE_NODE_HEADER_BLOCKS:
+        if block < LINK_STORE_NODE_HEADER_BLOCKS:
             raise LinkStoreNodeUsageException('Next node cannot be the root.')
 
         self.data[LINK_STORE_NODE_NEXT] = block
@@ -173,15 +175,17 @@ class LinkStoreNode(object):
     def target(self):
         block = self.data[LINK_STORE_NODE_TARGET]
 
-        if block <= LRU_TRIE_NODE_HEADER_BLOCKS:
+        if block < LRU_TRIE_NODE_HEADER_BLOCKS:
             return None
 
         return block
 
     # Method used to set the target block
-    def set_next(self, block):
-        if block <= LRU_TRIE_NODE_HEADER_BLOCKS:
-            raise LinkStoreNodeUsageException('Next node cannot be the root.')
+    def set_target(self, block):
+        if block < LRU_TRIE_NODE_HEADER_BLOCKS:
+            raise LinkStoreNodeUsageException(
+                'Target node cannot be the root.'
+            )
 
         self.data[LINK_STORE_NODE_TARGET] = block
 
@@ -196,4 +200,3 @@ class LinkStoreNode(object):
 
     def increment_weight(self):
         self.data[LINK_STORE_NODE_WEIGHT] += 1
-
