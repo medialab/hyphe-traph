@@ -21,7 +21,7 @@ import struct
 # TODO: When the format is stabilized, we should order the bytes correctly as
 # with a C struct to optimize block size & save up some space.
 LINK_STORE_NODE_FORMAT = '2Q1H'
-LINK_STORE_NODE_SIZE = struct.calcsize(LINK_STORE_NODE_FORMAT)
+LINK_STORE_NODE_BLOCK_SIZE = struct.calcsize(LINK_STORE_NODE_FORMAT)
 
 # Positions
 LINK_STORE_NODE_TARGET = 0

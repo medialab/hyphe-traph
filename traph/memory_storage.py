@@ -9,16 +9,15 @@
 # Main class
 class MemoryStorage(object):
 
-    def __init__(self, Node):
+    def __init__(self, block_size):
 
         # Properties
-        self.Node = Node
-        self.block_size = self.Node.block_size
+        self.block_size = block_size
         self.array = bytearray()
 
     # Method returning a block offset in the file
     def __block_offset(self, block):
-        return self.Node.block_size * block
+        return self.block_size * block
 
     # Method reading a block in the bytearray
     def read(self, block):
@@ -29,7 +28,7 @@ class MemoryStorage(object):
 
         data = self.array[offset:self.block_size]
 
-        return self.Node(self, data=data, block=block)
+        return data
 
     # Method writing a node
     def write(self, data, block=None):
