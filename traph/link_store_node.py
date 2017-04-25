@@ -16,13 +16,7 @@ from lru_trie_node import LRU_TRIE_NODE_HEADER_BLOCKS
 # NOTE: Since python mimics C struct, the block size should be respecting
 # some rules (namely have even addresses or addresses divisble by 4 on some
 # architecture).
-# -
-# Reference: http://stackoverflow.com/questions/2611858/
-#   struct-error-unpack-requires-a-string-argument-of-length-4
-# -
-# TODO: When the format is stabilized, we should order the bytes correctly as
-# with a C struct to optimize block size & save up some space.
-LINK_STORE_NODE_FORMAT = '2Q1H'
+LINK_STORE_NODE_FORMAT = 'QQH'
 LINK_STORE_NODE_BLOCK_SIZE = struct.calcsize(LINK_STORE_NODE_FORMAT)
 
 # Header blocks
@@ -126,7 +120,7 @@ class LinkStoreNode(object):
         return self.block == LINK_STORE_NODE_HEADER_BLOCKS
 
     # =========================================================================
-    # Next block-related methods
+    # Next block methods
     # =========================================================================
 
     # Method used to know whether the next block is set
@@ -164,7 +158,7 @@ class LinkStoreNode(object):
         return LRUTrieNode(self.storage, block=self.next())
 
     # =========================================================================
-    # Target block-related methods
+    # Target block methods
     # =========================================================================
 
     # Method used to know whether the target block is set
@@ -190,7 +184,7 @@ class LinkStoreNode(object):
         self.data[LINK_STORE_NODE_TARGET] = block
 
     # =========================================================================
-    # Weight-related methods
+    # Weight methods
     # =========================================================================
     def weight(self):
         return self.data[LINK_STORE_NODE_WEIGHT]

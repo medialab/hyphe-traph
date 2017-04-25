@@ -14,13 +14,7 @@ import struct
 # NOTE: Since python mimics C struct, the block size should be respecting
 # some rules (namely have even addresses or addresses divisble by 4 on some
 # architecture).
-# -
-# Reference: http://stackoverflow.com/questions/2611858/
-#   struct-error-unpack-requires-a-string-argument-of-length-4
-# -
-# TODO: When the format is stabilized, we should order the bytes correctly as
-# with a C struct to optimize block size & save up some space.
-LRU_TRIE_NODE_FORMAT = '2B4Q'
+LRU_TRIE_NODE_FORMAT = 'BBxxxxxxQQQQII'
 LRU_TRIE_NODE_BLOCK_SIZE = struct.calcsize(LRU_TRIE_NODE_FORMAT)
 
 # Header blocks
@@ -36,6 +30,8 @@ LRU_TRIE_NODE_NEXT_BLOCK = 2
 LRU_TRIE_NODE_CHILD_BLOCK = 3
 LRU_TRIE_NODE_PARENT_BLOCK = 4
 LRU_TRIE_NODE_OUTLINKS_BLOCK = 5
+LRU_TRIE_NODE_WEBENTITY = 6
+LRU_TRIE_NODE_WEBENTITY_CREATION_RULE = 7
 
 # Flags (Currently allocating 4/8 bits)
 LRU_TRIE_NODE_FLAG_PAGE = 0
@@ -97,6 +93,8 @@ class LRUTrieNode(object):
             0,          # Child block
             0,          # Parent block
             0,          # Outlinks block
+            0,          # Webentity
+            0,          # Webentity creation rule
         ]
 
     def __repr__(self):
@@ -153,7 +151,7 @@ class LRUTrieNode(object):
         return self.block == LRU_TRIE_NODE_HEADER_BLOCKS
 
     # =========================================================================
-    # Flags related-methods
+    # Flags methods
     # =========================================================================
     def is_page(self):
         return test(self.data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_PAGE)
@@ -165,7 +163,7 @@ class LRUTrieNode(object):
         unflag(self.data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_PAGE)
 
     # =========================================================================
-    # Character-related methods
+    # Character methods
     # =========================================================================
 
     # Method used to retrieve the node's char
@@ -181,7 +179,7 @@ class LRUTrieNode(object):
         self.data[LRU_TRIE_NODE_CHAR] = char
 
     # =========================================================================
-    # Next block-related methods
+    # Next block methods
     # =========================================================================
 
     # Method used to know whether the next block is set
@@ -219,7 +217,7 @@ class LRUTrieNode(object):
         return LRUTrieNode(self.storage, block=self.next())
 
     # =========================================================================
-    # Child block related-methods
+    # Child block methods
     # =========================================================================
 
     # Method used to know whether the child block is set
@@ -257,7 +255,7 @@ class LRUTrieNode(object):
         return LRUTrieNode(self.storage, block=self.child())
 
     # =========================================================================
-    # Parent block related-methods
+    # Parent block methods
     # =========================================================================
 
     # Method used to retrieve the parent block
@@ -279,7 +277,7 @@ class LRUTrieNode(object):
         return LRUTrieNode(self.storage, block=self.parent())
 
     # =========================================================================
-    # Outlinks block related-methods
+    # Outlinks block methods
     # =========================================================================
 
     # Method used to know whether the outlinks block is set
@@ -294,3 +292,47 @@ class LRUTrieNode(object):
     # Method used to set the outlinks block
     def set_outlinks(self, block):
         self.data[LRU_TRIE_NODE_OUTLINKS_BLOCK] = block
+
+    # =========================================================================
+    # WebEntity methods
+    # =========================================================================
+
+    # Method used to know whether the node has a webentity flag
+    def has_webentity(self):
+        return self.data[LRU_TRIE_NODE_WEBENTITY] != 0
+
+    # Method used to retrieve the webentity id of the flag
+    def webentity(self):
+        webentity_id = self.data[LRU_TRIE_NODE_WEBENTITY]
+
+        if webentity_id == 0:
+            return None
+
+        return webentity_id
+
+    # Method used to set the webentity flag
+    def set_webentity(self, webentity_id):
+        self.data[LRU_TRIE_NODE_WEBENTITY] = webentity_id
+
+    # =========================================================================
+    # WebEntity creation rules methods
+    # =========================================================================
+
+    # Method used to know whether the node has a webentity creation rule flag
+    def has_webentity_creation_rule(self):
+        return self.data[LRU_TRIE_NODE_WEBENTITY_CREATION_RULE] != 0
+
+    # Method used to retrieve the webentity creation rule id of the flag
+    def webentity_creation_rule(self):
+        webentity_creation_rule_id = \
+            self.data[LRU_TRIE_NODE_WEBENTITY_CREATION_RULE]
+
+        if webentity_creation_rule_id == 0:
+            return None
+
+        return webentity_creation_rule_id
+
+    # Method used to set the webentity flag
+    def set_webentity_creation_rule(self, webentity_creation_rule_id):
+        self.data[LRU_TRIE_NODE_WEBENTITY_CREATION_RULE] = \
+            webentity_creation_rule_id

@@ -5,7 +5,7 @@
 # Trying to make this whole thing work...
 #
 from traph import Traph
-from scripts.utils.web_entity_store import WebEntityStore
+from scripts.utils.webentity_store import WebEntityStore
 
 # Constants
 PAGES = [
