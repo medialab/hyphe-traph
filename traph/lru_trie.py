@@ -111,6 +111,32 @@ class LRUTrie(object):
         node.flag_as_page()
         node.write()
 
+        return node
+
+    # =========================================================================
+    # Read methods
+    # =========================================================================
+    def get_lru_node(self, lru):
+        node = self.__root()
+
+        l = len(lru)
+
+        for i in range(l):
+            char = ord(lru[i])
+
+            while node.char() != char:
+                if not node.has_next():
+                    return
+                node.read_next()
+
+            if i < l - 1:
+                if not node.has_child():
+                    return
+                else:
+                    node.read_child()
+
+        return node
+
     # =========================================================================
     # Iteration methods
     # =========================================================================
@@ -174,4 +200,4 @@ class LRUTrie(object):
     def pages_iter(self):
         for node, lru in self.dfs_iter():
             if node.is_page():
-                yield lru
+                yield node, lru

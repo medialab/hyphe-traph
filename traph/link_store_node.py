@@ -9,6 +9,7 @@
 # time being.
 #
 import struct
+from lru_trie_node import LRU_TRIE_NODE_HEADER_BLOCKS
 
 # Binary format
 # -
@@ -34,6 +35,15 @@ LINK_STORE_NODE_HEADER_BLOCKS = 1
 LINK_STORE_NODE_TARGET = 0
 LINK_STORE_NODE_NEXT = 1
 LINK_STORE_NODE_WEIGHT = 2
+
+
+# Exceptions
+class LinkStoreNodeTraversalException(Exception):
+    pass
+
+
+class LinkStoreNodeUsageException(Exception):
+    pass
 
 
 # Main class
@@ -63,7 +73,7 @@ class LinkStoreNode(object):
         self.data = [
             0,  # Target
             0,  # Next
-            0   # Weight
+            1   # Weight
         ]
 
     def __repr__(self):
@@ -112,3 +122,78 @@ class LinkStoreNode(object):
     # Method returning whether this node is the root
     def is_root(self):
         return self.block == LINK_STORE_NODE_HEADER_BLOCKS
+
+    # =========================================================================
+    # Next block-related methods
+    # =========================================================================
+
+    # Method used to know whether the next block is set
+    def has_next(self):
+        return self.data[LINK_STORE_NODE_NEXT] != 0
+
+    # Method used to retrieve the next block
+    def next(self):
+        block = self.data[LINK_STORE_NODE_NEXT]
+
+        if block <= LINK_STORE_NODE_HEADER_BLOCKS:
+            return None
+
+        return block
+
+    # Method used to set a sibling
+    def set_next(self, block):
+        if block <= LINK_STORE_NODE_HEADER_BLOCKS:
+            raise LinkStoreNodeUsageException('Next node cannot be the root.')
+
+        self.data[LINK_STORE_NODE_NEXT] = block
+
+    # Method used to read the next sibling
+    def read_next(self):
+        if not self.has_next():
+            raise LinkStoreNodeTraversalException('Node has no next sibling.')
+
+        self.read(self.next())
+
+    # Method used to get next node
+    def next_node(self):
+        if not self.has_next():
+            raise LinkStoreNodeTraversalException('Node has no next sibling.')
+
+        return LRUTrieNode(self.storage, block=self.next())
+
+    # =========================================================================
+    # Target block-related methods
+    # =========================================================================
+
+    # Method used to know whether the target block is set
+    def has_target(self):
+        return self.data[LINK_STORE_NODE_TARGET] != 0
+
+    # Method used to retrieve the target block
+    def target(self):
+        block = self.data[LINK_STORE_NODE_TARGET]
+
+        if block <= LRU_TRIE_NODE_HEADER_BLOCKS:
+            return None
+
+        return block
+
+    # Method used to set the target block
+    def set_next(self, block):
+        if block <= LRU_TRIE_NODE_HEADER_BLOCKS:
+            raise LinkStoreNodeUsageException('Next node cannot be the root.')
+
+        self.data[LINK_STORE_NODE_TARGET] = block
+
+    # =========================================================================
+    # Weight-related methods
+    # =========================================================================
+    def weight(self):
+        return self.data[LINK_STORE_NODE_WEIGHT]
+
+    def set_weight(self, weight):
+        self.data[LINK_STORE_NODE_WEIGHT] = weight
+
+    def increment_weight(self):
+        self.data[LINK_STORE_NODE_WEIGHT] += 1
+

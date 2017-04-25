@@ -7,6 +7,12 @@
 from link_store_node import LinkStoreNode, LINK_STORE_NODE_HEADER_BLOCKS
 
 
+# Exceptions
+class LinkStoreTraversalException(Exception):
+    pass
+
+
+# Main class
 class LinkStore(object):
 
     # =========================================================================
@@ -43,3 +49,32 @@ class LinkStore(object):
                 header_node.write()
 
             header_block += 1
+
+    # =========================================================================
+    # Mutation methods
+    # =========================================================================
+    def add_first_link(target_block):
+        node = self.__node()
+        node.set_target(target_block)
+        node.write()
+
+        return node.block
+
+    def add_link(block, target_block):
+        node = self.__node(block=block)
+
+        if not node.exists:
+            raise LinkStoreTraversalException('Block does not exist.')
+
+        while node.target() != target:
+            node.read_next()
+
+        if node.target() != target:
+            sibling = self.__node()
+            sibling.set_target(target)
+            sibling.write()
+            node.set_next(sibling.block)
+            node.write()
+        else:
+            node.increment_weight()
+            node.write()
