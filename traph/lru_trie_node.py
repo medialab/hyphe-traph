@@ -15,12 +15,19 @@ import struct
 # some rules (namely have even addresses or addresses divisble by 4 on some
 # architecture).
 # -
-# Reference: http://stackoverflow.com/questions/2611858/struct-error-unpack-requires-a-string-argument-of-length-4
+# Reference: http://stackoverflow.com/questions/2611858/
+#   struct-error-unpack-requires-a-string-argument-of-length-4
 # -
 # TODO: When the format is stabilized, we should order the bytes correctly as
 # with a C struct to optimize block size & save up some space.
 LRU_TRIE_NODE_FORMAT = '2B3Q'
 LRU_TRIE_NODE_BLOCK_SIZE = struct.calcsize(LRU_TRIE_NODE_FORMAT)
+
+# Header blocks
+# -
+# We are retaining at least one header block so we can keep the 0 block address
+# as a NULL pointer and be able to store some metadata about the structure.
+LRU_TRIE_NODE_HEADER_BLOCKS = 1
 
 # Positions
 LRU_TRIE_NODE_CHAR = 0
@@ -29,10 +36,11 @@ LRU_TRIE_NODE_NEXT_BLOCK = 2
 LRU_TRIE_NODE_CHILD_BLOCK = 3
 LRU_TRIE_NODE_PARENT_BLOCK = 4
 
-# Flags (Currently allocation 3/8 bits)
+# Flags (Currently allocating 4/8 bits)
 LRU_TRIE_NODE_FLAG_PAGE = 0
 LRU_TRIE_NODE_FLAG_CRAWLED = 1
 LRU_TRIE_NODE_FLAG_LINKED = 2
+LRU_TRIE_NODE_FLAG_DELETED = 3
 
 
 # Helpers
@@ -81,13 +89,30 @@ class LRUTrieNode(object):
             self.__set_default_data(char)
 
     def __set_default_data(self, char=None):
-        self.data = (
+        self.data = [
             char or 0,  # Character
             0,          # Flags
             0,          # Next block
             0,          # Child block
             0           # Parent block
-        )
+        ]
+
+    def __repr__(self):
+        class_name = self.__class__.__name__
+
+        return (
+            '<%(class_name)s(%(char)s)'
+            ' block=%(block)s exists=%(exists)s'
+            ' parent=%(parent)s child=%(child)s next=%(next)s>'
+        ) % {
+            'class_name': class_name,
+            'char': self.char_as_str(),
+            'block': self.block,
+            'exists': str(self.exists),
+            'parent': self.parent(),
+            'child': self.child(),
+            'next': self.next()
+        }
 
     # =========================================================================
     # Utilities
@@ -121,7 +146,7 @@ class LRUTrieNode(object):
 
     # Method returning whether this node is the root
     def is_root(self):
-        return self.block == 0
+        return self.block == LRU_TRIE_NODE_HEADER_BLOCKS
 
     # =========================================================================
     # Flags related-methods
@@ -163,14 +188,14 @@ class LRUTrieNode(object):
     def next(self):
         block = self.data[LRU_TRIE_NODE_NEXT_BLOCK]
 
-        if block == 0:
+        if block <= LRU_TRIE_NODE_HEADER_BLOCKS:
             return None
 
         return block
 
     # Method used to set a sibling
     def set_next(self, block):
-        if block == 0:
+        if block <= LRU_TRIE_NODE_HEADER_BLOCKS:
             raise LRUTrieNodeUsageException('Next node cannot be the root.')
 
         self.data[LRU_TRIE_NODE_NEXT_BLOCK] = block
@@ -201,14 +226,14 @@ class LRUTrieNode(object):
     def child(self):
         block = self.data[LRU_TRIE_NODE_CHILD_BLOCK]
 
-        if block == 0:
+        if block <= LRU_TRIE_NODE_HEADER_BLOCKS:
             return None
 
         return block
 
     # Method used to set a child
     def set_child(self, block):
-        if block == 0:
+        if block <= LRU_TRIE_NODE_HEADER_BLOCKS:
             raise LRUTrieNodeUsageException('Child node cannot be the root.')
 
         self.data[LRU_TRIE_NODE_CHILD_BLOCK] = block

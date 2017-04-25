@@ -7,7 +7,7 @@
 # Note that we only process raw ascii bytes as string for the moment and not
 # UTF-16 characters.
 #
-from lru_trie_node import LRUTrieNode
+from lru_trie_node import LRUTrieNode, LRU_TRIE_NODE_HEADER_BLOCKS
 
 
 class LRUTrie(object):
@@ -20,6 +20,9 @@ class LRUTrie(object):
         # Properties
         self.storage = storage
 
+        # Ensuring headers are written
+        self.__ensure_headers()
+
     # =========================================================================
     # Internal methods
     # =========================================================================
@@ -30,10 +33,23 @@ class LRUTrie(object):
 
     # Method returning root node
     def __root(self):
-        return self.__node(block=0)
+        return self.__node(block=LRU_TRIE_NODE_HEADER_BLOCKS)
+
+    # Method ensuring we wrote the headers
+    def __ensure_headers(self):
+        header_block = 0
+
+        while header_block < LRU_TRIE_NODE_HEADER_BLOCKS:
+            header_node = self.__node(block=header_block)
+
+            if not header_node.exists:
+                header_node.write()
+
+            header_block += 1
+
 
     # Method ensuring that a sibling with the desired char exists
-    def __require_char_from_siblings(self, node, char):
+    def __ensure_char_from_siblings(self, node, char):
 
         # If the node does not exist, we create it
         if not node.exists:
@@ -78,7 +94,7 @@ class LRUTrie(object):
         for i in range(l):
             char = ord(lru[i])
 
-            node = self.__require_char_from_siblings(node, char)
+            node = self.__ensure_char_from_siblings(node, char)
 
             # Following up through the child
             if i < l - 1:

@@ -26,9 +26,7 @@ traph = Traph(lru_trie_file=lruTrieFile)
 for page in PAGES:
     traph.add_page(page)
 
-# traph.lru_trie.log()
-
-# for page in traph.lru_trie.pages_iter():
-#     print page
+for page in traph.lru_trie.pages_iter():
+    print page
 
 lruTrieFile.close()

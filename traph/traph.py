@@ -13,7 +13,6 @@ from link_store import LinkStore
 from link_store_node import LINK_STORE_NODE_BLOCK_SIZE
 
 
-
 class Traph(object):
 
     # =========================================================================
@@ -39,7 +38,8 @@ class Traph(object):
                 links_store_file
             )
         else:
-            self.links_store_storage = MemoryStorage(LINK_STORE_NODE_BLOCK_SIZE)
+            self.links_store_storage = MemoryStorage(
+                LINK_STORE_NODE_BLOCK_SIZE)
 
     # =========================================================================
     # Public interface

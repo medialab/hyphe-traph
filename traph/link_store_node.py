@@ -16,17 +16,20 @@ import struct
 # some rules (namely have even addresses or addresses divisble by 4 on some
 # architecture).
 # -
-# Reference: http://stackoverflow.com/questions/2611858/struct-error-unpack-requires-a-string-argument-of-length-4
+# Reference: http://stackoverflow.com/questions/2611858/
+#   struct-error-unpack-requires-a-string-argument-of-length-4
 # -
 # TODO: When the format is stabilized, we should order the bytes correctly as
 # with a C struct to optimize block size & save up some space.
 LINK_STORE_NODE_FORMAT = '2Q1H'
 LINK_STORE_NODE_BLOCK_SIZE = struct.calcsize(LINK_STORE_NODE_FORMAT)
+LINK_STORE_NODE_HEADER_BLOCKS = 1
 
 # Positions
 LINK_STORE_NODE_TARGET = 0
 LINK_STORE_NODE_NEXT = 1
 LINK_STORE_NODE_WEIGHT = 2
+
 
 # Main class
 class LinkStoreNode(object):
@@ -52,8 +55,8 @@ class LinkStoreNode(object):
             self.__set_default_data()
 
     def __set_default_data(self):
-        self.data = (
+        self.data = [
             char or 0,  # Target
             0,          # Next
-            0          # Weight
-        )
+            0           # Weight
+        ]
