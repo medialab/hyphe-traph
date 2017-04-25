@@ -10,6 +10,7 @@
 from lru_trie_node import LRUTrieNode, LRU_TRIE_NODE_HEADER_BLOCKS
 from lru_trie_walk_history import LRUTrieWalkHistory
 
+
 # Main class
 class LRUTrie(object):
 
@@ -136,17 +137,17 @@ class LRUTrie(object):
             node = child
             i += 1
 
-        return node
+        return node, history
 
     # Method adding a page to the trie
     def add_page(self, lru):
-        node = self.add_lru(lru)
+        node, history = self.add_lru(lru)
 
         # Flagging the node as a page
         node.flag_as_page()
         node.write()
 
-        return node
+        return node, history
 
     # =========================================================================
     # Read methods
