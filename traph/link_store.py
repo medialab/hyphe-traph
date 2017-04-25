@@ -66,15 +66,19 @@ class LinkStore(object):
         if not node.exists:
             raise LinkStoreTraversalException('Block does not exist.')
 
+        # We go through the linked list to find matching link
         while node.target() != target_block and node.has_next():
             node.read_next()
 
+        # If we did not find a matching link, we add it
         if node.target() != target_block:
             sibling = self.__node()
             sibling.set_target(target_block)
             sibling.write()
             node.set_next(sibling.block)
             node.write()
+
+        # Else we just increment the weight of the existing one
         else:
             node.increment_weight()
             node.write()
