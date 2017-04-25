@@ -6,7 +6,4 @@ setup(name='hyphe-traph',
       url='http://github.com/medialab/hyphe-traph',
       license='MIT',
       packages=['traph'],
-      install_requires=[
-        'numpy'
-      ]
       zip_safe=False)

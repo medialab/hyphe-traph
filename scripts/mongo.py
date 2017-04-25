@@ -22,7 +22,7 @@ client = MongoClient('localhost', 27017)
 collection = client['hyphe']['AXA.pages']
 
 i = 0
-for page in collection.find({}, sort=[("_job", 1)]):
+for page in collection.find({}, {'lru': 1, 'lrulinks': 1}, sort=[("_job", 1)]):
     i += 1
 
     traph.add_page(page['lru'])
