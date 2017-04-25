@@ -81,13 +81,13 @@ class LRUTrieNode(object):
             self.__set_default_data(char)
 
     def __set_default_data(self, char=None):
-        self.data = [
+        self.data = (
             char or 0,  # Character
             0,          # Flags
             0,          # Next block
             0,          # Child block
             0           # Parent block
-        ]
+        )
 
     # =========================================================================
     # Utilities

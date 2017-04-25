@@ -17,6 +17,11 @@ lruTrieFile = open('./scripts/data/lru_trie.dat', 'rb')
 traph = Traph(lru_trie_file=lruTrieFile)
 trie = traph.lru_trie
 
-print len(list(trie.pages_iter()))
+count = 0
+
+for page in trie.pages_iter():
+    count += 1
+
+print count
 
 lruTrieFile.close()
