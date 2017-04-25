@@ -8,8 +8,9 @@
 # UTF-16 characters.
 #
 from lru_trie_node import LRUTrieNode, LRU_TRIE_NODE_HEADER_BLOCKS
+from lru_trie_walk_history import LRUTrieWalkHistory
 
-
+# Main class
 class LRUTrie(object):
 
     # =========================================================================
@@ -82,10 +83,11 @@ class LRUTrie(object):
     # Mutation methods
     # =========================================================================
 
-    # Method adding a page to the trie
-    def add_page(self, lru):
+    # Method adding a lru to the trie
+    def add_lru(self, lru):
 
         l = len(lru)
+        history = LRUTrieWalkHistory()
 
         node = self.__root()
 
@@ -94,6 +96,20 @@ class LRUTrie(object):
             char = ord(lru[i])
 
             node = self.__ensure_char_from_siblings(node, char)
+
+            # Tracking webentities etc.
+            if node.has_webentity():
+                history.update_webentity(
+                    node.webentity(),
+                    lru[:i],
+                    i
+                )
+
+            if node.has_webentity_creation_rule():
+                history.update_webentity_creation_rule(
+                    node.webentity_creation_rule(),
+                    i
+                )
 
             # Following up through the child
             if i < l - 1:
@@ -106,6 +122,12 @@ class LRUTrie(object):
                     node.write()
                     parent_node.set_child(node.block)
                     parent_node.write()
+
+        return node
+
+    # Method adding a page to the trie
+    def add_page(self, lru):
+        node = self.add_lru(lru)
 
         # Flagging the node as a page
         node.flag_as_page()

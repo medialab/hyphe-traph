@@ -303,16 +303,16 @@ class LRUTrieNode(object):
 
     # Method used to retrieve the webentity id of the flag
     def webentity(self):
-        webentity_id = self.data[LRU_TRIE_NODE_WEBENTITY]
+        weid = self.data[LRU_TRIE_NODE_WEBENTITY]
 
-        if webentity_id == 0:
+        if weid == 0:
             return None
 
-        return webentity_id
+        return weid
 
     # Method used to set the webentity flag
-    def set_webentity(self, webentity_id):
-        self.data[LRU_TRIE_NODE_WEBENTITY] = webentity_id
+    def set_webentity(self, weid):
+        self.data[LRU_TRIE_NODE_WEBENTITY] = weid
 
     # =========================================================================
     # WebEntity creation rules methods
@@ -324,15 +324,13 @@ class LRUTrieNode(object):
 
     # Method used to retrieve the webentity creation rule id of the flag
     def webentity_creation_rule(self):
-        webentity_creation_rule_id = \
-            self.data[LRU_TRIE_NODE_WEBENTITY_CREATION_RULE]
+        wecrid = self.data[LRU_TRIE_NODE_WEBENTITY_CREATION_RULE]
 
-        if webentity_creation_rule_id == 0:
+        if wecrid == 0:
             return None
 
-        return webentity_creation_rule_id
+        return wecrid
 
     # Method used to set the webentity flag
-    def set_webentity_creation_rule(self, webentity_creation_rule_id):
-        self.data[LRU_TRIE_NODE_WEBENTITY_CREATION_RULE] = \
-            webentity_creation_rule_id
+    def set_webentity_creation_rule(self, wecrid):
+        self.data[LRU_TRIE_NODE_WEBENTITY_CREATION_RULE] = wecrid
