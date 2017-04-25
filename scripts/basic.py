@@ -4,8 +4,8 @@
 #
 # Trying to make this whole thing work...
 #
-import os
 from traph import Traph
+from scripts.utils.web_entity_store import WebEntityStore
 
 # Constants
 PAGES = [
@@ -22,15 +22,13 @@ LINKS = [
     (1, 1)
 ]
 
-# Creating data folder
-if not os.path.isdir('./scripts/data'):
-    os.makedirs('./scripts/data')
+webentity_store = WebEntityStore('./scripts/data/webentities.json')
 
 # Truncating the file for our purpose
-lruTrieFile = open('./scripts/data/lru_trie.dat', 'wb+')
-linkStoreFile = open('./scripts/data/link_store.dat', 'wb+')
+lru_trie_file = open('./scripts/data/lru_trie.dat', 'wb+')
+link_store_file = open('./scripts/data/link_store.dat', 'wb+')
 
-traph = Traph(lru_trie_file=lruTrieFile, link_store_file=linkStoreFile)
+traph = Traph(lru_trie_file=lru_trie_file, link_store_file=link_store_file)
 trie = traph.lru_trie
 links = traph.link_store
 
@@ -57,4 +55,6 @@ for source_page in PAGES:
     for link_node in links.link_nodes_iter(source_node.outlinks()):
         print source_node, link_node
 
-lruTrieFile.close()
+# Cleanup
+lru_trie_file.close()
+link_store_file.close()

@@ -4,13 +4,11 @@
 #
 # Attempting to load a corpus from MongoDB
 #
-import os
 from traph import Traph
 from pymongo import MongoClient
+from config import CONFIG
 
-# Creating data folder
-if not os.path.isdir('./scripts/data'):
-    os.makedirs('./scripts/data')
+MONGO = CONFIG['mongo']
 
 # Truncating the file for our purpose
 lruTrieFile = open('./scripts/data/lru_trie.dat', 'wb+')
@@ -18,8 +16,8 @@ lruTrieFile = open('./scripts/data/lru_trie.dat', 'wb+')
 traph = Traph(lru_trie_file=lruTrieFile)
 
 # Reading from mongo
-client = MongoClient('localhost', 27017)
-collection = client['hyphe']['AXA.pages']
+client = MongoClient(MONGO['host'], MONGO['port'])
+collection = client[MONGO['db']][MONGO['collection']]
 
 i = 0
 for page in collection.find({}, {'lru': 1, 'lrulinks': 1}, sort=[("_job", 1)]):

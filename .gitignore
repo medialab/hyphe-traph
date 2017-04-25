@@ -1,3 +1,8 @@
+# Annoying little things
 .DS_Store
 *.pyc
+__pycache__
+
+# Scripts data etc.
 scripts/data
+scripts/config.py
