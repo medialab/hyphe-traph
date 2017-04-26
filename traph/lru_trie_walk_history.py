@@ -20,6 +20,7 @@ class LRUTrieWalkHistory(object):
         self.webentity_position = -1
         self.webentity_creation_rule = None
         self.webentity_creation_rule_position = -1
+        self.page_was_created = False
 
     def __repr__(self):
         class_name = self.__class__.__name__

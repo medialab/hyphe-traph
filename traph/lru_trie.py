@@ -144,8 +144,10 @@ class LRUTrie(object):
         node, history = self.add_lru(lru)
 
         # Flagging the node as a page
-        node.flag_as_page()
-        node.write()
+        if not node.is_page():
+            node.flag_as_page()
+            node.write()
+            history.page_was_created = True
 
         return node, history
 
