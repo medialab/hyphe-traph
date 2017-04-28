@@ -287,6 +287,10 @@ class LRUTrieNode(object):
     # Method used to retrieve the outlinks block
     def outlinks(self):
         block = self.data[LRU_TRIE_NODE_OUTLINKS_BLOCK]
+
+        if block < LRU_TRIE_NODE_HEADER_BLOCKS:
+            return None
+
         return block
 
     # Method used to set the outlinks block

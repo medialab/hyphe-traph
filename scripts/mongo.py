@@ -22,13 +22,15 @@ links = traph.link_store
 client = MongoClient(MONGO['host'], MONGO['port'])
 collection = client[MONGO['db']][MONGO['collection']]
 
+batch = traph.batch()
+
 i = 0
 for page in collection.find({}, {'lru': 1, 'lrulinks': 1}, sort=[("_job", 1)]):
     i += 1
 
-    traph.add_page(page['lru'])
+    batch.add_page_with_links(page['lru'], page['lrulinks'])
 
-    if i % 1000 == 0:
+    if i % 100 == 0:
         print '(%i) [%i] - %s' % (i, len(page['lrulinks']), page['lru'])
 
     # for link in page['lrulinks']:

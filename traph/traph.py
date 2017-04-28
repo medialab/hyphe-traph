@@ -4,6 +4,7 @@
 #
 # Main class representing the Traph data structure.
 #
+from traph_batch import TraphBatch
 from walk_history import WalkHistory
 from file_storage import FileStorage
 from memory_storage import MemoryStorage
@@ -14,6 +15,7 @@ from link_store import LinkStore
 from link_store_node import LINK_STORE_NODE_BLOCK_SIZE
 
 
+# Main class
 class Traph(object):
 
     # =========================================================================
@@ -47,6 +49,9 @@ class Traph(object):
     # =========================================================================
     # Public interface
     # =========================================================================
+    def batch(self):
+        return TraphBatch(self)
+
     def add_page(self, lru):
         node, history = self.lru_trie.add_page(lru)
 
@@ -63,3 +68,5 @@ class Traph(object):
             # If we fail to match the pattern of the creation rule,
             # we fallback on the default one
             pass
+
+        return node

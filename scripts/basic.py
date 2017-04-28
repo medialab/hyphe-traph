@@ -42,15 +42,13 @@ for source, target in LINKS:
     source_node = trie.lru_node(PAGES[source])
     target_node = trie.lru_node(PAGES[target])
 
-    if not source_node.has_outlinks():
-        block = links.add_first_link(target_node.block)
-        source_node.set_outlinks(block)
-        source_node.write()
-    else:
-        links.add_link(source_node.outlinks(), target_node.block)
+    links.add_link(source_node, target_node.block)
 
 for source_page in PAGES:
     source_node = trie.lru_node(source_page)
+
+    if not source_node.has_outlinks():
+        continue
 
     for link_node in links.link_nodes_iter(source_node.outlinks()):
         print source_node, link_node
