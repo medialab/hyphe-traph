@@ -161,6 +161,17 @@ class LRUTrie(object):
 
         return node
 
+    def windup_lru(self, block):
+        # TODO: check block
+        node = self.__node(block=block)
+
+        lru = node.char_as_str()
+
+        for parent in self.node_parents_iter(node):
+            lru = parent.char_as_str() + lru
+
+        return lru
+
     # =========================================================================
     # Iteration methods
     # =========================================================================
@@ -171,7 +182,23 @@ class LRUTrie(object):
             yield node
             node.read(node.block + 1)
 
+    def node_parents_iter(self, node):
+
+        # TODO: block
+        if node.is_root():
+            return
+
+        parent = node.parent_node()
+
+        yield parent
+
+        while not parent.is_root():
+            parent.read_parent()
+            yield parent
+
     def node_siblings_iter(self, node):
+
+        # TODO: block
         if not node.has_next():
             return
 

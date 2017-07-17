@@ -337,7 +337,7 @@ class LRUTrieNode(object):
     def has_links(self, out=True):
         offset = LRU_TRIE_NODE_OUTLINKS_BLOCK
 
-        if out:
+        if not out:
             offset = LRU_TRIE_NODE_INLINKS_BLOCK
 
         return self.data[offset] != 0
@@ -345,7 +345,7 @@ class LRUTrieNode(object):
     def links(self, out=True):
         offset = LRU_TRIE_NODE_OUTLINKS_BLOCK
 
-        if out:
+        if not out:
             offset = LRU_TRIE_NODE_INLINKS_BLOCK
 
         block = self.data[offset]
@@ -358,7 +358,7 @@ class LRUTrieNode(object):
     def set_links(self, block, out=True):
         offset = LRU_TRIE_NODE_OUTLINKS_BLOCK
 
-        if out:
+        if not out:
             offset = LRU_TRIE_NODE_INLINKS_BLOCK
 
         self.data[offset] = block

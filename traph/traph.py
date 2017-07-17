@@ -192,5 +192,8 @@ class Traph(object):
     # =========================================================================
     def links_iter(self, out=True):
         for page_node, lru in self.lru_trie.pages_iter():
-            for target_block in self.link_store.link_nodes_iter(page_node.outlinks()):
-                yield lru, target_block
+            if not page_node.has_outlinks():
+                continue
+
+            for link_node in self.link_store.link_nodes_iter(page_node.outlinks()):
+                yield lru, self.lru_trie.windup_lru(link_node.target())

@@ -81,6 +81,7 @@ class LinkStore(object):
 
     def add_links(self, source_node, target_blocks, out=True):
         target_blocks = iter(target_blocks)
+        links_block = source_node.links(out=out)
 
         try:
             first_target_block = next(target_blocks)
@@ -88,22 +89,22 @@ class LinkStore(object):
             return
 
         # If the node does not have outlinks yet
-        if not source_node.has_links(out=out):
+        if not links_block:
             link_node = self.__node()
             link_node.set_target(first_target_block)
             link_node.write()
 
+            links_block = link_node.block
             source_node.set_links(link_node.block, out=out)
             source_node.write()
 
             first_target_block = None
 
         # Finding the current
-        link_nodes = self.link_nodes_iter(source_node.links(out=out))
         link_nodes_index = {}
         last_link_node = None
 
-        for link_node in link_nodes:
+        for link_node in self.link_nodes_iter(links_block):
             link_nodes_index[link_node.target()] = link_node
             last_link_node = link_node
 
@@ -111,6 +112,7 @@ class LinkStore(object):
             target_blocks = chain([first_target_block], target_blocks)
 
         # Adding new targets
+        # TODO: possible to virtualize chain and flush later to ease writes
         for target_block in target_blocks:
 
             if target_block in link_nodes_index:
@@ -125,6 +127,7 @@ class LinkStore(object):
                 link_nodes_index[target_block] = link_node
 
                 last_link_node.set_next(link_node.block)
+                last_link_node.write()
                 last_link_node = link_node
 
     def add_outlinks(self, source_node, target_blocks):
@@ -136,6 +139,13 @@ class LinkStore(object):
     # =========================================================================
     # Iteration methods
     # =========================================================================
+    def nodes_iter(self):
+        node = self.__root()
+
+        while node.exists:
+            yield node
+            node.read(node.block + 1)
+
     def link_nodes_iter(self, block):
         node = self.__node(block=block)
 

@@ -57,8 +57,14 @@ for page in PAGES:
 
 traph.add_links(LINKS)
 
-for node, lru in trie.pages_iter():
-    print lru
+for source_lru, target_lru in traph.links_iter():
+    print 'Source: %s, Target: %s' % (source_lru, target_lru)
+
+for node in links.nodes_iter():
+    print node
+
+# for node, lru in trie.pages_iter():
+#     print lru
 
 # for node in trie.nodes_iter():
 #     if node.webentity():
