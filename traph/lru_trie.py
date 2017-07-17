@@ -98,10 +98,7 @@ class LRUTrie(object):
 
             # Tracking webentity creation rules
             if node.has_webentity_creation_rule():
-                history.add_webentity_creation_rule(
-                    node.webentity_creation_rule(),
-                    i
-                )
+                history.add_webentity_creation_rule(i)
 
             i += 1
 

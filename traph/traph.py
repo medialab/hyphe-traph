@@ -36,17 +36,6 @@ class Traph(object):
             self.lru_trie_file = open(folder+'lru_trie.dat', 'rb+')
             self.link_store_file = open(folder+'link_store.dat', 'rb+')
 
-        # Web entity creation rules are stored in RAM
-        self.default_webentity_creation_rule = re.compile(
-            default_webentity_creation_rule,
-            re.I
-        )
-
-        self.webentity_creation_rules = {}
-
-        for prefix, pattern in webentity_creation_rules.items():
-            self.add_webentity_creation_rule(prefix, pattern, create)
-
         # LRU Trie initialization
         if folder:
             self.lru_trie_storage = FileStorage(
@@ -69,6 +58,18 @@ class Traph(object):
                 LINK_STORE_NODE_BLOCK_SIZE)
 
         self.link_store = LinkStore(self.links_store_storage)
+
+        # Web entity creation rules are stored in RAM
+        self.default_webentity_creation_rule = re.compile(
+            default_webentity_creation_rule,
+            re.I
+        )
+
+        self.webentity_creation_rules = {}
+
+        for prefix, pattern in webentity_creation_rules.items():
+            self.add_webentity_creation_rule(prefix, pattern, create)
+
 
     # =========================================================================
     # Internal methods
@@ -114,10 +115,16 @@ class Traph(object):
     # Public interface
     # =========================================================================
     def add_webentity_creation_rule(self, prefix, pattern, write_in_trie=True):
+        print 'add webentity ' + prefix + ' - ' + str(write_in_trie)
+        print self.webentity_creation_rules
         self.webentity_creation_rules[prefix] = re.compile(
                 pattern,
                 re.I
             )
+        if write_in_trie:
+            node, history = self.lru_trie.add_lru(prefix)
+            node.flag_as_webentity_creation_rule()
+            node.write()
 
     def expand_prefix(self, prefix):
         # TODO: expand

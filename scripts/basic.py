@@ -44,7 +44,7 @@ webentity_creation_rules = {
 
 webentity_store = WebEntityStore('./scripts/data/webentities.json')
 
-traph = Traph(folder='./scripts/data/',
+traph = Traph(create=True, folder='./scripts/data/',
               default_webentity_creation_rule=default_webentity_creation_rule,
               webentity_creation_rules=webentity_creation_rules)
 trie = traph.lru_trie
@@ -58,6 +58,8 @@ for page in PAGES:
 
 for page in trie.pages_iter():
     print page
+
+print 'GAGAAAAAA'
 
 for source, target in LINKS:
     source_node = trie.lru_node(PAGES[source])
@@ -73,8 +75,6 @@ for source_page in PAGES:
 
     for link_node in links.link_nodes_iter(source_node.outlinks()):
         print source_node, link_node
-
-print ''
 
 for node in trie.nodes_iter():
     if node.webentity():

@@ -36,8 +36,7 @@ class LRUTrieWalkHistory(object):
         self.webentity_prefix = prefix
         self.webentity_position = position
 
-    # TODO: web entity creation rule id (wecrid) is currenty useless.
-    def add_webentity_creation_rule(self, wecrid, position):
+    def add_webentity_creation_rule(self, position):
         self.webentity_creation_rules.append(position)
 
     def rules_to_apply(self):
@@ -45,7 +44,7 @@ class LRUTrieWalkHistory(object):
             if position >= 0 and \
                position >= self.webentity_position:
 
-                prefix = self.lru[0:position]
+                prefix = self.lru[0:position+1] # FIXME: unsure of the +1
 
                 # Note that it remains to the user to apply default rule if
                 # none of the given rules would happen to succeed
