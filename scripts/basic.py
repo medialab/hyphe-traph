@@ -44,11 +44,7 @@ webentity_creation_rules = {
 
 webentity_store = WebEntityStore('./scripts/data/webentities.json')
 
-# Truncating the file for our purpose
-lru_trie_file = open('./scripts/data/lru_trie.dat', 'wb+')
-link_store_file = open('./scripts/data/link_store.dat', 'wb+')
-
-traph = Traph(lru_trie_file=lru_trie_file, link_store_file=link_store_file,
+traph = Traph(folder='./scripts/data/',
               default_webentity_creation_rule=default_webentity_creation_rule,
               webentity_creation_rules=webentity_creation_rules)
 trie = traph.lru_trie
@@ -84,6 +80,4 @@ for node in trie.nodes_iter():
     if node.webentity():
         print node
 
-# Cleanup
-lru_trie_file.close()
-link_store_file.close()
+traph.close()

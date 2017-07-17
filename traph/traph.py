@@ -21,9 +21,20 @@ class Traph(object):
     # =========================================================================
     # Constructor
     # =========================================================================
-    def __init__(self, lru_trie_file=None, link_store_file=None,
+    def __init__(self, create=False, folder=None,
                  default_webentity_creation_rule=None,
                  webentity_creation_rules=None):
+
+        # TODO: solve path
+
+        if create:
+            # TODO: erase dir and all its content
+            # TODO: make dir
+            self.lru_trie_file = open(folder+'lru_trie.dat', 'wb+')
+            self.link_store_file = open(folder+'link_store.dat', 'wb+')
+        else:
+            self.lru_trie_file = open(folder+'lru_trie.dat', 'rb+')
+            self.link_store_file = open(folder+'link_store.dat', 'rb+')
 
         # Web entity creation rules are stored in RAM
         self.default_webentity_creation_rule = re.compile(
@@ -34,16 +45,13 @@ class Traph(object):
         self.webentity_creation_rules = {}
 
         for prefix, pattern in webentity_creation_rules.items():
-            self.webentity_creation_rules[prefix] = re.compile(
-                pattern,
-                re.I
-            )
+            self.add_webentity_creation_rule(prefix, pattern, create)
 
         # LRU Trie initialization
-        if lru_trie_file:
+        if folder:
             self.lru_trie_storage = FileStorage(
                 LRU_TRIE_NODE_BLOCK_SIZE,
-                lru_trie_file
+                self.lru_trie_file
             )
         else:
             self.lru_trie_storage = MemoryStorage(LRU_TRIE_NODE_BLOCK_SIZE)
@@ -51,10 +59,10 @@ class Traph(object):
         self.lru_trie = LRUTrie(self.lru_trie_storage)
 
         # Link Store initialization
-        if link_store_file:
+        if folder:
             self.links_store_storage = FileStorage(
                 LINK_STORE_NODE_BLOCK_SIZE,
-                link_store_file
+                self.link_store_file
             )
         else:
             self.links_store_storage = MemoryStorage(
@@ -105,6 +113,12 @@ class Traph(object):
     # =========================================================================
     # Public interface
     # =========================================================================
+    def add_webentity_creation_rule(self, prefix, pattern, write_in_trie=True):
+        self.webentity_creation_rules[prefix] = re.compile(
+                pattern,
+                re.I
+            )
+
     def expand_prefix(self, prefix):
         # TODO: expand
         return [prefix]
@@ -122,3 +136,8 @@ class Traph(object):
 
         self.__apply_webentity_default_creation_rule(lru)
         return node
+
+    def close(self):
+        # Cleanup
+        self.lru_trie_file.close()
+        self.link_store_file.close()
