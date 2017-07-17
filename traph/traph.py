@@ -148,6 +148,7 @@ class Traph(object):
         return node
 
     def add_links(self, links):
+        store = self.link_store
 
         # TODO: this will need to return created web entities
         inlinks = defaultdict(list)
@@ -172,7 +173,13 @@ class Traph(object):
             source_node = pages[source_page]
             target_blocks = (pages[target_page].block for target_page in target_pages)
 
-            self.link_store.add_links(source_node, target_blocks)
+            store.add_outlinks(source_node, target_blocks)
+
+        for target_page, source_pages in inlinks:
+            target_node = pages[target_page]
+            source_blocks = (pages[source_page].block for source_page in source_pages)
+
+            store.add_inlinks(target_node, source_blocks)
 
 
     def close(self):

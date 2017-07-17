@@ -43,21 +43,21 @@ class LinkStore(object):
     # =========================================================================
     # Mutation methods
     # =========================================================================
-    def add_link(self, source_node, target_block):
+    def add_link(self, source_node, target_block, out=True):
 
         # If the node does not have outlinks yet
-        if not source_node.has_outlinks():
+        if not source_node.has_links(out=out):
             link_node = self.__node()
             link_node.set_target(target_block)
             link_node.write()
 
-            source_node.set_outlinks(link_node.block)
+            source_node.set_links(link_node.block, out=out)
             source_node.write()
 
             return
 
         # Else:
-        link_node = self.__node(block=source_node.outlinks())
+        link_node = self.__node(block=source_node.links(out=out))
 
         if not link_node.exists:
             raise LinkStoreTraversalException('Block does not exist.')
@@ -79,7 +79,7 @@ class LinkStore(object):
             link_node.increment_weight()
             link_node.write()
 
-    def add_links(self, source_node, target_blocks):
+    def add_links(self, source_node, target_blocks, out=True):
         target_blocks = iter(target_blocks)
 
         try:
@@ -88,18 +88,18 @@ class LinkStore(object):
             return
 
         # If the node does not have outlinks yet
-        if not source_node.has_outlinks():
+        if not source_node.has_links(out=out):
             link_node = self.__node()
             link_node.set_target(first_target_block)
             link_node.write()
 
-            source_node.set_outlinks(link_node.block)
+            source_node.set_links(link_node.block, out=out)
             source_node.write()
 
             first_target_block = None
 
         # Finding the current
-        link_nodes = self.link_nodes_iter(source_node.outlinks())
+        link_nodes = self.link_nodes_iter(source_node.links(out=out))
         link_nodes_index = {}
         last_link_node = None
 
@@ -126,6 +126,12 @@ class LinkStore(object):
 
                 last_link_node.set_next(link_node.block)
                 last_link_node = link_node
+
+    def add_outlinks(self, source_node, target_blocks):
+        return self.add_links(self, source_node, target_blocks, out=True)
+
+    def add_inlinks(self, source_node, target_blocks):
+        return self.add_links(self, source_node, target_blocks, out=False)
 
     # =========================================================================
     # Iteration methods
