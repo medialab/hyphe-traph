@@ -34,7 +34,7 @@ webentity_creation_rules_regexp = {
     'path2':        '(s:[a-zA-Z]+\\|(t:[0-9]+\\|)?(h:[^\\|]+\\|(h:[^\\|]+\\|)+|h:(localhost|(\\d{1,3}\\.){3}\\d{1,3}|\\[[\\da-f]*:[\\da-f:]*\\])\\|)(p:[^\\|]+\\|){2})'
 }
 
-webentity_default_creation_rule = webentity_creation_rules_regexp['domain']
+default_webentity_creation_rule = webentity_creation_rules_regexp['domain']
 
 webentity_creation_rules = {
     's:http|h:com|h:twitter|': webentity_creation_rules_regexp['path1'],
@@ -49,7 +49,7 @@ lru_trie_file = open('./scripts/data/lru_trie.dat', 'wb+')
 link_store_file = open('./scripts/data/link_store.dat', 'wb+')
 
 traph = Traph(lru_trie_file=lru_trie_file, link_store_file=link_store_file,
-              webentity_default_creation_rule=webentity_default_creation_rule,
+              default_webentity_creation_rule=default_webentity_creation_rule,
               webentity_creation_rules=webentity_creation_rules)
 trie = traph.lru_trie
 links = traph.link_store
@@ -77,6 +77,11 @@ for source_page in PAGES:
 
     for link_node in links.link_nodes_iter(source_node.outlinks()):
         print source_node, link_node
+
+print ''
+
+for node in trie.nodes_iter():
+    print node
 
 # Cleanup
 lru_trie_file.close()

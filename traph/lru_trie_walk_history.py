@@ -24,21 +24,20 @@ class LRUTrieWalkHistory(object):
 
         return (
             '<%(class_name)s prefix="%(prefix)s"'
-            ' weid=%(weid)s wecrid=%(wecrid)s>'
+            ' weid=%(weid)s>'
         ) % {
             'class_name': class_name,
             'prefix': self.webentity_prefix,
-            'weid': self.webentity,
-            'wecrid': self.webentity_creation_rule
+            'weid': self.webentity
         }
 
-    def update_webentity(weid, prefix, position):
+    def update_webentity(self, weid, prefix, position):
         self.webentity = weid
         self.webentity_prefix = prefix
         self.webentity_position = position
 
     # TODO: web entity creation rule id (wecrid) is currenty useless.
-    def add_webentity_creation_rule(wecrid, position):
+    def add_webentity_creation_rule(self, wecrid, position):
         self.webentity_creation_rules.append(position)
 
     def rules_to_apply(self):
@@ -47,6 +46,7 @@ class LRUTrieWalkHistory(object):
                position >= self.webentity_position:
 
                 prefix = self.lru[0:position]
+
                 # Note that it remains to the user to apply default rule if
                 # none of the given rules would happen to succeed
                 yield prefix
