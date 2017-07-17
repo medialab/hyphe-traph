@@ -9,17 +9,14 @@
 # Main class
 class LRUTrieWalkHistory(object):
 
-    APPLY_DEFAULT_RULE = 'APPLY_DEFAULT_RULE'
-    SKIP_RULE = 'SKIP_RULE'
-
-    def __init__(self):
+    def __init__(self, lru):
 
         # Properties
+        self.lru=lru
         self.webentity = None
         self.webentity_prefix = ''
         self.webentity_position = -1
-        self.webentity_creation_rule = None
-        self.webentity_creation_rule_position = -1
+        self.webentity_creation_rules = []
         self.page_was_created = False
 
     def __repr__(self):
@@ -40,19 +37,16 @@ class LRUTrieWalkHistory(object):
         self.webentity_prefix = prefix
         self.webentity_position = position
 
-    def update_webentity_creation_rule(wecrid, position):
-        self.webentity_creation_rule = wecrid
-        self.webentity_creation_rule_position = position
+    #TODO: web entity creation rule id (wecrid) is currenty useless.
+    def add_webentity_creation_rule(wecrid, position):
+        self.webentity_creation_rules.append(position)
 
-    def rule_to_apply(self):
-        if self.webentity_creation_rule_position >= 0 and \
-           self.webentity_creation_rule_position >= self.webentity_position:
+    def rules_to_apply(self):
+        for position in reversed(self.webentity_creation_rules):
+            if position >= 0 and \
+               position >= self.webentity_position:
 
-            # Note that it remains to the user to apply default rule if
-            # the given rule would happen to fail
-            return self.webentity_creation_rule
-
-        elif self.webentity is None:
-            return self.APPLY_DEFAULT_RULE
-
-        return self.SKIP_RULE
+                prefix = self.lru[0:position]
+                # Note that it remains to the user to apply default rule if
+                # none of the given rules would happen to succeed
+                yield prefix

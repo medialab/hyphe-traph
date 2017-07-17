@@ -51,6 +51,12 @@ class Traph(object):
 
         self.link_store = LinkStore(self.links_store_storage)
 
+    def __apply_webentity_creation_rule(self, prefix, lru):
+        pass #TODO
+
+    def __apply_webentity_default_creation_rule(self, lru):
+        pass #TODO
+
     # =========================================================================
     # Public interface
     # =========================================================================
@@ -61,17 +67,10 @@ class Traph(object):
         node, history = self.lru_trie.add_page(lru)
 
         # Here we need to deal with webentity creation rules
-        rule = history.rule_to_apply()
+        for prefix in history.rules_to_apply():
+            regexp = self.webentity_creation_rules[prefix]
+            self.__apply_webentity_creation_rule(prefix, lru)
+            return node
 
-        # Either we apply the default rule
-        if rule == LRUTrieWalkHistory.APPLY_DEFAULT_RULE:
-            pass
-
-        # Either we attempt to apply the matched creation rule
-        if rule != LRUTrieWalkHistory.SKIP_RULE:
-
-            # If we fail to match the pattern of the creation rule,
-            # we fallback on the default one
-            pass
-
+        self.__apply_webentity_default_creation_rule(lru)
         return node
