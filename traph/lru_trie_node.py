@@ -15,7 +15,7 @@ from lru_trie_header import LRU_TRIE_HEADER_BLOCKS
 # NOTE: Since python mimics C struct, the block size should be respecting
 # some rules (namely have even addresses or addresses divisble by 4 on some
 # architecture).
-LRU_TRIE_NODE_FORMAT = 'BBIxxQQQQ'
+LRU_TRIE_NODE_FORMAT = 'BBxxIQQQQ'
 LRU_TRIE_NODE_BLOCK_SIZE = struct.calcsize(LRU_TRIE_NODE_FORMAT)
 
 # Header blocks

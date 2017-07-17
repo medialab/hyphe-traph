@@ -53,13 +53,14 @@ links = traph.link_store
 print trie.header
 print links.header
 
+for node in trie.nodes_iter():
+    print node
+
 for page in PAGES:
     traph.add_page(page)
 
 for page in trie.pages_iter():
     print page
-
-print 'GAGAAAAAA'
 
 for source, target in LINKS:
     source_node = trie.lru_node(PAGES[source])
