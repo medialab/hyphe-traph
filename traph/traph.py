@@ -181,9 +181,16 @@ class Traph(object):
 
             store.add_inlinks(target_node, source_blocks)
 
-
     def close(self):
 
         # Cleanup
         self.lru_trie_file.close()
         self.link_store_file.close()
+
+    # =========================================================================
+    # Iteration methods
+    # =========================================================================
+    def links_iter(self, out=True):
+        for page_node, lru in self.lru_trie.pages_iter():
+            for target_block in self.link_store.link_nodes_iter(page_node.outlinks()):
+                yield lru, target_block
