@@ -8,6 +8,7 @@
 # writing the updated fields (typically when setting a pointer).
 #
 import struct
+from lru_trie_header import LRU_TRIE_HEADER_BLOCKS
 
 # Binary format
 # -
@@ -23,7 +24,7 @@ LRU_TRIE_NODE_BLOCK_SIZE = struct.calcsize(LRU_TRIE_NODE_FORMAT)
 # as a NULL pointer and be able to store some metadata about the structure.
 LRU_TRIE_NODE_HEADER_BLOCKS = 1
 
-# Positions
+# Node Positions
 LRU_TRIE_NODE_CHAR = 0
 LRU_TRIE_NODE_FLAGS = 1
 LRU_TRIE_NODE_NEXT_BLOCK = 2

@@ -7,7 +7,8 @@
 # Note that we only process raw ascii bytes as string for the moment and not
 # UTF-16 characters.
 #
-from lru_trie_node import LRUTrieNode, LRU_TRIE_NODE_HEADER_BLOCKS
+from lru_trie_node import LRUTrieNode
+from lru_trie_header import LRU_TRIE_HEADER_BLOCKS
 from lru_trie_walk_history import LRUTrieWalkHistory
 
 
@@ -35,13 +36,13 @@ class LRUTrie(object):
 
     # Method returning root node
     def __root(self):
-        return self.__node(block=LRU_TRIE_NODE_HEADER_BLOCKS)
+        return self.__node(block=LRU_TRIE_HEADER_BLOCKS)
 
     # Method ensuring we wrote the headers
     def __ensure_headers(self):
         header_block = 0
 
-        while header_block < LRU_TRIE_NODE_HEADER_BLOCKS:
+        while header_block < LRU_TRIE_HEADER_BLOCKS:
             header_node = self.__node(block=header_block)
 
             if not header_node.exists:

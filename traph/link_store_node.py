@@ -9,7 +9,8 @@
 # time being.
 #
 import struct
-from lru_trie_node import LRU_TRIE_NODE_HEADER_BLOCKS
+from link_store_header import LINK_STORE_HEADER_BLOCKS
+from lru_trie_header import LRU_TRIE_HEADER_BLOCKS
 
 # Binary format
 # -
@@ -18,12 +19,6 @@ from lru_trie_node import LRU_TRIE_NODE_HEADER_BLOCKS
 # architecture).
 LINK_STORE_NODE_FORMAT = 'QQH'
 LINK_STORE_NODE_BLOCK_SIZE = struct.calcsize(LINK_STORE_NODE_FORMAT)
-
-# Header blocks
-# -
-# We are retaining at least one header block so we can keep the 0 block address
-# as a NULL pointer and be able to store some metadata about the structure.
-LINK_STORE_NODE_HEADER_BLOCKS = 1
 
 # Positions
 LINK_STORE_NODE_TARGET = 0
@@ -117,7 +112,7 @@ class LinkStoreNode(object):
 
     # Method returning whether this node is the root
     def is_root(self):
-        return self.block == LINK_STORE_NODE_HEADER_BLOCKS
+        return self.block == LINK_STORE_HEADER_BLOCKS
 
     # =========================================================================
     # Next block methods
@@ -131,14 +126,14 @@ class LinkStoreNode(object):
     def next(self):
         block = self.data[LINK_STORE_NODE_NEXT]
 
-        if block < LINK_STORE_NODE_HEADER_BLOCKS:
+        if block < LINK_STORE_HEADER_BLOCKS:
             return None
 
         return block
 
     # Method used to set a sibling
     def set_next(self, block):
-        if block < LINK_STORE_NODE_HEADER_BLOCKS:
+        if block < LINK_STORE_HEADER_BLOCKS:
             raise LinkStoreNodeUsageException('Next node cannot be the root.')
 
         self.data[LINK_STORE_NODE_NEXT] = block
@@ -169,14 +164,14 @@ class LinkStoreNode(object):
     def target(self):
         block = self.data[LINK_STORE_NODE_TARGET]
 
-        if block < LRU_TRIE_NODE_HEADER_BLOCKS:
+        if block < LRU_TRIE_HEADER_BLOCKS:
             return None
 
         return block
 
     # Method used to set the target block
     def set_target(self, block):
-        if block < LRU_TRIE_NODE_HEADER_BLOCKS:
+        if block < LRU_TRIE_HEADER_BLOCKS:
             raise LinkStoreNodeUsageException(
                 'Target node cannot be the root.'
             )

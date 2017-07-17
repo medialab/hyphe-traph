@@ -5,7 +5,8 @@
 # Class representing the structure storing the links as linked list of stubs.
 #
 from itertools import chain
-from link_store_node import LinkStoreNode, LINK_STORE_NODE_HEADER_BLOCKS
+from link_store_node import LinkStoreNode
+from link_store_header import LINK_STORE_HEADER_BLOCKS
 
 
 # Exceptions
@@ -37,13 +38,13 @@ class LinkStore(object):
 
     # Method returning the root
     def __root(self):
-        return self.__node(block=LINK_STORE_NODE_HEADER_BLOCKS)
+        return self.__node(block=LINK_STORE_HEADER_BLOCKS)
 
     # Method ensuring we wrote the headers
     def __ensure_headers(self):
         header_block = 0
 
-        while header_block < LINK_STORE_NODE_HEADER_BLOCKS:
+        while header_block < LINK_STORE_HEADER_BLOCKS:
             header_node = self.__node(block=header_block)
 
             if not header_node.exists:
