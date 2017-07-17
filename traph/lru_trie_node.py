@@ -15,7 +15,7 @@ from lru_trie_header import LRU_TRIE_HEADER_BLOCKS
 # NOTE: Since python mimics C struct, the block size should be respecting
 # some rules (namely have even addresses or addresses divisble by 4 on some
 # architecture).
-LRU_TRIE_NODE_FORMAT = 'BBxxIQQQQ'
+LRU_TRIE_NODE_FORMAT = 'BBxxIQQQQQ'
 LRU_TRIE_NODE_BLOCK_SIZE = struct.calcsize(LRU_TRIE_NODE_FORMAT)
 
 # Header blocks
@@ -32,6 +32,7 @@ LRU_TRIE_NODE_NEXT_BLOCK = 3
 LRU_TRIE_NODE_CHILD_BLOCK = 4
 LRU_TRIE_NODE_PARENT_BLOCK = 5
 LRU_TRIE_NODE_OUTLINKS_BLOCK = 6
+LRU_TRIE_NODE_INLINKS_BLOCK = 7
 
 # Flags (Currently allocating 5/8 bits)
 LRU_TRIE_NODE_FLAG_PAGE = 0
@@ -90,11 +91,12 @@ class LRUTrieNode(object):
         self.data = [
             char or 0,  # Character
             0,          # Flags
+            0,          # Webentity
             0,          # Next block
             0,          # Child block
             0,          # Parent block
             0,          # Outlinks block
-            0,          # Webentity
+            0,          # Inlinks block
         ]
 
     def __repr__(self):
@@ -307,6 +309,27 @@ class LRUTrieNode(object):
     # Method used to set the outlinks block
     def set_outlinks(self, block):
         self.data[LRU_TRIE_NODE_OUTLINKS_BLOCK] = block
+
+    # =========================================================================
+    # Inlinks block methods
+    # =========================================================================
+
+    # Method used to know whether the outlinks block is set
+    def has_inlinks(self):
+        return self.data[LRU_TRIE_NODE_INLINKS_BLOCK] != 0
+
+    # Method used to retrieve the inlinks block
+    def inlinks(self):
+        block = self.data[LRU_TRIE_NODE_INLINKS_BLOCK]
+
+        if block < LRU_TRIE_NODE_HEADER_BLOCKS:
+            return None
+
+        return block
+
+    # Method used to set the inlinks block
+    def set_inlinks(self, block):
+        self.data[LRU_TRIE_NODE_INLINKS_BLOCK] = block
 
     # =========================================================================
     # WebEntity methods
