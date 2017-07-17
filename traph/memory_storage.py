@@ -5,6 +5,8 @@
 # Class storing the data in a byte array.
 #
 
+# TODO: this does not work currently and must be partially rewritten!
+
 
 # Main class
 class MemoryStorage(object):

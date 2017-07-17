@@ -35,7 +35,7 @@ class LRUTrieHeader(object):
         # Properties
         self.storage = storage
         self.data = [
-            0, # Last webentity id
+            0,  # Last webentity id
             0,
             0,
             0,
@@ -52,9 +52,10 @@ class LRUTrieHeader(object):
         class_name = self.__class__.__name__
 
         return (
-            '<%(class_name)s "%(char)s"'
+            '<%(class_name)s'
             ' last_webentity_id=%(last_webentity_id)s>'
         ) % {
+            'class_name': class_name,
             'last_webentity_id': self.last_webentity_id()
         }
 

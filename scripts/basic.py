@@ -54,6 +54,9 @@ traph = Traph(lru_trie_file=lru_trie_file, link_store_file=link_store_file,
 trie = traph.lru_trie
 links = traph.link_store
 
+print trie.header
+print links.header
+
 for page in PAGES:
     traph.add_page(page)
 

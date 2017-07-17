@@ -6,7 +6,7 @@
 #
 from itertools import chain
 from link_store_node import LinkStoreNode
-from link_store_header import LINK_STORE_HEADER_BLOCKS
+from link_store_header import LinkStoreHeader, LINK_STORE_HEADER_BLOCKS
 
 
 # Exceptions
@@ -25,8 +25,8 @@ class LinkStore(object):
         # Properties
         self.storage = storage
 
-        # Ensuring headers are written
-        self.__ensure_headers()
+        # Reading headers
+        self.header = LinkStoreHeader(storage)
 
     # =========================================================================
     # Internal methods
@@ -39,18 +39,6 @@ class LinkStore(object):
     # Method returning the root
     def __root(self):
         return self.__node(block=LINK_STORE_HEADER_BLOCKS)
-
-    # Method ensuring we wrote the headers
-    def __ensure_headers(self):
-        header_block = 0
-
-        while header_block < LINK_STORE_HEADER_BLOCKS:
-            header_node = self.__node(block=header_block)
-
-            if not header_node.exists:
-                header_node.write()
-
-            header_block += 1
 
     # =========================================================================
     # Mutation methods
