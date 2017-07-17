@@ -24,6 +24,10 @@ class Traph(object):
                  webentity_default_creation_rule=None,
                  webentity_creation_rules=None):
 
+        # Web entity creation rules are stored in RAM
+        self.webentity_default_creation_rule = webentity_default_creation_rule
+        self.webentity_creation_rules = webentity_creation_rules
+
         # LRU Trie initialization
         if lru_trie_file:
             self.lru_trie_storage = FileStorage(
