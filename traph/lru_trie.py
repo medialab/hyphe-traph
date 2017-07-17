@@ -8,7 +8,7 @@
 # UTF-16 characters.
 #
 from lru_trie_node import LRUTrieNode
-from lru_trie_header import LRU_TRIE_HEADER_BLOCKS
+from lru_trie_header import LRUTrieHeader, LRU_TRIE_HEADER_BLOCKS
 from lru_trie_walk_history import LRUTrieWalkHistory
 
 
@@ -23,8 +23,8 @@ class LRUTrie(object):
         # Properties
         self.storage = storage
 
-        # Ensuring headers are written
-        self.__ensure_headers()
+        # Readin headers
+        self.header = LRUTrieHeader(storage)
 
     # =========================================================================
     # Internal methods
@@ -37,18 +37,6 @@ class LRUTrie(object):
     # Method returning root node
     def __root(self):
         return self.__node(block=LRU_TRIE_HEADER_BLOCKS)
-
-    # Method ensuring we wrote the headers
-    def __ensure_headers(self):
-        header_block = 0
-
-        while header_block < LRU_TRIE_HEADER_BLOCKS:
-            header_node = self.__node(block=header_block)
-
-            if not header_node.exists:
-                header_node.write()
-
-            header_block += 1
 
     # Method ensuring that a sibling with the desired char exists
     def __ensure_char_from_siblings(self, node, char):
