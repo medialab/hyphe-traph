@@ -20,11 +20,9 @@ PAGES = [
 ]
 
 LINKS = [
-    (0, 1),
-    (0, 1),
-    (0, 2),
-    (1, 2),
-    (1, 1)
+    ['s:http|h:fr|h:sciences-po|h:medialab|', 's:https|h:com|h:twitter|p:paulanomalie|'],
+    ['s:http|h:com|h:twitter|p:papa|', 's:http|h:com|h:twitter|p:pépé|'],
+    ['s:http|h:com|h:twitter|p:papa|', 's:http|h:com|h:twitter|p:mémé|']
 ]
 
 webentity_creation_rules_regexp = {
@@ -56,6 +54,8 @@ print links.header
 
 for page in PAGES:
     traph.add_page(page)
+
+traph.add_links(LINKS)
 
 for node, lru in trie.pages_iter():
     print lru
