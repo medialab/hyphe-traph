@@ -104,7 +104,7 @@ class LRUTrieNode(object):
             '<%(class_name)s "%(char)s"'
             ' block=%(block)s exists=%(exists)s'
             ' parent=%(parent)s child=%(child)s next=%(next)s'
-            ' outlinks=%(outlinks)s webentity=%(webentity)s>'
+            ' out=%(outlinks)s we=%(webentity)s wecr=%(webentity_creation_rule)s>'
         ) % {
             'class_name': class_name,
             'char': self.char_as_str(),
@@ -114,7 +114,8 @@ class LRUTrieNode(object):
             'child': self.child(),
             'next': self.next(),
             'outlinks': self.outlinks(),
-            'webentity': self.webentity()
+            'webentity': self.webentity(),
+            'webentity_creation_rule': self.has_webentity_creation_rule()
         }
 
     # =========================================================================

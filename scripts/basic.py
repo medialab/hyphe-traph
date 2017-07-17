@@ -53,32 +53,34 @@ links = traph.link_store
 print trie.header
 print links.header
 
-for node in trie.nodes_iter():
-    print node
 
 for page in PAGES:
     traph.add_page(page)
 
-for page in trie.pages_iter():
-    print page
+for node, lru in trie.pages_iter():
+    print lru
 
-for source, target in LINKS:
-    source_node = trie.lru_node(PAGES[source])
-    target_node = trie.lru_node(PAGES[target])
+# for node in trie.nodes_iter():
+#     if node.webentity():
+#         print node
 
-    links.add_link(source_node, target_node.block)
+# for source, target in LINKS:
+#     source_node = trie.lru_node(PAGES[source])
+#     target_node = trie.lru_node(PAGES[target])
 
-for source_page in PAGES:
-    source_node = trie.lru_node(source_page)
+#     links.add_link(source_node, target_node.block)
 
-    if not source_node.has_outlinks():
-        continue
+# for source_page in PAGES:
+#     source_node = trie.lru_node(source_page)
 
-    for link_node in links.link_nodes_iter(source_node.outlinks()):
-        print source_node, link_node
+#     if not source_node.has_outlinks():
+#         continue
 
-for node in trie.nodes_iter():
-    if node.webentity():
-        print node
+#     for link_node in links.link_nodes_iter(source_node.outlinks()):
+#         print source_node, link_node
+
+# for node in trie.nodes_iter():
+#     if node.webentity():
+#         print node
 
 traph.close()
