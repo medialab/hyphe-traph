@@ -26,8 +26,18 @@ class Traph(object):
                  webentity_creation_rules=None):
 
         # Web entity creation rules are stored in RAM
-        self.default_webentity_creation_rule = default_webentity_creation_rule
-        self.webentity_creation_rules = webentity_creation_rules
+        self.default_webentity_creation_rule = re.compile(
+            default_webentity_creation_rule,
+            re.I
+        )
+
+        self.webentity_creation_rules = {}
+
+        for prefix, pattern in webentity_creation_rules.items():
+            self.webentity_creation_rules[prefix] = re.compile(
+                pattern,
+                re.I
+            )
 
         # LRU Trie initialization
         if lru_trie_file:
@@ -66,11 +76,7 @@ class Traph(object):
 
     def __apply_webentity_creation_rule(self, rule_prefix, lru):
 
-        pattern = self.webentity_creation_rules[rule_prefix]
-
-        # TODO: don't compile here for perf's sake
-        regexp = re.compile(pattern, re.I)
-
+        regexp = self.webentity_creation_rules[rule_prefix]
         match = regexp.search(lru)
 
         if not match:
@@ -83,11 +89,8 @@ class Traph(object):
         return True
 
     def __apply_webentity_default_creation_rule(self, lru):
-        pattern = self.default_webentity_creation_rule
 
-        # TODO: don't compile here for perf's sake
-        regexp = re.compile(pattern, re.I)
-
+        regexp = self.default_webentity_creation_rule
         match = regexp.search(lru)
 
         if not match:

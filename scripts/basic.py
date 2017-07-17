@@ -81,7 +81,8 @@ for source_page in PAGES:
 print ''
 
 for node in trie.nodes_iter():
-    print node
+    if node.webentity():
+        print node
 
 # Cleanup
 lru_trie_file.close()
