@@ -79,7 +79,7 @@ class LRUTrie(object):
         # Iteration state
         l = len(lru)
         i = 0
-        history = LRUTrieWalkHistory()
+        history = LRUTrieWalkHistory(lru)
         node = self.__root()
 
         # Descending the trie
@@ -98,7 +98,7 @@ class LRUTrie(object):
 
             # Tracking webentity creation rules
             if node.has_webentity_creation_rule():
-                history.update_webentity_creation_rule(
+                history.add_webentity_creation_rule(
                     node.webentity_creation_rule(),
                     i
                 )
