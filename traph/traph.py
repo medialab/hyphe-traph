@@ -5,6 +5,7 @@
 # Main class representing the Traph data structure.
 #
 import re
+from collections import defaultdict
 from traph_batch import TraphBatch
 from file_storage import FileStorage
 from memory_storage import MemoryStorage
@@ -118,9 +119,10 @@ class Traph(object):
         print 'add webentity ' + prefix + ' - ' + str(write_in_trie)
         print self.webentity_creation_rules
         self.webentity_creation_rules[prefix] = re.compile(
-                pattern,
-                re.I
-            )
+            pattern,
+            re.I
+        )
+
         if write_in_trie:
             node, history = self.lru_trie.add_lru(prefix)
             node.flag_as_webentity_creation_rule()
@@ -144,7 +146,36 @@ class Traph(object):
         self.__apply_webentity_default_creation_rule(lru)
         return node
 
+    def add_links(self, links):
+
+        # TODO: this will need to return created web entities
+        inlinks = defaultdict(list)
+        outlinks = defaultdict(list)
+        pages = dict()
+
+        for source_page, target_page in links:
+
+            # Adding pages
+            if not source_page in pages:
+                node = self.add_page(source_page)
+                pages[source_page] = node
+            if not target_page in pages:
+                node = self.add_page(target_page)
+                pages[target_page] = node
+
+            # Handling multimaps
+            outlinks[source_page].append(target_page)
+            inlinks[target_page].append(source_page)
+
+        for source_page, target_pages in outlinks:
+            source_node = pages[source_page]
+            target_blocks = (pages[target_page].block for target_page in target_pages)
+
+            self.link_store.add_links(source_node, target_blocks)
+
+
     def close(self):
+
         # Cleanup
         self.lru_trie_file.close()
         self.link_store_file.close()

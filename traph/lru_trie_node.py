@@ -332,6 +332,39 @@ class LRUTrieNode(object):
         self.data[LRU_TRIE_NODE_INLINKS_BLOCK] = block
 
     # =========================================================================
+    # Generic links block methods
+    # =========================================================================
+    def has_links(self, out=True):
+        offset = LRU_TRIE_NODE_OUTLINKS_BLOCK
+
+        if out:
+            offset = LRU_TRIE_NODE_INLINKS_BLOCK
+
+        return self.data[offset] != 0
+
+    def links(self, out=True):
+        offset = LRU_TRIE_NODE_OUTLINKS_BLOCK
+
+        if out:
+            offset = LRU_TRIE_NODE_INLINKS_BLOCK
+
+        block = self.data[offset]
+
+        if block < LRU_TRIE_NODE_HEADER_BLOCKS:
+            return None
+
+        return block
+
+    def set_links(self, out=True):
+        offset = LRU_TRIE_NODE_OUTLINKS_BLOCK
+
+        if out:
+            offset = LRU_TRIE_NODE_INLINKS_BLOCK
+
+        self.data[offset] = block
+
+
+    # =========================================================================
     # WebEntity methods
     # =========================================================================
 
