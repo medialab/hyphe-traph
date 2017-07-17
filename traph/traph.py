@@ -5,7 +5,6 @@
 # Main class representing the Traph data structure.
 #
 from traph_batch import TraphBatch
-from walk_history import WalkHistory
 from file_storage import FileStorage
 from memory_storage import MemoryStorage
 from lru_trie import LRUTrie
