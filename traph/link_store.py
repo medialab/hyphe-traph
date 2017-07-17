@@ -4,7 +4,7 @@
 #
 # Class representing the structure storing the links as linked list of stubs.
 #
-import itertools
+from itertools import chain
 from link_store_node import LinkStoreNode, LINK_STORE_NODE_HEADER_BLOCKS
 
 
@@ -119,7 +119,7 @@ class LinkStore(object):
             last_link_node = link_node
 
         if first_target_block:
-            target_blocks = itertools.chain([first_target_block], target_blocks)
+            target_blocks = chain([first_target_block], target_blocks)
 
         # Adding new targets
         for target_block in target_blocks:
@@ -137,7 +137,6 @@ class LinkStore(object):
 
                 last_link_node.set_next(link_node.block)
                 last_link_node = link_node
-
 
     # =========================================================================
     # Iteration methods
