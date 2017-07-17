@@ -128,10 +128,10 @@ class LinkStore(object):
                 last_link_node = link_node
 
     def add_outlinks(self, source_node, target_blocks):
-        return self.add_links(self, source_node, target_blocks, out=True)
+        return self.add_links(source_node, target_blocks, out=True)
 
     def add_inlinks(self, source_node, target_blocks):
-        return self.add_links(self, source_node, target_blocks, out=False)
+        return self.add_links(source_node, target_blocks, out=False)
 
     # =========================================================================
     # Iteration methods
