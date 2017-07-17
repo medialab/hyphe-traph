@@ -21,7 +21,8 @@ class Traph(object):
     # Constructor
     # =========================================================================
     def __init__(self, lru_trie_file=None, link_store_file=None,
-                 webentity_creation_rule=None):
+                 webentity_default_creation_rule=None,
+                 webentity_creation_rules=None):
 
         # LRU Trie initialization
         if lru_trie_file:
