@@ -52,10 +52,10 @@ class Traph(object):
         self.link_store = LinkStore(self.links_store_storage)
 
     def __apply_webentity_creation_rule(self, prefix, lru):
-        pass #TODO
+        pass  # TODO
 
     def __apply_webentity_default_creation_rule(self, lru):
-        pass #TODO
+        pass  # TODO
 
     # =========================================================================
     # Public interface

@@ -12,7 +12,7 @@ class LRUTrieWalkHistory(object):
     def __init__(self, lru):
 
         # Properties
-        self.lru=lru
+        self.lru = lru
         self.webentity = None
         self.webentity_prefix = ''
         self.webentity_position = -1
@@ -37,7 +37,7 @@ class LRUTrieWalkHistory(object):
         self.webentity_prefix = prefix
         self.webentity_position = position
 
-    #TODO: web entity creation rule id (wecrid) is currenty useless.
+    # TODO: web entity creation rule id (wecrid) is currenty useless.
     def add_webentity_creation_rule(wecrid, position):
         self.webentity_creation_rules.append(position)
 
