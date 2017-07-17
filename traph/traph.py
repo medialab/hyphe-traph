@@ -127,6 +127,7 @@ class Traph(object):
             node, history = self.lru_trie.add_lru(prefix)
             node.flag_as_webentity_creation_rule()
             node.write()
+        # TODO: if write_in_trie, depth first search to apply the rule (create entities)
 
     def expand_prefix(self, prefix):
         # TODO: expand
