@@ -169,13 +169,13 @@ class Traph(object):
             outlinks[source_page].append(target_page)
             inlinks[target_page].append(source_page)
 
-        for source_page, target_pages in outlinks:
+        for source_page, target_pages in outlinks.items():
             source_node = pages[source_page]
             target_blocks = (pages[target_page].block for target_page in target_pages)
 
             store.add_outlinks(source_node, target_blocks)
 
-        for target_page, source_pages in inlinks:
+        for target_page, source_pages in inlinks.items():
             target_node = pages[target_page]
             source_blocks = (pages[source_page].block for source_page in source_pages)
 
