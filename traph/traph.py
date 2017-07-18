@@ -64,8 +64,6 @@ class Traph(object):
                     'File inconsistency: `link_store.dat` file exists but not `lru_trie.dat`.'
                 )
 
-            # TODO: check corruption by mod file size / block
-
             # Do we need to create the files for the first time?
             create = overwrite or (not lru_trie_file_exists and not link_store_file_exists)
 
@@ -86,6 +84,18 @@ class Traph(object):
                 LINK_STORE_NODE_BLOCK_SIZE,
                 self.link_store_file
             )
+
+            # Checking for corruption
+            if self.lru_trie_storage.check_for_corruption():
+                raise TraphException(
+                    'File corrupted: `lru_trie.dat`'
+                )
+
+            if self.links_store_storage.check_for_corruption():
+                raise TraphException(
+                    'File corrupted: `link_store.dat`'
+                )
+
         else:
             self.lru_trie_storage = MemoryStorage(LRU_TRIE_NODE_BLOCK_SIZE)
             self.links_store_storage = MemoryStorage(LINK_STORE_NODE_BLOCK_SIZE)
