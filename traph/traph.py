@@ -13,6 +13,7 @@ from lru_trie_walk_history import LRUTrieWalkHistory
 from lru_trie_node import LRU_TRIE_NODE_BLOCK_SIZE
 from link_store import LinkStore
 from link_store_node import LINK_STORE_NODE_BLOCK_SIZE
+from helpers import lru_variations
 
 
 # Main class
@@ -235,8 +236,7 @@ class Traph(object):
         pass
 
     def expand_prefix(self, prefix):
-        # TODO: expand
-        return [prefix]
+        return lru_variations(prefix)
 
     def add_page(self, lru):
         node, history = self.lru_trie.add_page(lru)
