@@ -79,7 +79,8 @@ for page in PAGES:
     print report
 
 print 'Store links...'
-traph.add_links(LINKS)
+links_report = traph.add_links(LINKS)
+print links_report
 
 print '...data stored.'
 

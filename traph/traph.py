@@ -275,6 +275,7 @@ class Traph(object):
 
     def add_links(self, links):
         store = self.link_store
+        report = TraphWriteReport()
 
         # TODO: this will need to return created web entities
         inlinks = defaultdict(list)
@@ -285,10 +286,12 @@ class Traph(object):
 
             # Adding pages
             if not source_page in pages:
-                node, report = self.__add_page(source_page)
+                node, page_report = self.__add_page(source_page)
+                report += page_report
                 pages[source_page] = node
             if not target_page in pages:
-                node, report = self.__add_page(target_page)
+                node, page_report = self.__add_page(target_page)
+                report += page_report
                 pages[target_page] = node
 
             # Handling multimaps
@@ -306,6 +309,8 @@ class Traph(object):
             source_blocks = (pages[source_page].block for source_page in source_pages)
 
             store.add_inlinks(target_node, source_blocks)
+
+        return report
 
     def close(self):
 
