@@ -24,7 +24,7 @@ webentity_creation_rules = {
 }
 
 # Creating the Traph
-traph = Traph(create=True, folder='./scripts/data/',
+traph = Traph(overwrite=True, folder='./scripts/data/',
               default_webentity_creation_rule=default_webentity_creation_rule,
               webentity_creation_rules=webentity_creation_rules)
 

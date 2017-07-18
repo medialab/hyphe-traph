@@ -20,7 +20,7 @@ class FileStorage(object):
     def __block_offset(self, block):
         return self.block_size * block
 
-    # Method returning whether the file is corrupte
+    # Method returning whether the file is corrupted
     def check_for_corruption(self):
         self.file.seek(0, os.SEEK_END)
         file_length = self.file.tell()
