@@ -81,7 +81,7 @@ traph = Traph(create=True, folder='./scripts/data/',
 # Store data
 print 'Store pages...'
 for page in PAGES:
-    traph.add_page(page)
+    report = traph.add_page(page)
 
 print 'Store links...'
 traph.add_links(LINKS)
