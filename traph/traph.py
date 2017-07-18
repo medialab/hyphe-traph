@@ -140,8 +140,11 @@ class Traph(object):
         # TODO: if write_in_trie, depth first search to apply the rule (create entities)
 
     def remove_webentity_creation_rule(self, prefix):
-        # TODO
-        pass
+        node = self.lru_trie.lru_node(prefix)
+        if not node:
+            raise Exception('Prefix not in tree: ' + prefix) # TODO: raise custom exception
+        node.unflag_as_webentity_creation_rule()
+        return True
 
     def create_webentity(self, prefixes, expand=False):
         # TODO
@@ -319,3 +322,6 @@ class Traph(object):
 
             for link_node in self.link_store.link_nodes_iter(page_node.outlinks()):
                 yield lru, self.lru_trie.windup_lru(link_node.target())
+
+    def pages_iter(self):
+        return self.lru_trie.pages_iter()

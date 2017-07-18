@@ -88,7 +88,7 @@ traph.add_links(LINKS)
 print '...data stored.'
 
 print '\nPages:'
-for node, lru in trie.pages_iter():
+for node, lru in traph.pages_iter():
     print ' - '+lru
 
 print '\nPage Links:'
