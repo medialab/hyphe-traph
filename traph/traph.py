@@ -74,13 +74,23 @@ class Traph(object):
     # =========================================================================
     # Internal methods
     # =========================================================================
-    def __add_prefixes(self, prefixes):
-        for prefix in prefixes:
+    def __generate_web_entities_ids(self, number):
+        header = self.lru_trie.header
+        last_webentity_id = header.last_webentity_id()
+        header.increment_last_webentity_id_by(number)
+        header.write()
 
-            # TODO: notify of webentity creation
-            # TODO: 45 is a placeholder for the weid
+        return range(last_webentity_id + 1, last_webentity_id + number + 1)
+
+    def __add_prefixes(self, prefixes):
+        webentity_ids = self.__generate_web_entities_ids(len(prefixes))
+
+        for i in range(len(prefixes)):
+            prefix = prefixes[i]
+            webentity_id = webentity_ids[i]
+
             node, history = self.lru_trie.add_lru(prefix)
-            node.set_webentity(45)
+            node.set_webentity(webentity_id)
             node.write()
 
     def __apply_webentity_creation_rule(self, rule_prefix, lru):
@@ -92,8 +102,10 @@ class Traph(object):
             return False
 
         prefix = match.group()
+        expanded_prefixes = self.expand_prefix(prefix)
 
-        self.__add_prefixes(self.expand_prefix(prefix))
+        if len(expanded_prefixes):
+            self.__add_prefixes(expanded_prefixes)
 
         return True
 
@@ -117,7 +129,7 @@ class Traph(object):
     def index_batch_crawl(self, data):
         # data is supposed to be a JSON of this form:
         # {pages:{'lru':'<lru>', 'lrulinks':[<lrulink1>, ...]}}
-        # 
+        #
         # TODO: return a JSON containing created entities:
         # {stats:{}, webentities:{'<weid>':[<prefix1>, ...]}}
         pass
