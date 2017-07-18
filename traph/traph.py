@@ -255,7 +255,7 @@ class Traph(object):
         for rule_prefix in history.rules_to_apply():
             candidate_prefix = self.__apply_webentity_creation_rule(rule_prefix, lru)
 
-            if len(candidate_prefix) > len(longest_candidate_prefix) :
+            if candidate_prefix and len(candidate_prefix) > len(longest_candidate_prefix) :
                 longest_candidate_prefix = candidate_prefix
 
         # In this case, the webentity already exists

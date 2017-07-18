@@ -10,31 +10,41 @@ from config import CONFIG
 
 MONGO = CONFIG['mongo']
 
-# Truncating the file for our purpose
-lru_trie_file = open('./scripts/data/lru_trie.dat', 'wb+')
-link_store_file = open('./scripts/data/link_store.dat', 'wb+')
+webentity_creation_rules_regexp = {
+    'domain':       '(s:[a-zA-Z]+\\|(t:[0-9]+\\|)?(h:[^\\|]+\\|(h:[^\\|]+\\|)|h:(localhost|(\\d{1,3}\\.){3}\\d{1,3}|\\[[\\da-f]*:[\\da-f:]*\\])\\|))',
+    'subdomain':    '(s:[a-zA-Z]+\\|(t:[0-9]+\\|)?(h:[^\\|]+\\|(h:[^\\|]+\\|)+|h:(localhost|(\\d{1,3}\\.){3}\\d{1,3}|\\[[\\da-f]*:[\\da-f:]*\\])\\|))',
+    'path1':        '(s:[a-zA-Z]+\\|(t:[0-9]+\\|)?(h:[^\\|]+\\|(h:[^\\|]+\\|)+|h:(localhost|(\\d{1,3}\\.){3}\\d{1,3}|\\[[\\da-f]*:[\\da-f:]*\\])\\|)(p:[^\\|]+\\|){1})',
+    'path2':        '(s:[a-zA-Z]+\\|(t:[0-9]+\\|)?(h:[^\\|]+\\|(h:[^\\|]+\\|)+|h:(localhost|(\\d{1,3}\\.){3}\\d{1,3}|\\[[\\da-f]*:[\\da-f:]*\\])\\|)(p:[^\\|]+\\|){2})'
+}
 
-traph = Traph(lru_trie_file=lru_trie_file, link_store_file=link_store_file)
-trie = traph.lru_trie
-links = traph.link_store
+default_webentity_creation_rule = webentity_creation_rules_regexp['domain']
+
+webentity_creation_rules = {
+    's:http|h:com|h:twitter|': webentity_creation_rules_regexp['path1'],
+}
+
+# Creating the Traph
+traph = Traph(create=True, folder='./scripts/data/',
+              default_webentity_creation_rule=default_webentity_creation_rule,
+              webentity_creation_rules=webentity_creation_rules)
 
 # Reading from mongo
 client = MongoClient(MONGO['host'], MONGO['port'])
 collection = client[MONGO['db']][MONGO['collection']]
 
-batch = traph.batch()
+def links_generator(data):
+    source = data['lru']
+
+    for target in data['lrulinks']:
+        yield source, target
 
 i = 0
 for page in collection.find({}, {'lru': 1, 'lrulinks': 1}, sort=[("_job", 1)]):
     i += 1
 
-    batch.add_page_with_links(page['lru'], page['lrulinks'])
+    traph.add_links(links_generator(page))
 
     if i % 100 == 0:
         print '(%i) [%i] - %s' % (i, len(page['lrulinks']), page['lru'])
 
-    # for link in page['lrulinks']:
-    #     traph.add_page(link)
-
-lru_trie_file.close()
-link_store_file.close()
+traph.close()
