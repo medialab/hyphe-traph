@@ -20,12 +20,6 @@ from lru_trie_header import LRU_TRIE_HEADER_BLOCKS
 LRU_TRIE_NODE_FORMAT = 'BBxxIQQQQQ'
 LRU_TRIE_NODE_BLOCK_SIZE = struct.calcsize(LRU_TRIE_NODE_FORMAT)
 
-# Header blocks
-# -
-# We are retaining at least one header block so we can keep the 0 block address
-# as a NULL pointer and be able to store some metadata about the structure.
-LRU_TRIE_NODE_HEADER_BLOCKS = 1
-
 # Node Positions
 LRU_TRIE_NODE_CHAR = 0
 LRU_TRIE_NODE_FLAGS = 1
@@ -154,7 +148,7 @@ class LRUTrieNode(object):
 
     # Method returning whether this node is the root
     def is_root(self):
-        return self.block == LRU_TRIE_NODE_HEADER_BLOCKS
+        return self.block == LRU_TRIE_HEADER_BLOCKS
 
     # =========================================================================
     # Flags methods
@@ -205,14 +199,14 @@ class LRUTrieNode(object):
     def next(self):
         block = self.data[LRU_TRIE_NODE_NEXT_BLOCK]
 
-        if block < LRU_TRIE_NODE_HEADER_BLOCKS:
+        if block < LRU_TRIE_HEADER_BLOCKS:
             return None
 
         return block
 
     # Method used to set a sibling
     def set_next(self, block):
-        if block < LRU_TRIE_NODE_HEADER_BLOCKS:
+        if block < LRU_TRIE_HEADER_BLOCKS:
             raise LRUTrieNodeUsageException('Next node cannot be the root.')
 
         self.data[LRU_TRIE_NODE_NEXT_BLOCK] = block
@@ -243,14 +237,14 @@ class LRUTrieNode(object):
     def child(self):
         block = self.data[LRU_TRIE_NODE_CHILD_BLOCK]
 
-        if block < LRU_TRIE_NODE_HEADER_BLOCKS:
+        if block < LRU_TRIE_HEADER_BLOCKS:
             return None
 
         return block
 
     # Method used to set a child
     def set_child(self, block):
-        if block < LRU_TRIE_NODE_HEADER_BLOCKS:
+        if block < LRU_TRIE_HEADER_BLOCKS:
             raise LRUTrieNodeUsageException('Child node cannot be the root.')
 
         self.data[LRU_TRIE_NODE_CHILD_BLOCK] = block
@@ -303,7 +297,7 @@ class LRUTrieNode(object):
     def outlinks(self):
         block = self.data[LRU_TRIE_NODE_OUTLINKS_BLOCK]
 
-        if block < LRU_TRIE_NODE_HEADER_BLOCKS:
+        if block < LRU_TRIE_HEADER_BLOCKS:
             return None
 
         return block
@@ -324,7 +318,7 @@ class LRUTrieNode(object):
     def inlinks(self):
         block = self.data[LRU_TRIE_NODE_INLINKS_BLOCK]
 
-        if block < LRU_TRIE_NODE_HEADER_BLOCKS:
+        if block < LRU_TRIE_HEADER_BLOCKS:
             return None
 
         return block
@@ -352,7 +346,7 @@ class LRUTrieNode(object):
 
         block = self.data[offset]
 
-        if block < LRU_TRIE_NODE_HEADER_BLOCKS:
+        if block < LRU_TRIE_HEADER_BLOCKS:
             return None
 
         return block
