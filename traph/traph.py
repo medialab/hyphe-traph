@@ -325,3 +325,6 @@ class Traph(object):
 
     def pages_iter(self):
         return self.lru_trie.pages_iter()
+
+    def webentity_prefix_iter(self):
+        return self.lru_trie.webentity_prefix_iter()

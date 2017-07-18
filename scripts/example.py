@@ -72,11 +72,6 @@ webentity_store = WebEntityStore('./scripts/data/webentities.json')
 traph = Traph(create=True, folder='./scripts/data/',
               default_webentity_creation_rule=default_webentity_creation_rule,
               webentity_creation_rules=webentity_creation_rules)
-trie = traph.lru_trie
-links = traph.link_store
-
-# print trie.header
-# print links.header
 
 print 'Store pages...'
 for page in PAGES:
@@ -96,7 +91,7 @@ for source_lru, target_lru in traph.links_iter():
     print ' - %s\t->  %s' % (source_lru, target_lru)
 
 print '\nPrefixes:'
-for node, lru in trie.webentity_prefix_iter():
+for node, lru in traph.webentity_prefix_iter():
     print ' - webentity  '+str(node.webentity())+' \t'+lru
 
 traph.close()
