@@ -16,6 +16,10 @@ def https_variation(lru):
 
 def lru_variations(lru):
     variations = [lru]
+
+    if not lru:
+        return variations
+
     https_var = https_variation(lru)
     if https_var:
         variations.append(https_var)

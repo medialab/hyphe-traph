@@ -39,12 +39,21 @@ def links_generator(data):
         yield source, target
 
 i = 0
-for page in collection.find({}, {'lru': 1, 'lrulinks': 1}, sort=[("_job", 1)]):
+links = []
+for page in collection.find({}, {'lru': 1, 'lrulinks': 1}, sort=[('_job', 1)]):
     i += 1
 
-    traph.add_links(links_generator(page))
+    links.extend(links_generator(page))
+
+    # traph.add_links(links_generator(page))
 
     if i % 100 == 0:
         print '(%i) [%i] - %s' % (i, len(page['lrulinks']), page['lru'])
+
+    # for link in page['lrulinks']:
+    #     traph.add_page(link)
+
+print 'Gathered links'
+traph.add_links(links)
 
 traph.close()
