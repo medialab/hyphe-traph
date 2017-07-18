@@ -1,3 +1,4 @@
 # Dev Dependencies
+networkx
 pep8
 pymongo
