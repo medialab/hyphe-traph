@@ -182,21 +182,13 @@ class Traph(object):
                 raise Exception('Prefix not in tree: ' + rule_prefix) # TODO: raise custom exception
             node.flag_as_webentity_creation_rule()
             node.write()
-            # TODO: if write_in_trie, depth first search to apply the rule (create entities)
             # Spawn necessary web entities
             candidate_prefixes = set()
             for node2, lru in self.lru_trie.dfs_iter(node, rule_prefix[:-1]):
                 # Note: unsure why we need to trim rule_prefix above, but it seems to work
-                candidate_prefix = self.__apply_webentity_creation_rule(rule_prefix, lru)
-                if candidate_prefix: # regexp may fail, that is normal and expected
-                    candidate_prefixes.add(candidate_prefix)
-            for candidate_prefix in candidate_prefixes:
-                candidate_node, c_history = self.lru_trie.add_lru(candidate_prefix)
-                if not candidate_node.has_webentity():
-                    # Create a webentity
-                    expanded_prefixes = self.expand_prefix(candidate_prefix)
-                    webentity_id = self.__add_prefixes(expanded_prefixes)
-                    report.created_webentities[webentity_id] = expanded_prefixes
+                if node2.is_page():
+                    _, add_report = self.__add_page(lru)
+                    report += add_report
 
         return report
 
