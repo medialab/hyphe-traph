@@ -166,8 +166,6 @@ class Traph(object):
         pass
 
     def add_webentity_creation_rule(self, prefix, pattern, write_in_trie=True):
-        print 'add webentity ' + prefix + ' - ' + str(write_in_trie)
-        print self.webentity_creation_rules
         self.webentity_creation_rules[prefix] = re.compile(
             pattern,
             re.I
