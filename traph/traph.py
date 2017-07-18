@@ -4,6 +4,8 @@
 #
 # Main class representing the Traph data structure.
 #
+import errno
+import os
 import re
 from collections import defaultdict
 from file_storage import FileStorage
@@ -16,48 +18,82 @@ from link_store_node import LINK_STORE_NODE_BLOCK_SIZE
 from helpers import lru_variations
 
 
+# Exceptions
+class TraphException(Exception):
+    pass
+
+
 # Main class
 class Traph(object):
 
     # =========================================================================
     # Constructor
     # =========================================================================
-    def __init__(self, create=False, folder=None,
+    def __init__(self, overwrite=False, folder=None,
                  default_webentity_creation_rule=None,
                  webentity_creation_rules=None):
 
-        # TODO: solve path
+        create = overwrite
 
-        if create:
-            # TODO: erase dir and all its content
-            # TODO: make dir
-            self.lru_trie_file = open(folder+'lru_trie.dat', 'wb+')
-            self.link_store_file = open(folder+'link_store.dat', 'wb+')
-        else:
-            self.lru_trie_file = open(folder+'lru_trie.dat', 'rb+')
-            self.link_store_file = open(folder+'link_store.dat', 'rb+')
-
-        # LRU Trie initialization
+        # Solving paths
         if folder:
+            lru_trie_path = os.path.join(folder, 'lru_trie.dat')
+            link_store_path = os.path.join(folder, 'link_store.dat')
+
+            # Ensuring the given folder exists
+            try:
+                os.makedirs(folder)
+            except OSError as exception:
+                if exception.errno == errno.EEXIST and os.path.isdir(folder):
+                    pass
+                else:
+                    raise
+
+            # Testing existence of files
+            lru_trie_file_exists = os.path.isfile(lru_trie_path)
+            link_store_file_exists = os.path.isfile(link_store_path)
+
+            # Checking consistency
+            if lru_trie_file_exists and not link_store_file_exists:
+                raise TraphException(
+                    'File inconsistency: `lru_trie.dat` file exists but not `link_store.dat`.'
+                )
+
+            if not lru_trie_file_exists and link_store_file_exists:
+                raise TraphException(
+                    'File inconsistency: `link_store.dat` file exists but not `lru_trie.dat`.'
+                )
+
+            # TODO: check corruption by mod file size / block
+
+            # Do we need to create the files for the first time?
+            create = overwrite or (not lru_trie_file_exists and not link_store_file_exists)
+
+            if create:
+                # TODO: erase dir and all its content
+                self.lru_trie_file = open(lru_trie_path, 'wb+')
+                self.link_store_file = open(link_store_path, 'wb+')
+            else:
+                self.lru_trie_file = open(lru_trie_path, 'rb+')
+                self.link_store_file = open(link_store_path, 'rb+')
+
             self.lru_trie_storage = FileStorage(
                 LRU_TRIE_NODE_BLOCK_SIZE,
                 self.lru_trie_file
             )
-        else:
-            self.lru_trie_storage = MemoryStorage(LRU_TRIE_NODE_BLOCK_SIZE)
 
-        self.lru_trie = LRUTrie(self.lru_trie_storage)
-
-        # Link Store initialization
-        if folder:
             self.links_store_storage = FileStorage(
                 LINK_STORE_NODE_BLOCK_SIZE,
                 self.link_store_file
             )
         else:
-            self.links_store_storage = MemoryStorage(
-                LINK_STORE_NODE_BLOCK_SIZE)
+            self.lru_trie_storage = MemoryStorage(LRU_TRIE_NODE_BLOCK_SIZE)
+            self.links_store_storage = MemoryStorage(LINK_STORE_NODE_BLOCK_SIZE)
 
+        # LRU Trie initialization
+        self.lru_trie = LRUTrie(self.lru_trie_storage)
+
+        # Link Store initialization
         self.link_store = LinkStore(self.links_store_storage)
 
         # Webentity creation rules are stored in RAM
@@ -196,7 +232,7 @@ class Traph(object):
         if not self.webentity_creation_rules[rule_prefix]:
             raise Exception('Prefix not in creation rules: ' + rule_prefix) # TODO: raise custom exception
         del self.webentity_creation_rules[rule_prefix]
-        
+
         node = self.lru_trie.lru_node(rule_prefix)
         if not node:
             raise Exception('Prefix not in tree: ' + rule_prefix) # TODO: raise custom exception

@@ -10,6 +10,8 @@
 import struct
 from lru_trie_header import LRU_TRIE_HEADER_BLOCKS
 
+# TODO: we can be more compact for some things
+
 # Binary format
 # -
 # NOTE: Since python mimics C struct, the block size should be respecting
