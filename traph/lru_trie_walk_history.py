@@ -41,8 +41,7 @@ class LRUTrieWalkHistory(object):
 
     def rules_to_apply(self):
         for position in reversed(self.webentity_creation_rules):
-            if position >= 0 and \
-               position >= self.webentity_position:
+            if position >= 0:
 
                 prefix = self.lru[0:position+1] # FIXME: unsure of the +1
 
