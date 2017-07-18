@@ -67,12 +67,6 @@ webentity_creation_rules = {
     's:http|h:com|h:twitter|': webentity_creation_rules_regexp['path1'],
 }
 
-# Webentity store is necessary to keep track of web entities' prefixes.
-# Though the traph could retrieve them, it would not be efficient.
-# In a real situation, these would be tracked elsewhere.
-# That's what we are simulating with this store.
-webentity_store = WebEntityStore('./scripts/data/webentities.json')
-
 # Instanciate the traph
 traph = Traph(create=True, folder='./scripts/data/',
               default_webentity_creation_rule=default_webentity_creation_rule,
