@@ -188,6 +188,52 @@ class Traph(object):
         # raise an error if no webentity id found
         pass
 
+    def get_webentity_by_prefix(self, prefix):
+        # TODO: return weid
+        # If the prefix is not in the trie or not the prefix of
+        # an existing webentity, return an error
+        pass
+
+    def get_webentity_pages(self, weid, prefixes):
+        # TODO: return list of lrus
+        # Note: the prefixes are thoses of the webentity whose id is weid
+        # No need to check
+        pass
+
+    def get_webentity_crawled_pages(self, weid, prefixes):
+        # TODO: return list of lrus
+        # Note: the prefixes are thoses of the webentity whose id is weid
+        # No need to check
+        pass
+
+    def get_webentity_most_linked_pages(self, weid, prefixes):
+        # TODO: return list of lrus
+        # Note: the prefixes are thoses of the webentity whose id is weid
+        # No need to check
+        pass
+
+    def get_webentity_parent_webentities(self, weid, prefixes):
+        # : return list of weid
+        # Note: the prefixes are thoses of the webentity whose id is weid
+        # No need to check
+        pass
+
+    def get_webentity_child_webentities(self, weid, prefixes):
+        # TODO: return list of weid
+        # Note: the prefixes are thoses of the webentity whose id is weid
+        # No need to check
+        pass
+
+    def get_webentity_pagelinks(self, weid, prefixes, include_internal=False):
+        # TODO: return list of [source_lru, target_lru, weight]
+        # Note: the prefixes are thoses of the webentity whose id is weid
+        # No need to check
+        pass
+
+    def get_webentities_links(self):
+        # TODO: return all webentity links
+        pass
+
     def expand_prefix(self, prefix):
         # TODO: expand
         return [prefix]
