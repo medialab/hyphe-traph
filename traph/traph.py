@@ -107,7 +107,6 @@ class Traph(object):
         for prefix, pattern in webentity_creation_rules.items():
             self.add_webentity_creation_rule(prefix, pattern, create)
 
-
     # =========================================================================
     # Internal methods
     # =========================================================================
@@ -170,7 +169,7 @@ class Traph(object):
         for rule_prefix in history.rules_to_apply():
             candidate_prefix = self.__apply_webentity_creation_rule(rule_prefix, lru)
 
-            if candidate_prefix and len(candidate_prefix) > len(longest_candidate_prefix) :
+            if candidate_prefix and len(candidate_prefix) > len(longest_candidate_prefix):
                 longest_candidate_prefix = candidate_prefix
 
         # In this case, the webentity already exists
@@ -191,7 +190,6 @@ class Traph(object):
         report.created_webentities[webentity_id] = expanded_prefixes
 
         return node, report
-
 
     # =========================================================================
     # Public interface
@@ -215,7 +213,7 @@ class Traph(object):
         if write_in_trie:
             node, history = self.lru_trie.add_lru(rule_prefix)
             if not node:
-                raise Exception('Prefix not in tree: ' + rule_prefix) # TODO: raise custom exception
+                raise Exception('Prefix not in tree: ' + rule_prefix)  # TODO: raise custom exception
             node.flag_as_webentity_creation_rule()
             node.write()
             # Spawn necessary web entities
@@ -230,12 +228,12 @@ class Traph(object):
 
     def remove_webentity_creation_rule(self, rule_prefix):
         if not self.webentity_creation_rules[rule_prefix]:
-            raise Exception('Prefix not in creation rules: ' + rule_prefix) # TODO: raise custom exception
+            raise Exception('Prefix not in creation rules: ' + rule_prefix)  # TODO: raise custom exception
         del self.webentity_creation_rules[rule_prefix]
 
         node = self.lru_trie.lru_node(rule_prefix)
         if not node:
-            raise Exception('Prefix not in tree: ' + rule_prefix) # TODO: raise custom exception
+            raise Exception('Prefix not in tree: ' + rule_prefix)  # TODO: raise custom exception
         node.unflag_as_webentity_creation_rule()
         node.write()
 
@@ -340,11 +338,11 @@ class Traph(object):
         for source_page, target_page in links:
 
             # Adding pages
-            if not source_page in pages:
+            if source_page not in pages:
                 node, page_report = self.__add_page(source_page)
                 report += page_report
                 pages[source_page] = node
-            if not target_page in pages:
+            if target_page not in pages:
                 node, page_report = self.__add_page(target_page)
                 report += page_report
                 pages[target_page] = node

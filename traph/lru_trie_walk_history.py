@@ -43,7 +43,7 @@ class LRUTrieWalkHistory(object):
         for position in reversed(self.webentity_creation_rules):
             if position >= 0:
 
-                prefix = self.lru[0:position+1] # FIXME: unsure of the +1
+                prefix = self.lru[0:position + 1]  # FIXME: unsure of the +1
 
                 # Note that it remains to the user to apply default rule if
                 # none of the given rules would happen to succeed

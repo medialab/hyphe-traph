@@ -7,10 +7,10 @@
 # Note that it should be possible to speed up targeted updates by only
 # writing the updated fields (typically when setting a pointer).
 #
+# TODO: we can be more compact for some things
+#
 import struct
 from lru_trie_header import LRU_TRIE_HEADER_BLOCKS
-
-# TODO: we can be more compact for some things
 
 # Binary format
 # -
@@ -364,7 +364,6 @@ class LRUTrieNode(object):
             offset = LRU_TRIE_NODE_INLINKS_BLOCK
 
         self.data[offset] = block
-
 
     # =========================================================================
     # WebEntity methods

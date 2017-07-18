@@ -8,7 +8,7 @@ test: test-unittest
 
 lint:
 	@echo Linting source code using pep8...
-	pep8 $(SOURCE)
+	pep8 --ignore E501 $(SOURCE)
 	@echo
 
 test-unittest:
