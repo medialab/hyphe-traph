@@ -194,6 +194,15 @@ class Traph(object):
     def add_page(self, lru):
         node, history = self.lru_trie.add_page(lru)
 
+        # FIXME: expected behavior is:
+        #        1) Retrieve all creation rules triggered 'above' in the trie
+        #        2) Apply them in order to get CANDIDATE prefixes
+        #        3) Two cases:
+        #           3a) All prefixes are smaller OR EQUAL (upper) than an existing prefix
+        #               -> Nothing happens (webentity already exists)
+        #           3b) A prefix is STRICTLY longer (lower) than existing prefixes
+        #               -> apply the longest prefix as a new webentity
+
         # Here we need to deal with webentity creation rules
         for rule_prefix in history.rules_to_apply():
             if self.__apply_webentity_creation_rule(rule_prefix, lru):
