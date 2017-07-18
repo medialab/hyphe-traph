@@ -6,7 +6,6 @@
 #
 import re
 from collections import defaultdict
-from traph_batch import TraphBatch
 from file_storage import FileStorage
 from memory_storage import MemoryStorage
 from lru_trie import LRUTrie
@@ -132,9 +131,6 @@ class Traph(object):
     def expand_prefix(self, prefix):
         # TODO: expand
         return [prefix]
-
-    def batch(self):
-        return TraphBatch(self)
 
     def add_page(self, lru):
         node, history = self.lru_trie.add_page(lru)
