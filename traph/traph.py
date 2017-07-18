@@ -104,14 +104,6 @@ class Traph(object):
 
         return match.group()
 
-        # TODO: move this elsewhere
-        expanded_prefixes = self.expand_prefix(prefix)
-
-        if len(expanded_prefixes):
-            self.__add_prefixes(expanded_prefixes)
-
-        return True
-
     def __apply_webentity_default_creation_rule(self, lru):
 
         regexp = self.default_webentity_creation_rule
@@ -121,11 +113,6 @@ class Traph(object):
             return None
 
         return match.group()
-
-        # TODO: move this elsewhere
-        self.__add_prefixes(self.expand_prefix(prefix))
-
-        return True
 
     # =========================================================================
     # Public interface
@@ -271,7 +258,7 @@ class Traph(object):
             return node
 
         # Nothing worked, we need to apply the default creation rule
-        self.__apply_webentity_default_creation_rule(lru)
+        longest_candidate_prefix = self.__apply_webentity_default_creation_rule(lru)
         expanded_prefixes = self.expand_prefix(longest_candidate_prefix)
         self.__add_prefixes(expanded_prefixes)
 
