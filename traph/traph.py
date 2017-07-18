@@ -67,13 +67,10 @@ class Traph(object):
             # Do we need to create the files for the first time?
             create = overwrite or (not lru_trie_file_exists and not link_store_file_exists)
 
-            if create:
-                # TODO: erase dir and all its content
-                self.lru_trie_file = open(lru_trie_path, 'wb+')
-                self.link_store_file = open(link_store_path, 'wb+')
-            else:
-                self.lru_trie_file = open(lru_trie_path, 'rb+')
-                self.link_store_file = open(link_store_path, 'rb+')
+            flags = 'wb+' if create else 'rb+'
+
+            self.lru_trie_file = open(lru_trie_path, flags)
+            self.link_store_file = open(link_store_path, flags)
 
             self.lru_trie_storage = FileStorage(
                 LRU_TRIE_NODE_BLOCK_SIZE,
@@ -378,8 +375,11 @@ class Traph(object):
     def close(self):
 
         # Cleanup
-        self.lru_trie_file.close()
-        self.link_store_file.close()
+        if self.lru_trie_file:
+            self.lru_trie_file.close()
+
+        if self.link_store_file:
+            self.link_store_file.close()
 
     def clear(self):
         # TODO
