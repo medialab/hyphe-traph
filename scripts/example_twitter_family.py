@@ -67,6 +67,13 @@ webentity_creation_rules = {
     's:http|h:com|h:twitter|': webentity_creation_rules_regexp['path1'],
 }
 
+# Webentity store is necessary to keep track of web entities' prefixes.
+# Though the traph could retrieve them, it would not be efficient.
+# In a real situation, these would be tracked elsewhere.
+# That's what we are simulating with this store.
+webentity_store = WebEntityStore('./scripts/data/webentities.json')
+webentity_store.data['webentities'] = {}
+
 # Instanciate the traph
 traph = Traph(overwrite=True, folder='./scripts/data/',
               default_webentity_creation_rule=default_webentity_creation_rule,
@@ -76,11 +83,13 @@ traph = Traph(overwrite=True, folder='./scripts/data/',
 print 'Store pages...'
 for page in PAGES:
     report = traph.add_page(page)
-    print report
+    webentity_store.data['webentities'].update(report.created_webentities)
+    # print report
 
 print 'Store links...'
 links_report = traph.add_links(LINKS)
-print links_report
+webentity_store.data['webentities'].update(links_report.created_webentities)
+# print links_report
 
 print '...data stored.'
 
@@ -93,8 +102,8 @@ print '\nPage Links:'
 for source_lru, target_lru in traph.links_iter():
     print ' - %s\t->  %s' % (source_lru, target_lru)
 
-print '\nPrefixes:'
-for node, lru in traph.webentity_prefix_iter():
-    print ' - webentity  '+str(node.webentity())+' \t'+lru
+print '\nWebentities:'
+for weid, prefixes in webentity_store.data['webentities'].items():
+    print ' - Webentity %s\t%s + %s other prefixes' % (weid, prefixes[0], len(prefixes)-1) 
 
 traph.close()
