@@ -114,6 +114,14 @@ class Traph(object):
     # =========================================================================
     # Public interface
     # =========================================================================
+    def index_batch_crawl(self, data):
+        # data is supposed to be a JSON of this form:
+        # {pages:{'lru':'<lru>', 'lrulinks':[<lrulink1>, ...]}}
+        # 
+        # TODO: return a JSON containing created entities:
+        # {stats:{}, webentities:{'<weid>':[<prefix1>, ...]}}
+        pass
+
     def add_webentity_creation_rule(self, prefix, pattern, write_in_trie=True):
         print 'add webentity ' + prefix + ' - ' + str(write_in_trie)
         print self.webentity_creation_rules
@@ -182,6 +190,10 @@ class Traph(object):
         # Cleanup
         self.lru_trie_file.close()
         self.link_store_file.close()
+
+    def clear(self):
+        # TODO
+        pass
 
     # =========================================================================
     # Iteration methods
