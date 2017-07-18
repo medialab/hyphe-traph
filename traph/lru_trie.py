@@ -252,3 +252,8 @@ class LRUTrie(object):
         for node, lru in self.dfs_iter():
             if node.is_page():
                 yield node, lru
+
+    def webentity_prefix_iter(self):
+        for node, lru in self.dfs_iter():
+            if node.has_webentity():
+                yield node, lru
