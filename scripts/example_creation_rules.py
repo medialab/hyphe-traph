@@ -61,7 +61,8 @@ for weid, prefixes in webentity_store.data['webentities'].items():
 # Operation 3
 print '\n:: Operation 3: Add the "Country" rule'
 
-traph.add_webentity_creation_rule('s:http|h:com|h:world|', webentity_creation_rules_regexp['path2'])
+report = traph.add_webentity_creation_rule('s:http|h:com|h:world|', webentity_creation_rules_regexp['path2'])
+webentity_store.data['webentities'].update(report.created_webentities)
 
 print 'Expected: "Japan" and "Spain" webentities created'
 print 'Result: existing webentities'

@@ -210,20 +210,22 @@ class LRUTrie(object):
             sibling.read_next()
             yield sibling
 
-    def dfs_iter(self, starting_node=False):
+    def dfs_iter(self, starting_node=False, starting_lru=False):
+        # Note: if starting_node is set, starting_lru must be too
         if starting_node:
             node = starting_node
             starting_block = starting_node.block
+            lru = starting_lru
         else:
             node = self.__root()
             starting_block = self.__root().block
+            lru = ''
 
         # If there is no root node, we can stop right there
         if not node.exists:
             return
 
         descending = True
-        lru = ''
 
         while True:
 
@@ -246,7 +248,6 @@ class LRUTrie(object):
 
             # Else we bubble up
             if not node.block == starting_block:
-            # if not node.is_root():
                 descending = False
                 lru = lru[:-1]
                 node.read_parent()

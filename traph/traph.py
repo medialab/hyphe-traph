@@ -83,6 +83,10 @@ class Traph(object):
         return header.last_webentity_id()
 
     def __add_prefixes(self, prefixes):
+        # TODO: deal with edge case where some prefixes are already set
+        #       to other and/or different web entities
+        # (if not in this function, then at the calls)
+
         webentity_id = self.__generated_web_entity_id()
 
         for prefix in prefixes:
@@ -164,26 +168,46 @@ class Traph(object):
         # {stats:{}, webentities:{'<weid>':[<prefix1>, ...]}}
         pass
 
-    def add_webentity_creation_rule(self, prefix, pattern, write_in_trie=True):
-        self.webentity_creation_rules[prefix] = re.compile(
+    def add_webentity_creation_rule(self, rule_prefix, pattern, write_in_trie=True):
+        self.webentity_creation_rules[rule_prefix] = re.compile(
             pattern,
             re.I
         )
 
+        report = TraphWriteReport()
+
         if write_in_trie:
-            node, history = self.lru_trie.add_lru(prefix)
+            node, history = self.lru_trie.add_lru(rule_prefix)
+            if not node:
+                raise Exception('Prefix not in tree: ' + rule_prefix) # TODO: raise custom exception
             node.flag_as_webentity_creation_rule()
             node.write()
             # TODO: if write_in_trie, depth first search to apply the rule (create entities)
+            # Spawn necessary web entities
+            candidate_prefixes = set()
+            for node2, lru in self.lru_trie.dfs_iter(node, rule_prefix[:-1]):
+                # Note: unsure why we need to trim rule_prefix above, but it seems to work
+                candidate_prefix = self.__apply_webentity_creation_rule(rule_prefix, lru)
+                if candidate_prefix: # regexp may fail, that is normal and expected
+                    candidate_prefixes.add(candidate_prefix)
+            for candidate_prefix in candidate_prefixes:
+                candidate_node, c_history = self.lru_trie.add_lru(candidate_prefix)
+                if not candidate_node.has_webentity():
+                    # Create a webentity
+                    expanded_prefixes = self.expand_prefix(candidate_prefix)
+                    webentity_id = self.__add_prefixes(expanded_prefixes)
+                    report.created_webentities[webentity_id] = expanded_prefixes
 
-    def remove_webentity_creation_rule(self, prefix):
-        if not self.webentity_creation_rules[prefix]:
-            raise Exception('Prefix not in creation rules: ' + prefix) # TODO: raise custom exception
-        del self.webentity_creation_rules[prefix]
+        return report
+
+    def remove_webentity_creation_rule(self, rule_prefix):
+        if not self.webentity_creation_rules[rule_prefix]:
+            raise Exception('Prefix not in creation rules: ' + rule_prefix) # TODO: raise custom exception
+        del self.webentity_creation_rules[rule_prefix]
         
-        node = self.lru_trie.lru_node(prefix)
+        node = self.lru_trie.lru_node(rule_prefix)
         if not node:
-            raise Exception('Prefix not in tree: ' + prefix) # TODO: raise custom exception
+            raise Exception('Prefix not in tree: ' + rule_prefix) # TODO: raise custom exception
         node.unflag_as_webentity_creation_rule()
         node.write()
 
