@@ -101,3 +101,6 @@ class LRUTrieHeader(object):
 
     def increment_last_webentity_id_by(self, number):
         self.data[LRU_TRIE_HEADER_LAST_WEBENTITY_ID] += number
+
+    def increment_last_webentity_id(self):
+        self.data[LRU_TRIE_HEADER_LAST_WEBENTITY_ID] += 1

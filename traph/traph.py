@@ -75,26 +75,22 @@ class Traph(object):
     # =========================================================================
     # Internal methods
     # =========================================================================
-    def __generate_web_entities_ids(self, number):
+    def __generated_web_entity_id(self):
         header = self.lru_trie.header
-        last_webentity_id = header.last_webentity_id()
-        header.increment_last_webentity_id_by(number)
+        header.increment_last_webentity_id()
         header.write()
 
-        return range(last_webentity_id + 1, last_webentity_id + number + 1)
+        return header.last_webentity_id()
 
     def __add_prefixes(self, prefixes):
-        webentity_ids = self.__generate_web_entities_ids(len(prefixes))
+        webentity_id = self.__generated_web_entity_id()
 
-        for i in range(len(prefixes)):
-            prefix = prefixes[i]
-            webentity_id = webentity_ids[i]
-
+        for prefix in prefixes:
             node, history = self.lru_trie.add_lru(prefix)
             node.set_webentity(webentity_id)
             node.write()
 
-        return dict(zip(webentity_ids, prefixes))
+        return webentity_id
 
     def __apply_webentity_creation_rule(self, rule_prefix, lru):
 
@@ -145,15 +141,15 @@ class Traph(object):
         # Else we need to expand the prefix and create relevant web entities
         if longest_candidate_prefix:
             expanded_prefixes = self.expand_prefix(longest_candidate_prefix)
-            created_webentities = self.__add_prefixes(expanded_prefixes)
-            report.created_webentities.update(created_webentities)
+            webentity_id = self.__add_prefixes(expanded_prefixes)
+            report.created_webentities[webentity_id] = expanded_prefixes
             return node, report
 
         # Nothing worked, we need to apply the default creation rule
         longest_candidate_prefix = self.__apply_webentity_default_creation_rule(lru)
         expanded_prefixes = self.expand_prefix(longest_candidate_prefix)
-        created_webentities = self.__add_prefixes(expanded_prefixes)
-        report.created_webentities.update(created_webentities)
+        webentity_id = self.__add_prefixes(expanded_prefixes)
+        report.created_webentities[webentity_id] = expanded_prefixes
 
         return node, report
 
