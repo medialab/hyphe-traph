@@ -93,7 +93,6 @@ class Traph(object):
         return webentity_id
 
     def __apply_webentity_creation_rule(self, rule_prefix, lru):
-
         regexp = self.webentity_creation_rules[rule_prefix]
         match = regexp.search(lru)
 
@@ -178,10 +177,16 @@ class Traph(object):
         # TODO: if write_in_trie, depth first search to apply the rule (create entities)
 
     def remove_webentity_creation_rule(self, prefix):
+        if not self.webentity_creation_rules[prefix]:
+            raise Exception('Prefix not in creation rules: ' + prefix) # TODO: raise custom exception
+        del self.webentity_creation_rules[prefix]
+        
         node = self.lru_trie.lru_node(prefix)
         if not node:
             raise Exception('Prefix not in tree: ' + prefix) # TODO: raise custom exception
         node.unflag_as_webentity_creation_rule()
+        node.write()
+
         return True
 
     def create_webentity(self, prefixes, expand=False):
