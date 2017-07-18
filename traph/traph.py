@@ -59,7 +59,7 @@ class Traph(object):
 
         self.link_store = LinkStore(self.links_store_storage)
 
-        # Web entity creation rules are stored in RAM
+        # Webentity creation rules are stored in RAM
         self.default_webentity_creation_rule = re.compile(
             default_webentity_creation_rule,
             re.I
@@ -135,6 +135,45 @@ class Traph(object):
             node.flag_as_webentity_creation_rule()
             node.write()
         # TODO: if write_in_trie, depth first search to apply the rule (create entities)
+
+    def remove_webentity_creation_rule(self, prefix):
+        # TODO
+        pass
+
+    def create_webentity(self, prefixes, expand=False):
+        # TODO
+        # Return an error if one of the prefixes is already attributed to a we
+        pass
+
+    def delete_webentity(self, weid, weid_prefixes):
+        # TODO
+        # Note: weid is not strictly necessary, but it helps to check
+        #       data consistency
+        pass
+
+    def add_webentity_prefix(self, weid, prefix):
+        # TODO
+        pass
+
+    def remove_webentity_prefix(self, weid, prefix):
+        # TODO
+        pass
+
+    def retrieve_prefix(self, lru):
+        # TODO: return the first webentity prefix above lru
+        # Raise an error in lru not in trie
+        # Worst case scenario should be default we creation rule:
+        # raise an error if no prefix found
+        pass
+
+    def retrieve_webentity(self, lru):
+        # TODO: return the first webentity id above lru
+        # Raise an error in lru not in trie
+        # Worst case scenario should be default we creation rule:
+        # raise an error if no webentity id found
+        pass
+
+    def 
 
     def expand_prefix(self, prefix):
         # TODO: expand
