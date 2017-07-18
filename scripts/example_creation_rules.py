@@ -59,12 +59,23 @@ for weid, prefixes in webentity_store.data['webentities'].items():
     print ' - Webentity %s\t%s + %s other prefixes' % (weid, prefixes[0], len(prefixes)-1) 
 
 # Operation 3
-print '\n:: Operation 3: Add the "Country" rule'
+print '\n:: Operation 3: Add the "City" rule'
+
+report = traph.add_webentity_creation_rule('s:http|h:com|h:world|', webentity_creation_rules_regexp['path3'])
+webentity_store.data['webentities'].update(report.created_webentities)
+
+print 'Expected: "Tokyo" and "Madrid" webentities created'
+print 'Result: existing webentities'
+for weid, prefixes in webentity_store.data['webentities'].items():
+    print ' - Webentity %s\t%s + %s other prefixes' % (weid, prefixes[0], len(prefixes)-1) 
+
+# Operation 4
+print '\n:: Operation 4: Add the "Country" rule'
 
 report = traph.add_webentity_creation_rule('s:http|h:com|h:world|', webentity_creation_rules_regexp['path2'])
 webentity_store.data['webentities'].update(report.created_webentities)
 
-print 'Expected: "Japan" and "Spain" webentities created'
+print 'Expected: nothing. "Japan" and "Spain" should not be created.'
 print 'Result: existing webentities'
 for weid, prefixes in webentity_store.data['webentities'].items():
     print ' - Webentity %s\t%s + %s other prefixes' % (weid, prefixes[0], len(prefixes)-1) 
