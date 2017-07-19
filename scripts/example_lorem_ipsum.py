@@ -162,15 +162,15 @@ for i in range(len(SOURCE_PAGES)):
     report = traph.add_page(lru)
     webentity_store.data['webentities'].update(report.created_webentities)
 
-    # build links
-    links = []
-    for j in range(len(TARGET_PAGES)):
-        if j%4 == i:
-            links.append([lru, TARGET_PAGES[j]])
+    # # build links
+    # links = []
+    # for j in range(len(TARGET_PAGES)):
+    #     if j%4 == i:
+    #         links.append([lru, TARGET_PAGES[j]])
     
-    # add links
-    links_report = traph.add_links(links)
-    webentity_store.data['webentities'].update(links_report.created_webentities)
+    # # add links
+    # links_report = traph.add_links(links)
+    # webentity_store.data['webentities'].update(links_report.created_webentities)
 
 
 print '\n:: Stats'
@@ -192,7 +192,7 @@ print '\n:: Breakdown by webentity'
 for weid in webentities:
     print '\nWebentity %s' % (weid)
     we_prefixes = webentity_store.data['webentities'][weid]
-    print ' - %s prefixes:' % (len(we_prefixes))
+    print ' - %s prefixes (store):' % (len(we_prefixes))
     for prefix in we_prefixes:
         print ' \t- %s' % (prefix)
     we_pages = traph.get_webentity_pages(weid, we_prefixes)
