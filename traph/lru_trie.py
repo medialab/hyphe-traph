@@ -7,8 +7,8 @@
 # Note that we only process raw ascii bytes as string for the moment and not
 # UTF-16 characters.
 #
-from lru_trie_node import LRUTrieNode
-from lru_trie_header import LRUTrieHeader, LRU_TRIE_HEADER_BLOCKS
+from lru_trie_node import LRUTrieNode, LRU_TRIE_FIRST_DATA_BLOCK
+from lru_trie_header import LRUTrieHeader
 from lru_trie_walk_history import LRUTrieWalkHistory
 
 
@@ -35,8 +35,9 @@ class LRUTrie(object):
         return LRUTrieNode(self.storage, **kwargs)
 
     # Method returning root node
+    # TODO: memoize or cache
     def __root(self):
-        return self.__node(block=LRU_TRIE_HEADER_BLOCKS)
+        return self.__node(block=LRU_TRIE_FIRST_DATA_BLOCK)
 
     # Method ensuring that a sibling with the desired char exists
     def __ensure_char_from_siblings(self, node, char):
@@ -180,7 +181,7 @@ class LRUTrie(object):
 
         while node.exists:
             yield node
-            node.read(node.block + 1)
+            node.read(node.block + self.storage.block_size)
 
     def node_parents_iter(self, node):
 
