@@ -124,19 +124,43 @@ class Traph(object):
 
         return header.last_webentity_id()
 
-    def __add_prefixes(self, prefixes):
-        # TODO: deal with edge case where some prefixes are already set
-        #       to other and/or different web entities
-        # (if not in this function, then at the calls)
-
-        webentity_id = self.__generated_web_entity_id()
-
+    def __add_prefixes(self, prefixes, use_best_case=True):
+        # Check that prefixes are not already defining a web entity
+        valid_prefixes_index = {}
+        invalid_prefixes = []
         for prefix in prefixes:
             node, history = self.lru_trie.add_lru(prefix)
-            node.set_webentity(webentity_id)
-            node.write()
+            if node.has_webentity():
+                invalid_prefixes.append(prefix)
+            else:
+                valid_prefixes_index.update({prefix: [node, history]})
 
-        return webentity_id
+        if len(invalid_prefixes)>0 and not use_best_case:
+            raise Exception('Some prefixes were already set: %s' % (invalid_prefixes))  # TODO: raise custom exception
+            return
+
+        elif len(invalid_prefixes)==len(prefixes):
+            # No prefix is valid!
+            return
+
+        else:
+            webentity_id = self.__generated_web_entity_id()
+
+            for prefix, [node, history] in valid_prefixes_index.items():
+                node.set_webentity(webentity_id)
+                node.write()
+
+            return webentity_id, valid_prefixes_index.keys()
+
+    def __create_webentity(self, prefix, expand=True, use_best_case=True):
+        if expand: expanded_prefixes = self.expand_prefix(prefix)
+        else: expanded_prefixes = [prefix]
+
+        report = TraphWriteReport()        
+        webentity_id, valid_prefixes = self.__add_prefixes(expanded_prefixes, use_best_case)
+        if webentity_id:
+            report.created_webentities[webentity_id] = valid_prefixes
+        return report
 
     def __apply_webentity_creation_rule(self, rule_prefix, lru):
         regexp = self.webentity_creation_rules[rule_prefix]
@@ -192,16 +216,6 @@ class Traph(object):
         longest_candidate_prefix = self.__apply_webentity_default_creation_rule(lru)
         report += self.__create_webentity(longest_candidate_prefix, expand=True)
         return node, report
-    
-    def __create_webentity(self, prefix, expand=True):
-        if expand:
-            expanded_prefixes = self.expand_prefix(prefix)
-        else:
-            expanded_prefixes = [prefix]
-        webentity_id = self.__add_prefixes(expanded_prefixes)
-        report = TraphWriteReport()
-        report.created_webentities[webentity_id] = expanded_prefixes
-        return report
 
     # =========================================================================
     # Public interface
