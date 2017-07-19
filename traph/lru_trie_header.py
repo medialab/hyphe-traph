@@ -68,7 +68,7 @@ class LRUTrieHeader(object):
             if not data:
                 self.storage.write(empty_data, block)
 
-            block += 1
+            block += self.storage.block_size
 
     # =========================================================================
     # Utilities

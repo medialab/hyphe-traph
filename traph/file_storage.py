@@ -16,10 +16,6 @@ class FileStorage(object):
         self.block_size = block_size
         self.file = file
 
-    # Method returning a block offset in the file
-    def __block_offset(self, block):
-        return self.block_size * block
-
     # Method returning whether the file is corrupted
     def check_for_corruption(self):
         self.file.seek(0, os.SEEK_END)
@@ -32,27 +28,21 @@ class FileStorage(object):
 
     # Method reading a block in the file and returning the contained node
     def read(self, block):
-        offset = self.__block_offset(block)
-
-        self.file.seek(offset)
+        self.file.seek(block)
 
         data = self.file.read(self.block_size)
 
-        if not data:
-            return None
-
-        return data
+        return data or None
 
     # Method writing a node
     def write(self, data, block=None):
         if block is not None:
-            offset = self.__block_offset(block)
-            self.file.seek(offset)
+            self.file.seek(block)
         else:
             self.file.seek(0, os.SEEK_END)
 
         self.file.write(data)
 
-        block = (self.file.tell() - self.block_size) / self.block_size
+        block = self.file.tell() - self.block_size
 
         return block

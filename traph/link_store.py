@@ -5,8 +5,8 @@
 # Class representing the structure storing the links as linked list of stubs.
 #
 from itertools import chain
-from link_store_node import LinkStoreNode
-from link_store_header import LinkStoreHeader, LINK_STORE_HEADER_BLOCKS
+from link_store_node import LinkStoreNode, LINK_STORE_FIRST_DATA_BLOCK
+from link_store_header import LinkStoreHeader
 
 
 # Exceptions
@@ -37,12 +37,15 @@ class LinkStore(object):
         return LinkStoreNode(self.storage, **kwargs)
 
     # Method returning the root
+    # TODO: memoize or cache
     def __root(self):
-        return self.__node(block=LINK_STORE_HEADER_BLOCKS)
+        return self.__node(block=LINK_STORE_FIRST_DATA_BLOCK)
 
     # =========================================================================
     # Mutation methods
     # =========================================================================
+
+    # TODO: not used for the time being
     def add_link(self, source_node, target_block, out=True):
 
         # If the node does not have outlinks yet
@@ -144,7 +147,7 @@ class LinkStore(object):
 
         while node.exists:
             yield node
-            node.read(node.block + 1)
+            node.read(node.block + self.storage.block_size)
 
     def link_nodes_iter(self, block):
         node = self.__node(block=block)

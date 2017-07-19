@@ -156,7 +156,7 @@ class Traph(object):
         if expand: expanded_prefixes = self.expand_prefix(prefix)
         else: expanded_prefixes = [prefix]
 
-        report = TraphWriteReport()        
+        report = TraphWriteReport()
         webentity_id, valid_prefixes = self.__add_prefixes(expanded_prefixes, use_best_case)
         if webentity_id:
             report.created_webentities[webentity_id] = valid_prefixes
