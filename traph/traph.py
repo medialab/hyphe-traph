@@ -26,9 +26,12 @@ class Traph(object):
     # =========================================================================
     # Constructor
     # =========================================================================
-    def __init__(self, overwrite=False, folder=None,
+    def __init__(self, overwrite=False, folder=None, encoding='utf-8',
                  default_webentity_creation_rule=None,
                  webentity_creation_rules=None):
+
+        # Handling encoding
+        self.encoding = encoding
 
         create = overwrite
 
@@ -114,6 +117,12 @@ class Traph(object):
     # =========================================================================
     # Internal methods
     # =========================================================================
+    def __encode(self, string):
+        if isinstance(string, str):
+            return string
+
+        return string.encode(self.encoding)
+
     def __generated_web_entity_id(self):
         header = self.lru_trie.header
         header.increment_last_webentity_id()
