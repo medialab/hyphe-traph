@@ -77,6 +77,9 @@ for state in trie.detailed_dfs_iter():
     if not state.node.is_root():
         g.add_edge(state.node.parent(), state.node.block)
 
-nx.write_gexf(g, './scripts/data/dump.gexf')
+print '\nRepresentation:'
+print trie.representation()
+
+# nx.write_gexf(g, './scripts/data/dump.gexf')
 
 traph.close()

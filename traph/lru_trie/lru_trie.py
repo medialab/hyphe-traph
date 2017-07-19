@@ -28,6 +28,25 @@ class LRUTrie(object):
         self.header = LRUTrieHeader(storage)
 
     # =========================================================================
+    # Debug
+    # =========================================================================
+    def representation(self):
+
+        string = ''
+        went_right = False
+
+        for state in self.detailed_dfs_iter():
+            if state.direction == 'down':
+                node = state.node
+                string += node.char_as_str()
+
+            if state.direction == 'right':
+                string += '\n'
+                string += (len(state.lru) - 1) * '-' + state.lru[-1]
+
+        return string
+
+    # =========================================================================
     # Internal methods
     # =========================================================================
 
