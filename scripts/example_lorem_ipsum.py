@@ -155,7 +155,7 @@ webentity_store.data['webentities'].update(report.created_webentities)
 
 print ' - Simulate page crawls with links to the list of target pages'
 
-for i in range(4):
+for i in range(len(SOURCE_PAGES)):
     lru = SOURCE_PAGES[i]
 
     # add page
@@ -173,21 +173,29 @@ for i in range(4):
     webentity_store.data['webentities'].update(links_report.created_webentities)
 
 
-print '\n:: Webentities'
-print '\nExisting webentities from Store:'
-for weid, prefixes in webentity_store.data['webentities'].items():
-    print ' - Webentity %s:' % (weid)
-    for prefix in prefixes:
-        print '\t\t' + prefix
-
-print '\nPrefixes from Traph:'
+print '\n:: Stats'
+print '- %s webentities in the Store' % (len(webentity_store.data['webentities']))
+webentities = set()
 for node, lru in traph.webentity_prefix_iter():
-    print ' - (%s) \t%s' % (node.webentity(), lru)
+    webentities.add(node.webentity())
+print '- %s webentities in the Traph' % (len(webentities))
+pages = []
+for node, lru in traph.lru_trie.dfs_iter():
+    if node.is_page():
+        pages.append(lru)
+print '- %s pages in the Traph' % (len(pages))
 
-print '\n:: Pages in "Lorem" webentity'
-lorem_weid = traph.get_webentity_by_prefix('s:http|h:com|h:lorem|')
-lorem_prefixes = webentity_store.data['webentities'][lorem_weid]
-for lru in traph.get_webentity_pages(lorem_weid, lorem_prefixes):
-    print ' - %s' % (lru)
+print '\n:: Traph: LRU trie'
+print traph.lru_trie.representation()
+
+print '\n:: Breakdown by webentity'
+for weid in webentities:
+    print '\nWebentity %s' % (weid)
+    we_prefixes = webentity_store.data['webentities'][weid]
+    print ' - %s prefixes:' % (len(we_prefixes))
+    for prefix in we_prefixes:
+        print ' \t- %s' % (prefix)
+    we_pages = traph.get_webentity_pages(weid, we_prefixes)
+    print ' - %s pages' % (len(we_pages))
 
 traph.close()
