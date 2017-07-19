@@ -141,7 +141,7 @@ class Traph(object):
 
         elif len(invalid_prefixes)==len(prefixes):
             # No prefix is valid!
-            return
+            return None, []
 
         else:
             webentity_id = self.__generated_web_entity_id()
