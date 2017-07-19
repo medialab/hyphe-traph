@@ -60,5 +60,10 @@ print '\nPrefixes from Traph:'
 for node, lru in traph.webentity_prefix_iter():
     print ' - (%s) \t%s' % (node.webentity(), lru)
 
+print '\n:: Pages in "Lorem" webentity'
+lorem_weid = traph.get_webentity_by_prefix('s:http|h:com|h:lorem|')
+lorem_prefixes = webentity_store.data['webentities'][lorem_weid]
+for lru in traph.get_webentity_pages(lorem_weid, lorem_prefixes):
+    print ' - %s' % (lru)
 
 traph.close()

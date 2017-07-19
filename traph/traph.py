@@ -355,7 +355,8 @@ class Traph(object):
             starting_node, _ = self.lru_trie.follow_lru(prefix)
             if not starting_node:
                 raise Exception('LRU %s not in the traph' % (prefix))  # TODO: raise custom exception
-            for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix):
+            for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix[:-1]):
+                # Note: unsure why we need to trim rule_prefix above, but it seems to work
                 if node.is_page():
                     pages.append(lru)
         return pages
