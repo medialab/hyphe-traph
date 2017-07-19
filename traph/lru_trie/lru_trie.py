@@ -219,7 +219,7 @@ class LRUTrie(object):
             lru = starting_lru
         else:
             node = self.__root()
-            starting_block = self.__root().block
+            starting_block = node.block
             lru = ''
 
         # If there is no root node, we can stop right there
@@ -255,6 +255,9 @@ class LRUTrie(object):
                 continue
 
             return
+
+    def detailed_dfs_iter():
+        pass
 
     def pages_iter(self):
         for node, lru in self.dfs_iter():
