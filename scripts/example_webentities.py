@@ -45,11 +45,16 @@ report = traph.create_webentity(boeing_prefixes)
 webentity_store.data['webentities'].update(report.created_webentities)
 boeing_weid = report.created_webentities.keys()[0] # Used for a step below
 
-print '\nResult - Existing webentities:'
+print '\nResult - Existing webentities from Store:'
 for weid, prefixes in webentity_store.data['webentities'].items():
     print ' - Webentity %s:' % (weid)
     for prefix in prefixes:
         print '\t\t' + prefix
+
+print '\nResult - Prefixes from Traph:'
+for node, lru in traph.webentity_prefix_iter():
+    print ' - (%s) \t%s' % (node.webentity(), lru)
+
 
 # Step 2
 print '\n:: Step 2 - Create a "Airbus HTTPS" webentity with only 2 prefix variations (WWW case).'
@@ -62,11 +67,16 @@ airbus_prefixes = [
 report = traph.create_webentity(airbus_prefixes)
 webentity_store.data['webentities'].update(report.created_webentities)
 
-print '\nResult - Existing webentities:'
+print '\nResult - Existing webentities from Store:'
 for weid, prefixes in webentity_store.data['webentities'].items():
     print ' - Webentity %s:' % (weid)
     for prefix in prefixes:
         print '\t\t' + prefix
+
+print '\nResult - Prefixes from Traph:'
+for node, lru in traph.webentity_prefix_iter():
+    print ' - (%s) \t%s' % (node.webentity(), lru)
+
 
 # Step 3
 print '\n:: Step 3 - Remove the "Boeing" webentity'
@@ -75,11 +85,16 @@ print 'Expected: Only Airbus remains'
 traph.delete_webentity(boeing_weid, webentity_store.data['webentities'][boeing_weid])
 del webentity_store.data['webentities'][boeing_weid]
 
-print '\nResult - Existing webentities:'
+print '\nResult - Existing webentities from Store:'
 for weid, prefixes in webentity_store.data['webentities'].items():
     print ' - Webentity %s:' % (weid)
     for prefix in prefixes:
         print '\t\t' + prefix
+
+print '\nResult - Prefixes from Traph:'
+for node, lru in traph.webentity_prefix_iter():
+    print ' - (%s) \t%s' % (node.webentity(), lru)
+
 
 # Step 4
 print '\n:: Step 4 - Add the "Airbus/blog" page'
@@ -88,11 +103,46 @@ print 'Expected: Create the NON-HTTPS Airbus webentity'
 report = traph.add_page('s:http|h:com|h:airbus|p:blog|')
 webentity_store.data['webentities'].update(report.created_webentities)
 
-print '\nResult - Existing webentities:'
+print '\nResult - Existing webentities from Store:'
 for weid, prefixes in webentity_store.data['webentities'].items():
     print ' - Webentity %s:' % (weid)
     for prefix in prefixes:
         print '\t\t' + prefix
+
+print '\nResult - Prefixes from Traph:'
+for node, lru in traph.webentity_prefix_iter():
+    print ' - (%s) \t%s' % (node.webentity(), lru)
+
+
+# Step 5
+print '\n:: Step 5 - Move the HTTPS prefixes to the NON-HTTPS Airbus entity'
+print 'Expected: A single Airbus webentity'
+
+prefixes = ['s:https|h:com|h:airbus|', 's:https|h:com|h:airbus|h:www|']
+for prefix in prefixes:
+    if traph.move_prefix_to_webentity(prefix, 3):
+        # Remove from source webentity in store
+        store_prefixes = webentity_store.data['webentities'][2]
+        store_prefixes.remove(prefix)
+        webentity_store.data['webentities'].update({2: store_prefixes})
+
+        if len(store_prefixes) == 0:
+            del webentity_store.data['webentities'][2]
+        
+        # Add to target webentity in store
+        store_prefixes = webentity_store.data['webentities'][3]
+        store_prefixes.append(prefix)
+        webentity_store.data['webentities'].update({3: store_prefixes})
+
+print '\nResult - Existing webentities from Store:'
+for weid, prefixes in webentity_store.data['webentities'].items():
+    print ' - Webentity %s:' % (weid)
+    for prefix in prefixes:
+        print '\t\t' + prefix
+
+print '\nResult - Prefixes from Traph:'
+for node, lru in traph.webentity_prefix_iter():
+    print ' - (%s) \t%s' % (node.webentity(), lru)
 
 
 traph.close()
