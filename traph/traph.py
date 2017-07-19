@@ -449,6 +449,7 @@ class Traph(object):
                 continue
 
             source_webentity = state.current_webentity()
+            page_to_webentity[node.block] = source_webentity
 
             # Iterating over the page's links
             links_block = node.outlinks()
