@@ -162,6 +162,48 @@ class LRUTrie(object):
 
         return node
 
+    def follow_lru(self, lru):
+        # Does almost the same thing as lru_node but with a history,
+        # and thus less efficient.
+        # Very similar to add_lru too, but returns False if lru not in Trie
+
+        # Iteration state
+        l = len(lru)
+        i = 0
+        history = LRUTrieWalkHistory(lru)
+        node = self.__root()
+
+        # Descending the trie
+        while i < l:
+            char = ord(lru[i])
+
+            node = self.__ensure_char_from_siblings(node, char)
+
+            # Tracking webentities
+            if node.has_webentity():
+                history.update_webentity(
+                    node.webentity(),
+                    lru[:i],
+                    i
+                )
+
+            # Tracking webentity creation rules
+            if node.has_webentity_creation_rule():
+                history.add_webentity_creation_rule(i)
+
+            i += 1
+
+            if i < l and node.has_child():
+                node.read_child()
+            else:
+                break
+
+        # We went as far as possible
+        if i < l:
+            return False, history
+
+        return node, history
+
     def windup_lru(self, block):
         # TODO: check block
         node = self.__node(block=block)

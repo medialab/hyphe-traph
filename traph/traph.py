@@ -324,18 +324,20 @@ class Traph(object):
         return self.move_prefix_to_webentity(prefix, weid_target, weid_source)
 
     def retrieve_prefix(self, lru):
-        # TODO: return the first webentity prefix above lru
-        # Raise an error in lru not in trie
-        # Worst case scenario should be default we creation rule:
-        # raise an error if no prefix found
-        pass
+        node, history = self.lru_trie.follow_lru(lru)
+        if not node:
+            raise Exception('LRU %s not in the traph' % (lru))  # TODO: raise custom exception
+        if not history.webentity_prefix:
+            raise Exception('No webentity prefix found for %s' % (lru))  # TODO: raise custom exception
+        return history.webentity_prefix
 
     def retrieve_webentity(self, lru):
-        # TODO: return the first webentity id above lru
-        # Raise an error in lru not in trie
-        # Worst case scenario should be default we creation rule:
-        # raise an error if no webentity id found
-        pass
+        node, history = self.lru_trie.follow_lru(lru)
+        if not node:
+            raise Exception('LRU %s not in the traph' % (lru))  # TODO: raise custom exception
+        if not history.webentity:
+            raise Exception('No webentity found for %s' % (lru))  # TODO: raise custom exception
+        return history.webentity
 
     def get_webentity_by_prefix(self, prefix):
         # TODO: return weid
