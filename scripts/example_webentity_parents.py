@@ -96,14 +96,24 @@ print '- %s pages in the Traph' % (len(pages))
 print '\n:: Results - Breakdown by webentity'
 for weid in webentities:
     print '\nWebentity %s' % (weid)
+    
     we_prefixes = webentity_store.data['webentities'][weid]
     print ' - %s prefixes (store)' % (len(we_prefixes))
+    
     for prefix in we_prefixes:
         print ' \t- %s' % (prefix)
+    
     parent_webentities = traph.get_webentity_parent_webentities(weid, we_prefixes)
     print ' - %s parent webentities (traph)' % (len(parent_webentities))
+    
     for parent_weid in parent_webentities:
         print ' \t- webentity %s' % (parent_weid)
+
+    child_webentities = traph.get_webentity_child_webentities(weid, we_prefixes)
+    print ' - %s child webentities (traph)' % (len(child_webentities))
+    
+    for child_weid in child_webentities:
+        print ' \t- webentity %s' % (child_weid)
 
 
 traph.close()
