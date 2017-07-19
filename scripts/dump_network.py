@@ -1,14 +1,12 @@
+# -*- coding: utf-8 -*-
 # =============================================================================
-# Mongo Script
+# Attempts Script
 # =============================================================================
 #
-# Attempting to load a corpus from MongoDB
+# Trying to make this whole thing work...
 #
+import networkx as nx
 from traph import Traph
-from pymongo import MongoClient
-from config import CONFIG
-
-MONGO = CONFIG['mongo']
 
 webentity_creation_rules_regexp = {
     'domain':       '(s:[a-zA-Z]+\\|(t:[0-9]+\\|)?(h:[^\\|]+\\|(h:[^\\|]+\\|)|h:(localhost|(\\d{1,3}\\.){3}\\d{1,3}|\\[[\\da-f]*:[\\da-f:]*\\])\\|))',
@@ -24,36 +22,19 @@ webentity_creation_rules = {
 }
 
 # Creating the Traph
-traph = Traph(overwrite=True, folder='./scripts/data/',
+traph = Traph(folder='./scripts/data/',
               default_webentity_creation_rule=default_webentity_creation_rule,
               webentity_creation_rules=webentity_creation_rules)
 
-# Reading from mongo
-client = MongoClient(MONGO['host'], MONGO['port'])
-collection = client[MONGO['db']][MONGO['collection']]
+webentities_network = traph.get_webentities_links()
 
-def links_generator(data):
-    source = data['lru']
+g = nx.Graph()
 
-    for target in data['lrulinks']:
-        yield source, target
+for source, targets in webentities_network.items():
+    g.add_node(source, label=source)
 
-i = 0
-links = []
-for page in collection.find({}, {'lru': 1, 'lrulinks': 1}, sort=[('_job', 1)]).limit(500):
-    i += 1
+    for target in targets:
+        g.add_node(target, label=target)
+        g.add_edge(source, target)
 
-    links.extend(links_generator(page))
-
-    # traph.add_links(links_generator(page))
-
-    if i % 100 == 0:
-        print '(%i) [%i] - %s' % (i, len(page['lrulinks']), page['lru'])
-
-    # for link in page['lrulinks']:
-    #     traph.add_page(link)
-
-print 'Gathered links'
-traph.add_links(links)
-
-traph.close()
+nx.write_gexf(g, './scripts/data/dump.gexf')

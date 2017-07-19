@@ -236,12 +236,10 @@ class LRUTrie(object):
         return lru
 
     def windup_lru_for_webentity(self, node):
-        print 'node', node, self.windup_lru(node.block)
         if node.has_webentity():
             return node.webentity()
 
         for parent in self.node_parents_iter(node):
-            print parent
             if parent.has_webentity():
                 return parent.webentity()
 
