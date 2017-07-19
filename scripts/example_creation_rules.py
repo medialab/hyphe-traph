@@ -74,7 +74,7 @@ for weid, prefixes in webentity_store.data['webentities'].items():
 
 # Step 4
 print '\n:: Step 4: Add the "Country" rule'
-print 'Expected: "Japan" should not be created, but not "Spain", since the "Madrid" page'
+print 'Expected: "Japan" should be created, but not "Spain", since the "Madrid" page'
 print '          already is in a more precise web entity ("Madrid" too).'
 
 report = traph.add_webentity_creation_rule('s:http|h:com|h:world|', webentity_creation_rules_regexp['path2'])
