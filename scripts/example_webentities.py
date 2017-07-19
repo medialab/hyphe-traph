@@ -43,6 +43,40 @@ boeing_prefixes = [
 ]
 report = traph.create_webentity(boeing_prefixes)
 webentity_store.data['webentities'].update(report.created_webentities)
+boeing_weid = report.created_webentities.keys()[0] # Used for a step below
+
+print '\nResult - Existing webentities:'
+for weid, prefixes in webentity_store.data['webentities'].items():
+    print ' - Webentity %s:' % (weid)
+    for prefix in prefixes:
+        print '\t\t' + prefix
+
+# # Step 2
+# print '\n:: Step 2 - Create a "Airbus HTTPS" webentity with only 2 prefix variations (WWW case).'
+# print 'Expected: Creates the entity with the 2 prefixes.'
+
+# airbus_prefixes = [
+#     's:https|h:com|h:airbus|',
+#     's:https|h:com|h:airbus|h:www|'
+# ]
+# report = traph.create_webentity(airbus_prefixes)
+# webentity_store.data['webentities'].update(report.created_webentities)
+
+# print '\nResult - Existing webentities:'
+# for weid, prefixes in webentity_store.data['webentities'].items():
+#     print ' - Webentity %s:' % (weid)
+#     for prefix in prefixes:
+#         print '\t\t' + prefix
+
+for node in traph.lru_trie.nodes_iter():
+    print node
+
+# Step 3
+print '\n:: Step 3 - Remove the "Boeing" webentity'
+print 'Expected: Only Airbus remains'
+
+traph.delete_webentity(boeing_weid, webentity_store.data['webentities'][boeing_weid])
+del webentity_store.data['webentities'][boeing_weid]
 
 print '\nResult - Existing webentities:'
 for weid, prefixes in webentity_store.data['webentities'].items():
