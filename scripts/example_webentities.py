@@ -113,26 +113,28 @@ print '\nResult - Prefixes from Traph:'
 for node, lru in traph.webentity_prefix_iter():
     print ' - (%s) \t%s' % (node.webentity(), lru)
 
+print '\nResult - Airbus blog page belongs to webentity %s via prefix %s' % (traph.retrieve_webentity('s:http|h:com|h:airbus|p:blog|'), traph.retrieve_prefix('s:http|h:com|h:airbus|p:blog|'))
+
 
 # Step 5
-print '\n:: Step 5 - Move the HTTPS prefixes to the NON-HTTPS Airbus entity'
+print '\n:: Step 5 - Move the NON-HTTPS prefixes to the HTTPS Airbus entity'
 print 'Expected: A single Airbus webentity'
 
-prefixes = ['s:https|h:com|h:airbus|', 's:https|h:com|h:airbus|h:www|']
+prefixes = ['s:http|h:com|h:airbus|', 's:http|h:com|h:airbus|h:www|']
 for prefix in prefixes:
-    if traph.move_prefix_to_webentity(prefix, 3):
+    if traph.move_prefix_to_webentity(prefix, 2):
         # Remove from source webentity in store
-        store_prefixes = webentity_store.data['webentities'][2]
+        store_prefixes = webentity_store.data['webentities'][3]
         store_prefixes.remove(prefix)
-        webentity_store.data['webentities'].update({2: store_prefixes})
+        webentity_store.data['webentities'].update({3: store_prefixes})
 
         if len(store_prefixes) == 0:
-            del webentity_store.data['webentities'][2]
+            del webentity_store.data['webentities'][3]
         
         # Add to target webentity in store
-        store_prefixes = webentity_store.data['webentities'][3]
+        store_prefixes = webentity_store.data['webentities'][2]
         store_prefixes.append(prefix)
-        webentity_store.data['webentities'].update({3: store_prefixes})
+        webentity_store.data['webentities'].update({2: store_prefixes})
 
 print '\nResult - Existing webentities from Store:'
 for weid, prefixes in webentity_store.data['webentities'].items():
@@ -143,6 +145,8 @@ for weid, prefixes in webentity_store.data['webentities'].items():
 print '\nResult - Prefixes from Traph:'
 for node, lru in traph.webentity_prefix_iter():
     print ' - (%s) \t%s' % (node.webentity(), lru)
+
+print '\nResult - Airbus blog page belongs to webentity %s via prefix %s' % (traph.retrieve_webentity('s:http|h:com|h:airbus|p:blog|'), traph.retrieve_prefix('s:http|h:com|h:airbus|p:blog|'))
 
 
 traph.close()
