@@ -68,15 +68,25 @@ for weid, prefixes in webentity_store.data['webentities'].items():
     for prefix in prefixes:
         print '\t\t' + prefix
 
-# for node in traph.lru_trie.nodes_iter():
-#     print node
-
 # Step 3
 print '\n:: Step 3 - Remove the "Boeing" webentity'
 print 'Expected: Only Airbus remains'
 
 traph.delete_webentity(boeing_weid, webentity_store.data['webentities'][boeing_weid])
 del webentity_store.data['webentities'][boeing_weid]
+
+print '\nResult - Existing webentities:'
+for weid, prefixes in webentity_store.data['webentities'].items():
+    print ' - Webentity %s:' % (weid)
+    for prefix in prefixes:
+        print '\t\t' + prefix
+
+# Step 4
+print '\n:: Step 4 - Add the "Airbus/blog" page'
+print 'Expected: Create the NON-HTTPS Airbus webentity'
+
+report = traph.add_page('s:http|h:com|h:airbus|p:blog|')
+webentity_store.data['webentities'].update(report.created_webentities)
 
 print '\nResult - Existing webentities:'
 for weid, prefixes in webentity_store.data['webentities'].items():
