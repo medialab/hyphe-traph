@@ -340,10 +340,12 @@ class Traph(object):
         return history.webentity
 
     def get_webentity_by_prefix(self, prefix):
-        # TODO: return weid
-        # If the prefix is not in the trie or not the prefix of
-        # an existing webentity, return an error
-        pass
+        node, history = self.lru_trie.follow_lru(prefix)
+        if not node:
+            raise Exception('LRU %s not in the traph' % (prefix))  # TODO: raise custom exception
+        if not node.has_webentity():
+            raise Exception('LRU %s is not a webentity prefix' % (prefix))  # TODO: raise custom exception
+        return node.webentity()
 
     def get_webentity_pages(self, weid, prefixes):
         # TODO: return list of lrus
