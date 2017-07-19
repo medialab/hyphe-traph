@@ -120,11 +120,11 @@ class LRUTrieNode(object):
     # Utilities
     # =========================================================================
 
-    # Method used to unpack data
+    # unpack data
     def unpack(self, data):
         return list(struct.unpack(LRU_TRIE_NODE_FORMAT, data))
 
-    # Method used to set a switch to another block
+    # set a switch to another block
     def read(self, block):
         data = self.storage.read(block)
 
@@ -136,11 +136,11 @@ class LRUTrieNode(object):
             self.data = self.unpack(data)
             self.block = block
 
-    # Method used to pack the node to binary form
+    # pack the node to binary form
     def pack(self):
         return struct.pack(LRU_TRIE_NODE_FORMAT, *self.data)
 
-    # Method used to write the node's data to storage
+    # write the node's data to storage
     def write(self):
         block = self.storage.write(self.pack(), self.block)
         self.block = block
@@ -175,15 +175,15 @@ class LRUTrieNode(object):
     # Character methods
     # =========================================================================
 
-    # Method used to retrieve the node's char
+    # retrieve the node's char
     def char(self):
         return self.data[LRU_TRIE_NODE_CHAR]
 
-    # Method used to retrieve the node's char as a string
+    # retrieve the node's char as a string
     def char_as_str(self):
         return chr(self.char())
 
-    # Method used to set the node's char
+    # set the node's char
     def set_char(self, char):
         self.data[LRU_TRIE_NODE_CHAR] = char
 
@@ -191,11 +191,11 @@ class LRUTrieNode(object):
     # Next block methods
     # =========================================================================
 
-    # Method used to know whether the next block is set
+    # know whether the next block is set
     def has_next(self):
         return self.data[LRU_TRIE_NODE_NEXT_BLOCK] != 0
 
-    # Method used to retrieve the next block
+    # retrieve the next block
     def next(self):
         block = self.data[LRU_TRIE_NODE_NEXT_BLOCK]
 
@@ -204,21 +204,21 @@ class LRUTrieNode(object):
 
         return block
 
-    # Method used to set a sibling
+    # set a sibling
     def set_next(self, block):
         if block < LRU_TRIE_HEADER_BLOCKS:
             raise LRUTrieNodeUsageException('Next node cannot be the root.')
 
         self.data[LRU_TRIE_NODE_NEXT_BLOCK] = block
 
-    # Method used to read the next sibling
+    # read the next sibling
     def read_next(self):
         if not self.has_next():
             raise LRUTrieNodeTraversalException('Node has no next sibling.')
 
         self.read(self.next())
 
-    # Method used to get next node
+    # get next node
     def next_node(self):
         if not self.has_next():
             raise LRUTrieNodeTraversalException('Node has no next sibling.')
@@ -229,11 +229,11 @@ class LRUTrieNode(object):
     # Child block methods
     # =========================================================================
 
-    # Method used to know whether the child block is set
+    # know whether the child block is set
     def has_child(self):
         return self.data[LRU_TRIE_NODE_CHILD_BLOCK] != 0
 
-    # Method used to retrieve the child block
+    # retrieve the child block
     def child(self):
         block = self.data[LRU_TRIE_NODE_CHILD_BLOCK]
 
@@ -242,21 +242,21 @@ class LRUTrieNode(object):
 
         return block
 
-    # Method used to set a child
+    # set a child
     def set_child(self, block):
         if block < LRU_TRIE_HEADER_BLOCKS:
             raise LRUTrieNodeUsageException('Child node cannot be the root.')
 
         self.data[LRU_TRIE_NODE_CHILD_BLOCK] = block
 
-    # Method used to read the child
+    # read the child
     def read_child(self):
         if not self.has_child():
             raise LRUTrieNodeTraversalException('Node has no child.')
 
         self.read(self.child())
 
-    # Method used to get child node
+    # get child node
     def child_node(self):
         if not self.has_child():
             raise LRUTrieNodeTraversalException('Node has no child.')
@@ -267,21 +267,21 @@ class LRUTrieNode(object):
     # Parent block methods
     # =========================================================================
 
-    # Method used to retrieve the parent block
+    # retrieve the parent block
     def parent(self):
         block = self.data[LRU_TRIE_NODE_PARENT_BLOCK]
 
         return block
 
-    # Method used to set a parent
+    # set a parent
     def set_parent(self, block):
         self.data[LRU_TRIE_NODE_PARENT_BLOCK] = block
 
-    # Method used to read the parent
+    # read the parent
     def read_parent(self):
         self.read(self.parent())
 
-    # Method used to get parent node
+    # get parent node
     def parent_node(self):
         return LRUTrieNode(self.storage, block=self.parent())
 
@@ -289,11 +289,11 @@ class LRUTrieNode(object):
     # Outlinks block methods
     # =========================================================================
 
-    # Method used to know whether the outlinks block is set
+    # know whether the outlinks block is set
     def has_outlinks(self):
         return self.data[LRU_TRIE_NODE_OUTLINKS_BLOCK] != 0
 
-    # Method used to retrieve the outlinks block
+    # retrieve the outlinks block
     def outlinks(self):
         block = self.data[LRU_TRIE_NODE_OUTLINKS_BLOCK]
 
@@ -302,7 +302,7 @@ class LRUTrieNode(object):
 
         return block
 
-    # Method used to set the outlinks block
+    # set the outlinks block
     def set_outlinks(self, block):
         self.data[LRU_TRIE_NODE_OUTLINKS_BLOCK] = block
 
@@ -310,11 +310,11 @@ class LRUTrieNode(object):
     # Inlinks block methods
     # =========================================================================
 
-    # Method used to know whether the outlinks block is set
+    # know whether the outlinks block is set
     def has_inlinks(self):
         return self.data[LRU_TRIE_NODE_INLINKS_BLOCK] != 0
 
-    # Method used to retrieve the inlinks block
+    # retrieve the inlinks block
     def inlinks(self):
         block = self.data[LRU_TRIE_NODE_INLINKS_BLOCK]
 
@@ -323,7 +323,7 @@ class LRUTrieNode(object):
 
         return block
 
-    # Method used to set the inlinks block
+    # set the inlinks block
     def set_inlinks(self, block):
         self.data[LRU_TRIE_NODE_INLINKS_BLOCK] = block
 
@@ -363,11 +363,11 @@ class LRUTrieNode(object):
     # WebEntity methods
     # =========================================================================
 
-    # Method used to know whether the node has a webentity flag
+    # know whether the node has a webentity flag
     def has_webentity(self):
         return self.data[LRU_TRIE_NODE_WEBENTITY] != 0
 
-    # Method used to retrieve the webentity id of the flag
+    # retrieve the webentity id of the flag
     def webentity(self):
         weid = self.data[LRU_TRIE_NODE_WEBENTITY]
 
@@ -376,10 +376,10 @@ class LRUTrieNode(object):
 
         return weid
 
-    # Method used to set the webentity flag
+    # set the webentity flag
     def set_webentity(self, weid):
         self.data[LRU_TRIE_NODE_WEBENTITY] = weid
 
-    # Method used to remove the tie between the node (ie. prefix) and the webentity
+    # remove the tie between the node (ie. prefix) and the webentity
     def unset_webentity(self):
         self.data[LRU_TRIE_NODE_WEBENTITY] = 0
