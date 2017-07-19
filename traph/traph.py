@@ -7,10 +7,10 @@
 import errno
 import os
 import re
-from collections import defaultdict
+from collections import defaultdict, Counter
 from traph_write_report import TraphWriteReport
 from storage import FileStorage, MemoryStorage
-from lru_trie import LRUTrie, LRU_TRIE_NODE_BLOCK_SIZE
+from lru_trie import LRUTrie, LRUTrieNode, LRU_TRIE_NODE_BLOCK_SIZE
 from link_store import LinkStore, LINK_STORE_NODE_BLOCK_SIZE
 from helpers import lru_variations
 
@@ -432,8 +432,37 @@ class Traph(object):
         pass
 
     def get_webentities_links(self):
-        # TODO: return all webentity links
-        pass
+        graph = defaultdict(Counter)
+        page_to_webentity = dict()
+
+        # TODO: we should probably get a node helper another way
+        target_node = LRUTrieNode(self.lru_trie_storage)
+
+        for state in self.lru_trie.detailed_dfs_iter():
+            node = state.node
+
+            if not node.is_page() or not node.has_outlinks():
+                continue
+
+            source_webentity = state.current_webentity()
+
+            # Iterating over the page's links
+            links_block = node.outlinks()
+            for link_node in self.link_store.link_nodes_iter(links_block):
+
+                target_node.read(link_node.target())
+                target_webentity = page_to_webentity.get(target_node.block)
+
+                if target_webentity is None:
+                    target_webentity = self.lru_trie.windup_lru_for_webentity(target_node)
+                    page_to_webentity[target_node.block] = target_webentity
+
+                # Adding to the graph
+                graph[source_webentity][target_webentity] += link_node.weight()
+
+        return graph
+
+
 
     def expand_prefix(self, prefix):
         prefix = self.__encode(prefix)
@@ -444,6 +473,7 @@ class Traph(object):
         lru = self.__encode(lru)
 
         node, report = self.__add_page(lru)
+
         node.flag_as_crawled()
         node.write()
 

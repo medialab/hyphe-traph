@@ -104,6 +104,14 @@ for source_lru, target_lru in traph.links_iter():
 
 print '\nWebentities:'
 for weid, prefixes in webentity_store.data['webentities'].items():
-    print ' - Webentity %s\t%s + %s other prefixes' % (weid, prefixes[0], len(prefixes)-1) 
+    print ' - Webentity %s\t%s + %s other prefixes' % (weid, prefixes[0], len(prefixes)-1)
+
+import networkx as nx
+
+g = nx.Graph()
+
+w = traph.get_webentities_links()
+
+print w
 
 traph.close()
