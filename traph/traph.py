@@ -243,8 +243,7 @@ class Traph(object):
             node.write()
             # Spawn necessary web entities
             candidate_prefixes = set()
-            for node2, lru in self.lru_trie.dfs_iter(node, rule_prefix[:-1]):
-                # Note: unsure why we need to trim rule_prefix above, but it seems to work
+            for node2, lru in self.lru_trie.dfs_iter(node, rule_prefix):
                 if node2.is_page():
                     _, add_report = self.__add_page(lru)
                     report += add_report
@@ -355,8 +354,7 @@ class Traph(object):
             starting_node, _ = self.lru_trie.follow_lru(prefix)
             if not starting_node:
                 raise Exception('LRU %s not in the traph' % (prefix))  # TODO: raise custom exception
-            for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix[:-1]):
-                # Note: unsure why we need to trim rule_prefix above, but it seems to work
+            for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix):
                 if node.is_page():
                     pages.append(lru)
         return pages

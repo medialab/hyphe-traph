@@ -278,7 +278,8 @@ class LRUTrie(object):
         if starting_node:
             node = starting_node
             starting_block = starting_node.block
-            lru = starting_lru
+            lru = starting_lru[:-1]
+            # Note: unsure why we need to trim rule_prefix above, but it seems to work
         else:
             node = self.__root()
             starting_block = node.block
@@ -321,7 +322,8 @@ class LRUTrie(object):
     def webentity_dfs_iter(self, weid, starting_node, starting_lru):
         node = starting_node
         starting_block = starting_node.block
-        lru = starting_lru
+        lru = starting_lru[:-1]
+        # Note: unsure why we need to trim rule_prefix above, but it seems to work
 
         # If there is no starting node, we can stop right there
         if not node.exists:
