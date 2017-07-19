@@ -393,10 +393,19 @@ class Traph(object):
         return pages
 
     def get_webentity_crawled_pages(self, weid, prefixes):
-        # TODO: return list of lrus
         # Note: the prefixes are thoses of the webentity whose id is weid
         # No need to check
-        pass
+        pages = []
+        for prefix in prefixes:
+            prefix = self.__encode(prefix)
+
+            starting_node, _ = self.lru_trie.follow_lru(prefix)
+            if not starting_node:
+                raise Exception('LRU %s not in the traph' % (prefix))  # TODO: raise custom exception
+            for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix):
+                if node.is_page() and node.is_crawled():
+                    pages.append(lru)
+        return pages
 
     def get_webentity_most_linked_pages(self, weid, prefixes):
         # TODO: return list of lrus
