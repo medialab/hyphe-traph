@@ -294,13 +294,34 @@ class Traph(object):
 
         return True
 
-    def add_webentity_prefix(self, weid, prefix):
-        # TODO
-        pass
+    def add_prefix_to_webentity(self, prefix, weid):
+        # check prefix
+        node, history = self.lru_trie.add_lru(prefix)
+        if node.has_webentity():
+            raise Exception('Prefix %s already attributed to webentity %s' % (prefix, node.webentity()))  # TODO: raise custom exception
+        else:
+            node.set_webentity(weid)
+            node.write()
+            return True
 
-    def remove_webentity_prefix(self, weid, prefix):
-        # TODO
-        pass
+    def remove_prefix_from_webentity(self, prefix, weid=False):
+        # check prefix
+        node, history = self.lru_trie.add_lru(prefix)
+        if not weid or node.webentity() == weid:
+            node.unset_webentity()
+            node.write()
+            return True
+        else:
+            raise Exception('Prefix %s not attributed to webentity %s' % (prefix, node.webentity()))  # TODO: raise custom exception
+
+    def move_prefix_to_webentity(self, prefix, weid_target, weid_source=False):
+        if self.remove_prefix_from_webentity(prefix, weid_source):
+            return self.add_prefix_to_webentity(prefix, weid_target)
+        return False
+
+    def move_prefix_to_webentity_from_webentity(self, prefix, weid_target, weid_source=False):
+        # Just an alias for clarity
+        return self.move_prefix_to_webentity(prefix, weid_target, weid_source)
 
     def retrieve_prefix(self, lru):
         # TODO: return the first webentity prefix above lru
