@@ -433,10 +433,21 @@ class Traph(object):
         return [page['lru'] for page in sorted_pages[0:pages_count]]
 
     def get_webentity_parent_webentities(self, weid, prefixes):
-        # : return list of weid
         # Note: the prefixes are thoses of the webentity whose id is weid
         # No need to check
-        pass
+        weids = set()
+        for prefix in prefixes:
+            prefix = self.__encode(prefix)
+
+            starting_node, _ = self.lru_trie.follow_lru(prefix)
+            if not starting_node:
+                raise Exception('LRU %s not in the traph' % (prefix))  # TODO: raise custom exception
+
+            for node in self.lru_trie.node_parents_iter(starting_node):
+                weid2 = node.webentity()
+                if weid2 and weid2 > 0 and weid2 != weid:
+                    weids.add(weid2)
+        return weids
 
     def get_webentity_child_webentities(self, weid, prefixes):
         # TODO: return list of weid
