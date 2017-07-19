@@ -6,7 +6,7 @@
 #
 
 
-# Main class
+# Class representing the history of a simple walk into the Trie
 class LRUTrieWalkHistory(object):
 
     def __init__(self, lru):
