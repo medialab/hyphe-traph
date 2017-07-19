@@ -109,6 +109,8 @@ class LRUTrieNode(object):
             'char': self.char_as_str(),
             'block': self.block,
             'exists': str(self.exists),
+            'page': self.is_page(),
+            'crawled': self.is_crawled(),
             'parent': self.parent(),
             'child': self.child(),
             'next': self.next(),
@@ -162,6 +164,15 @@ class LRUTrieNode(object):
 
     def unflag_as_page(self):
         unflag(self.data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_PAGE)
+
+    def is_crawled(self):
+        return test(self.data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_CRAWLED)
+
+    def flag_as_crawled(self):
+        flag(self.data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_CRAWLED)
+
+    def unflag_as_crawled(self):
+        unflag(self.data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_CRAWLED)
 
     def has_webentity_creation_rule(self):
         return test(self.data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_WEBENTITY_CREATION_RULE)

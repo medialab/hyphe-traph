@@ -398,6 +398,8 @@ class Traph(object):
 
     def add_page(self, lru):
         node, report = self.__add_page(lru)
+        node.flag_as_crawled()
+        node.write()
 
         return report
 
