@@ -185,18 +185,23 @@ class Traph(object):
 
         # Else we need to expand the prefix and create relevant web entities
         if longest_candidate_prefix:
-            expanded_prefixes = self.expand_prefix(longest_candidate_prefix)
-            webentity_id = self.__add_prefixes(expanded_prefixes)
-            report.created_webentities[webentity_id] = expanded_prefixes
+            report += self.__create_webentity(longest_candidate_prefix, expand=True)
             return node, report
 
         # Nothing worked, we need to apply the default creation rule
         longest_candidate_prefix = self.__apply_webentity_default_creation_rule(lru)
-        expanded_prefixes = self.expand_prefix(longest_candidate_prefix)
-        webentity_id = self.__add_prefixes(expanded_prefixes)
-        report.created_webentities[webentity_id] = expanded_prefixes
-
+        report += self.__create_webentity(longest_candidate_prefix, expand=True)
         return node, report
+    
+    def __create_webentity(self, prefix, expand=True):
+        if expand:
+            expanded_prefixes = self.expand_prefix(prefix)
+        else:
+            expanded_prefixes = [prefix]
+        webentity_id = self.__add_prefixes(expanded_prefixes)
+        report = TraphWriteReport()
+        report.created_webentities[webentity_id] = expanded_prefixes
+        return report
 
     # =========================================================================
     # Public interface
@@ -246,7 +251,7 @@ class Traph(object):
 
         return True
 
-    def create_webentity(self, prefixes, expand=False):
+    def create_webentity(self, prefixes):
         # TODO
         # Return an error if one of the prefixes is already attributed to a we
         pass
