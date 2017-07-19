@@ -299,6 +299,52 @@ class LRUTrie(object):
 
             return
 
+    def webentity_dfs_iter(self, weid, starting_node, starting_lru):
+        node = starting_node
+        starting_block = starting_node.block
+        lru = starting_lru
+
+        # If there is no starting node, we can stop right there
+        if not node.exists:
+            return
+
+        descending = True
+
+        while True:
+
+            # When descending, we yield
+            if descending:
+                yield node, lru + node.char_as_str()
+
+            # If we have a VALID child, we descend
+            if descending and node.has_child() and not node.child_node().has_webentity():
+                descending = True
+                lru = lru + node.char_as_str()
+                node.read_child()
+                continue
+
+            # If we have no child, we follow the next VALID sibling
+            valid_next = False
+            while node.has_next() and not valid_next:
+                node.read_next()
+                if node.has_webentity():
+                    continue
+                else:
+                    valid_next = True
+
+            if valid_next:
+                descending = True
+                continue
+
+            # Else we bubble up
+            if not node.block == starting_block:
+                descending = False
+                lru = lru[:-1]
+                node.read_parent()
+                continue
+
+            return
+
     def detailed_dfs_iter(self):
         node = self.__root()
         state = LRUTrieDetailedDFSIterationState(node)
