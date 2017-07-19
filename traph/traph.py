@@ -425,6 +425,7 @@ class Traph(object):
                 if node.is_page():
                     # Iterate over link nodes
                     indegree = 0
+                    # TODO: use a bounded heap for more efficiency
                     for linknode in self.link_store.link_nodes_iter(node.inlinks()):
                         indegree += 1
                     pages.append({'lru':lru, 'indegree':indegree})
