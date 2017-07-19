@@ -5,8 +5,8 @@
 # Class representing the structure storing the links as linked list of stubs.
 #
 from itertools import chain
-from link_store_node import LinkStoreNode, LINK_STORE_FIRST_DATA_BLOCK
-from link_store_header import LinkStoreHeader
+from traph.link_store.node import LinkStoreNode, LINK_STORE_FIRST_DATA_BLOCK
+from traph.link_store.header import LinkStoreHeader
 
 
 # Exceptions

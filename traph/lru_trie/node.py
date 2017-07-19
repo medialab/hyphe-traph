@@ -10,7 +10,7 @@
 # TODO: we can be more compact for some things
 #
 import struct
-from lru_trie_header import LRU_TRIE_HEADER_BLOCKS
+from traph.lru_trie.header import LRU_TRIE_HEADER_BLOCKS
 
 # Binary format
 # -

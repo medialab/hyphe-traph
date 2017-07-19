@@ -9,8 +9,8 @@
 # time being.
 #
 import struct
-from link_store_header import LINK_STORE_HEADER_BLOCKS
-from lru_trie_node import LRU_TRIE_FIRST_DATA_BLOCK
+from traph.link_store.header import LINK_STORE_HEADER_BLOCKS
+from traph.lru_trie.node import LRU_TRIE_FIRST_DATA_BLOCK
 
 # Binary format
 # -

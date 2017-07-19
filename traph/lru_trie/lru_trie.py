@@ -7,9 +7,9 @@
 # Note that we only process raw ascii bytes as string for the moment and not
 # UTF-16 characters.
 #
-from lru_trie_node import LRUTrieNode, LRU_TRIE_FIRST_DATA_BLOCK
-from lru_trie_header import LRUTrieHeader
-from lru_trie_walk_history import LRUTrieWalkHistory
+from traph.lru_trie.node import LRUTrieNode, LRU_TRIE_FIRST_DATA_BLOCK
+from traph.lru_trie.header import LRUTrieHeader
+from traph.lru_trie.walk_history import LRUTrieWalkHistory
 
 
 # Main class

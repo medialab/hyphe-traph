@@ -8,13 +8,10 @@ import errno
 import os
 import re
 from collections import defaultdict
-from file_storage import FileStorage
-from memory_storage import MemoryStorage
-from lru_trie import LRUTrie
 from traph_write_report import TraphWriteReport
-from lru_trie_node import LRU_TRIE_NODE_BLOCK_SIZE
-from link_store import LinkStore
-from link_store_node import LINK_STORE_NODE_BLOCK_SIZE
+from storage import FileStorage, MemoryStorage
+from lru_trie import LRUTrie, LRU_TRIE_NODE_BLOCK_SIZE
+from link_store import LinkStore, LINK_STORE_NODE_BLOCK_SIZE
 from helpers import lru_variations
 
 
@@ -268,7 +265,7 @@ class Traph(object):
         return True
 
     def create_webentity(self, prefixes):
-        report = TraphWriteReport()        
+        report = TraphWriteReport()
         # Note: with use_best_case=False an error will be raised if any of the prefixes is invalid
         webentity_id, valid_prefixes = self.__add_prefixes(prefixes, use_best_case=False)
         report.created_webentities[webentity_id] = valid_prefixes
@@ -290,7 +287,7 @@ class Traph(object):
             for prefix in weid_prefixes:
                 node = self.lru_trie.lru_node(prefix)
                 prefix_index.update({prefix: node})
-        
+
         for prefix, node in prefix_index.items():
             node.unset_webentity()
             node.write()
