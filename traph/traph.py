@@ -154,7 +154,6 @@ class Traph(object):
             webentity_id = self.__generated_web_entity_id()
 
             for prefix, [node, history] in valid_prefixes_index.items():
-                node.read(node.block) # update is necessary
                 node.set_webentity(webentity_id)
                 node.write()
 
@@ -168,6 +167,7 @@ class Traph(object):
         webentity_id, valid_prefixes = self.__add_prefixes(expanded_prefixes, use_best_case)
         if webentity_id:
             report.created_webentities[webentity_id] = valid_prefixes
+
         return report
 
     def __apply_webentity_creation_rule(self, rule_prefix, lru):
@@ -213,16 +213,19 @@ class Traph(object):
 
         # In this case, the webentity already exists
         if longest_candidate_prefix and len(longest_candidate_prefix) <= history.webentity_position + 1:
+            node.read(node.block) # update node
             return node, report
 
         # Else we need to expand the prefix and create relevant web entities
         if longest_candidate_prefix:
             report += self.__create_webentity(longest_candidate_prefix, expand=True)
+            node.read(node.block) # update node
             return node, report
 
         # Nothing worked, we need to apply the default creation rule
         longest_candidate_prefix = self.__apply_webentity_default_creation_rule(lru)
         report += self.__create_webentity(longest_candidate_prefix, expand=True)
+        node.read(node.block) # update node
         return node, report
 
     # =========================================================================
