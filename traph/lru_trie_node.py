@@ -379,3 +379,7 @@ class LRUTrieNode(object):
     # Method used to set the webentity flag
     def set_webentity(self, weid):
         self.data[LRU_TRIE_NODE_WEBENTITY] = weid
+
+    # Method used to remove the tie between the node (ie. prefix) and the webentity
+    def unset_webentity(self):
+        self.data[LRU_TRIE_NODE_WEBENTITY] = 0

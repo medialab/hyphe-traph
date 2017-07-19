@@ -266,15 +266,32 @@ class Traph(object):
         return True
 
     def create_webentity(self, prefixes):
-        # TODO
-        # Return an error if one of the prefixes is already attributed to a we
-        pass
+        report = TraphWriteReport()        
+        # Note: with use_best_case=False an error will be raised if any of the prefixes is invalid
+        webentity_id, valid_prefixes = self.__add_prefixes(prefixes, use_best_case=False)
+        report.created_webentities[webentity_id] = valid_prefixes
+        return report
 
-    def delete_webentity(self, weid, weid_prefixes):
-        # TODO
-        # Note: weid is not strictly necessary, but it helps to check
-        #       data consistency
-        pass
+    def delete_webentity(self, weid, weid_prefixes, check_for_corruption=True):
+        # Note: weid is ignored if no check for data consistency
+        if check_for_corruption:
+            prefix_index = {}
+            for prefix in weid_prefixes:
+                node = self.lru_trie.lru_node(prefix)
+                prefix_index.update({prefix: node})
+                if node.webentity() != weid:
+                    raise Exception('Prefix %s not attributed to webentity %s' % (prefix, weid))  # TODO: raise custom exception
+        else:
+            prefix_index = {}
+            for prefix in weid_prefixes:
+                node = self.lru_trie.lru_node(prefix)
+                prefix_index.update({prefix: node})
+        
+        for prefix, node in prefix_index.items():
+            node.unset_webentity()
+            node.write()
+
+        return True
 
     def add_webentity_prefix(self, weid, prefix):
         # TODO
