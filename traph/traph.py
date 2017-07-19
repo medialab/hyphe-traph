@@ -98,7 +98,7 @@ class Traph(object):
             self.links_store_storage = MemoryStorage(LINK_STORE_NODE_BLOCK_SIZE)
 
         # LRU Trie initialization
-        self.lru_trie = LRUTrie(self.lru_trie_storage)
+        self.lru_trie = LRUTrie(self.lru_trie_storage, encoding=encoding)
 
         # Link Store initialization
         self.link_store = LinkStore(self.links_store_storage)
@@ -237,6 +237,8 @@ class Traph(object):
         pass
 
     def add_webentity_creation_rule(self, rule_prefix, pattern, write_in_trie=True):
+        rule_prefix = self.__encode(rule_prefix)
+
         self.webentity_creation_rules[rule_prefix] = re.compile(
             pattern,
             re.I
@@ -260,6 +262,8 @@ class Traph(object):
         return report
 
     def remove_webentity_creation_rule(self, rule_prefix):
+        rule_prefix = self.__encode(rule_prefix)
+
         if not self.webentity_creation_rules[rule_prefix]:
             raise Exception('Prefix not in creation rules: ' + rule_prefix)  # TODO: raise custom exception
         del self.webentity_creation_rules[rule_prefix]
@@ -273,6 +277,8 @@ class Traph(object):
         return True
 
     def create_webentity(self, prefixes):
+        prefixes = [self.__encode(prefix) for prefix in prefixes]
+
         report = TraphWriteReport()
         # Note: with use_best_case=False an error will be raised if any of the prefixes is invalid
         webentity_id, valid_prefixes = self.__add_prefixes(prefixes, use_best_case=False)
@@ -280,6 +286,8 @@ class Traph(object):
         return report
 
     def delete_webentity(self, weid, weid_prefixes, check_for_corruption=True):
+        weid_prefixes = [self.__encode(weid_prefix) for weid_prefix in weid_prefixes]
+
         # Note: weid is ignored if no check for data consistency
         if check_for_corruption:
             prefix_index = {}
@@ -303,6 +311,8 @@ class Traph(object):
         return True
 
     def add_prefix_to_webentity(self, prefix, weid):
+        prefix = self.__encode(prefix)
+
         # check prefix
         node, history = self.lru_trie.add_lru(prefix)
         if node.has_webentity():
@@ -313,6 +323,8 @@ class Traph(object):
             return True
 
     def remove_prefix_from_webentity(self, prefix, weid=False):
+        prefix = self.__encode(prefix)
+
         # check prefix
         node, history = self.lru_trie.add_lru(prefix)
         if not weid or node.webentity() == weid:
@@ -323,15 +335,21 @@ class Traph(object):
             raise Exception('Prefix %s not attributed to webentity %s' % (prefix, node.webentity()))  # TODO: raise custom exception
 
     def move_prefix_to_webentity(self, prefix, weid_target, weid_source=False):
+        prefix = self.__encode(prefix)
+
         if self.remove_prefix_from_webentity(prefix, weid_source):
             return self.add_prefix_to_webentity(prefix, weid_target)
         return False
 
     def move_prefix_to_webentity_from_webentity(self, prefix, weid_target, weid_source=False):
+        prefix = self.__encode(prefix)
+
         # Just an alias for clarity
         return self.move_prefix_to_webentity(prefix, weid_target, weid_source)
 
     def retrieve_prefix(self, lru):
+        lru = self.__encode(lru)
+
         node, history = self.lru_trie.follow_lru(lru)
         if not node:
             raise Exception('LRU %s not in the traph' % (lru))  # TODO: raise custom exception
@@ -340,6 +358,8 @@ class Traph(object):
         return history.webentity_prefix
 
     def retrieve_webentity(self, lru):
+        lru = self.__encode(lru)
+
         node, history = self.lru_trie.follow_lru(lru)
         if not node:
             raise Exception('LRU %s not in the traph' % (lru))  # TODO: raise custom exception
@@ -348,6 +368,8 @@ class Traph(object):
         return history.webentity
 
     def get_webentity_by_prefix(self, prefix):
+        prefix = self.__encode(prefix)
+
         node, history = self.lru_trie.follow_lru(prefix)
         if not node:
             raise Exception('LRU %s not in the traph' % (prefix))  # TODO: raise custom exception
@@ -405,9 +427,13 @@ class Traph(object):
         pass
 
     def expand_prefix(self, prefix):
+        prefix = self.__encode(prefix)
+
         return lru_variations(prefix)
 
     def add_page(self, lru):
+        lru = self.__encode(lru)
+
         node, report = self.__add_page(lru)
         node.flag_as_crawled()
         node.write()
@@ -424,6 +450,8 @@ class Traph(object):
         pages = dict()
 
         for source_page, target_page in links:
+            source_page = self.__encode(source_page)
+            target_page = self.__encode(target_page)
 
             # Adding pages
             if source_page not in pages:

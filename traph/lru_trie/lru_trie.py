@@ -19,10 +19,11 @@ class LRUTrie(object):
     # =========================================================================
     # Constructor
     # =========================================================================
-    def __init__(self, storage):
+    def __init__(self, storage, encoding='utf-8'):
 
         # Properties
         self.storage = storage
+        self.encoding = encoding
 
         # Readin headers
         self.header = LRUTrieHeader(storage)
@@ -33,7 +34,6 @@ class LRUTrie(object):
     def representation(self):
 
         string = ''
-        went_right = False
 
         for state in self.detailed_dfs_iter():
             if state.direction == 'down':
@@ -42,7 +42,7 @@ class LRUTrie(object):
 
             if state.direction == 'right':
                 string += '\n'
-                string += (len(state.lru) - 1) * '-' + state.lru[-1]
+                string += (len(state.lru.decode(self.encoding, 'replace')) - 1) * '-' + state.lru[-1]
 
         return string
 
