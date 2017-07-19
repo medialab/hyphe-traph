@@ -112,9 +112,15 @@ for weid, prefixes in webentity_store.data['webentities'].items():
 
 # w = traph.get_webentities_links()
 
-# print w
-
 # for source, targets in w.items():
-#     g.add_node(source)
+#     source_label = webentity_store.data['webentities'][source][1]
+#     g.add_node(source, label=source_label)
+
+#     for target in targets:
+#         target_label = webentity_store.data['webentities'][target][1]
+#         g.add_node(target, label=target_label)
+#         g.add_edge(source, target)
+
+# nx.write_gexf(g, './scripts/data/dump.gexf')
 
 traph.close()
