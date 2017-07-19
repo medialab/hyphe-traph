@@ -130,6 +130,7 @@ class Traph(object):
         invalid_prefixes = []
         for prefix in prefixes:
             node, history = self.lru_trie.add_lru(prefix)
+
             if node.has_webentity():
                 invalid_prefixes.append(prefix)
             else:
@@ -147,6 +148,7 @@ class Traph(object):
             webentity_id = self.__generated_web_entity_id()
 
             for prefix, [node, history] in valid_prefixes_index.items():
+                node.read(node.block) # update is necessary
                 node.set_webentity(webentity_id)
                 node.write()
 
@@ -277,7 +279,6 @@ class Traph(object):
         if check_for_corruption:
             prefix_index = {}
             for prefix in weid_prefixes:
-                print 'SEARCH FOR PREFIX IN TRIE: ' + prefix
                 node = self.lru_trie.lru_node(prefix)
                 if not node:
                     raise Exception('Prefix %s cannot be found' % (prefix))  # TODO: raise custom exception
