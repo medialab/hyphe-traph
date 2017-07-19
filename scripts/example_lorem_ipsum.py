@@ -203,5 +203,9 @@ for weid in webentities:
     print ' - %s crawled pages (traph)' % (len(we_crawled_pages))
     for lru in we_crawled_pages:
         print ' \t- %s' % (lru)
+    we_most_linked_pages = traph.get_webentity_most_linked_pages(weid, we_prefixes, 3)
+    print ' - %s most linked pages (traph, max 3)' % (len(we_most_linked_pages))
+    for lru in we_most_linked_pages:
+        print ' \t- %s' % (lru)
 
 traph.close()

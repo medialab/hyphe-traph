@@ -411,11 +411,25 @@ class Traph(object):
                     pages.append(lru)
         return pages
 
-    def get_webentity_most_linked_pages(self, weid, prefixes):
-        # TODO: return list of lrus
+    def get_webentity_most_linked_pages(self, weid, prefixes, pages_count=10):
         # Note: the prefixes are thoses of the webentity whose id is weid
         # No need to check
-        pass
+        pages = []
+        for prefix in prefixes:
+            prefix = self.__encode(prefix)
+
+            starting_node, _ = self.lru_trie.follow_lru(prefix)
+            if not starting_node:
+                raise Exception('LRU %s not in the traph' % (prefix))  # TODO: raise custom exception
+            for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix):
+                if node.is_page():
+                    # Iterate over link nodes
+                    indegree = 0
+                    for linknode in self.link_store.link_nodes_iter(node.inlinks()):
+                        indegree += 1
+                    pages.append({'lru':lru, 'indegree':indegree})
+        sorted_pages = sorted(pages, key=lambda p: p['indegree'])
+        return [page['lru'] for page in sorted_pages[0:pages_count]]
 
     def get_webentity_parent_webentities(self, weid, prefixes):
         # : return list of weid
