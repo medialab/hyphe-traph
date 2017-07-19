@@ -154,6 +154,7 @@ class Traph(object):
             webentity_id = self.__generated_web_entity_id()
 
             for prefix, [node, history] in valid_prefixes_index.items():
+                node.read(node.block) # node update necessary
                 node.set_webentity(webentity_id)
                 node.write()
 
