@@ -360,6 +360,8 @@ class Traph(object):
         # No need to check
         pages = []
         for prefix in prefixes:
+            prefix = self.__encode(prefix)
+
             starting_node, _ = self.lru_trie.follow_lru(prefix)
             if not starting_node:
                 raise Exception('LRU %s not in the traph' % (prefix))  # TODO: raise custom exception
