@@ -5,6 +5,7 @@
 #
 # Trying to make this whole thing work...
 #
+import networkx as nx
 from traph import Traph
 from scripts.utils.webentity_store import WebEntityStore
 
@@ -64,7 +65,18 @@ for node in links.nodes_iter():
     print node
 
 print '\nDetailed DFS...'
+g = nx.Graph()
 for state in trie.detailed_dfs_iter():
     print state
+
+    g.add_node(state.node.block, label=state.node.char_as_str())
+
+    if state.node.is_root():
+        g.node[state.node.block]['viz'] = {'color': {'r': 255, 'g': 0, 'b': 0}}
+
+    if not state.node.is_root():
+        g.add_edge(state.node.parent(), state.node.block)
+
+nx.write_gexf(g, './scripts/data/dump.gexf')
 
 traph.close()
