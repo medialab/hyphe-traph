@@ -282,18 +282,18 @@ class Traph(object):
                 node = self.lru_trie.lru_node(prefix)
                 if not node:
                     raise Exception('Prefix %s cannot be found' % (prefix))  # TODO: raise custom exception
-        #         prefix_index.update({prefix: node})
-        #         if not node.has_webentity() or node.webentity() != weid:
-        #             raise Exception('Prefix %s not attributed to webentity %s' % (prefix, weid))  # TODO: raise custom exception
-        # else:
-        #     prefix_index = {}
-        #     for prefix in weid_prefixes:
-        #         node = self.lru_trie.lru_node(prefix)
-        #         prefix_index.update({prefix: node})
+                prefix_index.update({prefix: node})
+                if not node.has_webentity() or node.webentity() != weid:
+                    raise Exception('Prefix %s not attributed to webentity %s' % (prefix, weid))  # TODO: raise custom exception
+        else:
+            prefix_index = {}
+            for prefix in weid_prefixes:
+                node = self.lru_trie.lru_node(prefix)
+                prefix_index.update({prefix: node})
         
-        # for prefix, node in prefix_index.items():
-        #     node.unset_webentity()
-        #     node.write()
+        for prefix, node in prefix_index.items():
+            node.unset_webentity()
+            node.write()
 
         return True
 
