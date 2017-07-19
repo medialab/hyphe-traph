@@ -9,6 +9,7 @@
 #
 from traph.lru_trie.node import LRUTrieNode, LRU_TRIE_FIRST_DATA_BLOCK
 from traph.lru_trie.header import LRUTrieHeader
+from traph.lru_trie.iteration_state import LRUTrieDetailedDFSIterationState
 from traph.lru_trie.walk_history import LRUTrieWalkHistory
 
 
@@ -298,8 +299,73 @@ class LRUTrie(object):
 
             return
 
-    def detailed_dfs_iter():
-        pass
+    def detailed_dfs_iter(self):
+        node = self.__root()
+        state = LRUTrieDetailedDFSIterationState(node)
+
+        starting_block = node.block
+
+        # If there is no root node, we can stop right there
+        if not node.exists:
+            return
+
+        descending = True
+
+        while True:
+
+            # When descending, we yield
+            if descending:
+                state.lru += node.char_as_str()
+
+                webentity = node.webentity()
+
+                if webentity:
+                    state.webentities.append(webentity)
+
+                yield state
+                # TODO: yield in next condition rather (also in DFS)
+                state.lru = state.lru[:-1]
+
+            # If we have a child, we descend
+            if descending and node.has_child():
+                state.lru += node.char_as_str()
+                descending = True
+                state.last_block = node.block
+                state.direction = 'down'
+
+                node.read_child()
+                continue
+
+            # If we have no child, we follow the next sibling
+            if node.has_next():
+                descending = True
+                state.last_block = node.block
+                state.direction = 'right'
+
+                webentity = node.webentity()
+
+                if webentity and webentity == state.current_webentity():
+                    state.webentities.pop()
+
+                node.read_next()
+
+                continue
+
+            # Else we bubble up
+            if not node.block == starting_block:
+                state.lru = state.lru[:-1]
+                descending = False
+                state.last_block = node.block
+
+                webentity = node.webentity()
+
+                if webentity and webentity == state.current_webentity():
+                    state.webentities.pop()
+
+                node.read_parent()
+                continue
+
+            return
 
     def pages_iter(self):
         for node, lru in self.dfs_iter():

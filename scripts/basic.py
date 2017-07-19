@@ -63,30 +63,8 @@ for source_lru, target_lru in traph.links_iter():
 for node in links.nodes_iter():
     print node
 
-# for node, lru in trie.pages_iter():
-#     print lru
-
-# for node in trie.nodes_iter():
-#     if node.webentity():
-#         print node
-
-# for source, target in LINKS:
-#     source_node = trie.lru_node(PAGES[source])
-#     target_node = trie.lru_node(PAGES[target])
-
-#     links.add_link(source_node, target_node.block)
-
-# for source_page in PAGES:
-#     source_node = trie.lru_node(source_page)
-
-#     if not source_node.has_outlinks():
-#         continue
-
-#     for link_node in links.link_nodes_iter(source_node.outlinks()):
-#         print source_node, link_node
-
-# for node in trie.nodes_iter():
-#     if node.webentity():
-#         print node
+print '\nDetailed DFS...'
+for state in trie.detailed_dfs_iter():
+    print state
 
 traph.close()
