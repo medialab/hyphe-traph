@@ -191,21 +191,36 @@ print traph.lru_trie.representation()
 print '\n:: Breakdown by webentity'
 for weid in webentities:
     print '\nWebentity %s' % (weid)
+
     we_prefixes = webentity_store.data['webentities'][weid]
     print ' - %s prefixes (store)' % (len(we_prefixes))
+
     for prefix in we_prefixes:
         print ' \t- %s' % (prefix)
+
     we_pages = traph.get_webentity_pages(weid, we_prefixes)
     print ' - %s pages (traph)' % (len(we_pages))
+
     for lru in we_pages:
         print ' \t- %s' % (lru)
+
     we_crawled_pages = traph.get_webentity_crawled_pages(weid, we_prefixes)
     print ' - %s crawled pages (traph)' % (len(we_crawled_pages))
+
     for lru in we_crawled_pages:
         print ' \t- %s' % (lru)
+
     we_most_linked_pages = traph.get_webentity_most_linked_pages(weid, we_prefixes, 3)
     print ' - %s most linked pages (traph, max 3)' % (len(we_most_linked_pages))
+
     for lru in we_most_linked_pages:
         print ' \t- %s' % (lru)
+
+    pagelinks = traph.get_webentity_pagelinks(weid, we_prefixes)
+    print ' - %s page links (traph, excluding internal)' % (len(pagelinks))
+
+    for source_lru, target_lru, weight in pagelinks:
+        print ' \t- weight %s: %s  \t->  \t%s' % (weight, source_lru, target_lru)
+
 
 traph.close()

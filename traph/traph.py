@@ -467,10 +467,53 @@ class Traph(object):
         return weids
 
     def get_webentity_pagelinks(self, weid, prefixes, include_internal=False):
-        # TODO: return list of [source_lru, target_lru, weight]
         # Note: the prefixes are thoses of the webentity whose id is weid
         # No need to check
-        pass
+
+        pagelinks = []
+
+        # TODO: we should probably get a node helper another way
+        source_node = LRUTrieNode(self.lru_trie_storage)
+        target_node = LRUTrieNode(self.lru_trie_storage)
+
+        for prefix in prefixes:
+            prefix = self.__encode(prefix)
+
+            starting_node, _ = self.lru_trie.follow_lru(prefix)
+            if not starting_node:
+                raise Exception('LRU %s not in the traph' % (prefix))  # TODO: raise custom exception
+
+            for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix):
+                
+                if not node.is_page():
+                    continue
+
+                # Iterating over the page's outlinks
+                if node.has_outlinks():
+                    links_block = node.outlinks()
+                    for link_node in self.link_store.link_nodes_iter(links_block):
+
+                        target_node.read(link_node.target())
+                        target_lru = self.lru_trie.windup_lru(target_node.block)
+                        target_webentity = self.lru_trie.windup_lru_for_webentity(target_node)
+
+                        if include_internal or target_webentity != weid:
+                            pagelinks.append([lru, target_lru, link_node.weight()])
+                    
+                # Iterating over the page's inlinks
+                if node.has_inlinks():
+                    links_block = node.inlinks()
+                    for link_node in self.link_store.link_nodes_iter(links_block):
+
+                        source_node.read(link_node.target())
+                        source_lru = self.lru_trie.windup_lru(source_node.block)
+                        source_webentity = self.lru_trie.windup_lru_for_webentity(source_node)
+
+                        if source_webentity != weid: # Note: if include_internal, we have the links above
+                            pagelinks.append([source_lru, lru, link_node.weight()])
+                    
+        return pagelinks
+            
 
     def get_webentities_links(self):
         graph = defaultdict(Counter)
@@ -503,8 +546,6 @@ class Traph(object):
                 graph[source_webentity][target_webentity] += link_node.weight()
 
         return graph
-
-
 
     def expand_prefix(self, prefix):
         prefix = self.__encode(prefix)
