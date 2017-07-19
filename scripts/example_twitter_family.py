@@ -106,12 +106,15 @@ print '\nWebentities:'
 for weid, prefixes in webentity_store.data['webentities'].items():
     print ' - Webentity %s\t%s + %s other prefixes' % (weid, prefixes[0], len(prefixes)-1)
 
-import networkx as nx
+# import networkx as nx
 
-g = nx.Graph()
+# g = nx.Graph()
 
-w = traph.get_webentities_links()
+# w = traph.get_webentities_links()
 
-print w
+# print w
+
+# for source, targets in w.items():
+#     g.add_node(source)
 
 traph.close()
