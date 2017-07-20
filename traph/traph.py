@@ -447,6 +447,7 @@ class Traph(object):
 
     def get_webentity_most_linked_pages(self, weid, prefixes, pages_count=10):
         '''
+        Returns a list of objects {lru:, indegree:}
         Note: the prefixes are supposed to match the webentity id. We do not check.
         '''
         pages = []
@@ -465,7 +466,7 @@ class Traph(object):
                         indegree += 1
                     pages.append({'lru':lru, 'indegree':indegree})
         sorted_pages = sorted(pages, key=lambda p: p['indegree'])
-        return [page['lru'] for page in sorted_pages[0:pages_count]]
+        return pages
 
     def get_webentity_parent_webentities(self, weid, prefixes):
         '''
