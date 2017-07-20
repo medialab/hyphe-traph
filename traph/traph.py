@@ -651,6 +651,11 @@ class Traph(object):
         graph = defaultdict(Counter)
         page_to_webentity = dict()
 
+        # TODO: we can try a version where we do a DFS for solving the page/webentity relation
+        # then solve the network
+
+        # TODO: it's possible that it's the DFS which is slow => need to benchmark
+
         # TODO: we should probably get a node helper another way
         target_node = LRUTrieNode(self.lru_trie_storage)
 
@@ -667,17 +672,18 @@ class Traph(object):
             links_block = node.outlinks()
             for link_node in self.link_store.link_nodes_iter(links_block):
 
-                target_node.read(link_node.target())
-                target_webentity = page_to_webentity.get(target_node.block)
+                target_block = link_node.target()
+                target_webentity = page_to_webentity.get(target_block)
 
                 if target_webentity is None:
+                    target_node.read(target_block)
                     target_webentity = self.lru_trie.windup_lru_for_webentity(target_node)
 
                     # Beware: it's possible that we could not find a webentity
                     if not target_webentity:
                         continue
 
-                    page_to_webentity[target_node.block] = target_webentity
+                    page_to_webentity[target_block] = target_webentity
 
                 # Adding to the graph
                 graph[source_webentity][target_webentity] += link_node.weight()
