@@ -638,7 +638,7 @@ class Traph(object):
 
     def index_batch_crawl(self, data):
         '''
-        returns a multimap 'source_lru' => 'target_lrus'
+        data is must be a multimap 'source_lru' => 'target_lrus'
         '''
         store = self.link_store
         report = TraphWriteReport()
