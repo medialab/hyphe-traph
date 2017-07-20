@@ -4,6 +4,7 @@
 #
 # Attempting to load a corpus from MongoDB
 #
+from collections import defaultdict
 from traph import Traph
 from pymongo import MongoClient
 from config import CONFIG
@@ -38,12 +39,16 @@ def links_generator(data):
     for target in data['lrulinks']:
         yield source, target
 
+links_multimap = defaultdict(list)
+
 i = 0
 links = []
-for page in collection.find({}, {'lru': 1, 'lrulinks': 1}, sort=[('_job', -1)]).limit(1000):
+for page in collection.find({}, {'lru': 1, 'lrulinks': 1}, sort=[('_job', 1)]).limit(1000):
     i += 1
 
-    links.extend(links_generator(page))
+    # links.extend(links_generator(page))
+
+    links_multimap[page['lru']].extend(page['lrulinks'])
 
     # traph.add_links(links_generator(page))
 
@@ -54,6 +59,8 @@ for page in collection.find({}, {'lru': 1, 'lrulinks': 1}, sort=[('_job', -1)]).
     #     traph.add_page(link)
 
 print 'Gathered links'
-traph.add_links(links)
+# traph.add_links(links)
+
+traph.index_batch_crawl(links_multimap)
 
 traph.close()

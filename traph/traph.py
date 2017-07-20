@@ -625,9 +625,13 @@ class Traph(object):
 
             # We need to add the page
             if source_page not in pages:
-                source_node, source_page_report = self.add_page(source_page)
+                source_node, source_page_report = self.__add_page(source_page)
+                source_node.flag_as_crawled()
+                source_node.write()
                 report += source_page_report
                 pages[source_page] = source_node
+
+            target_blocks = []
 
             for target_page in target_pages:
                 target_page = self.__encode(target_page)
@@ -635,7 +639,25 @@ class Traph(object):
                 if target_page not in pages:
                     target_node, target_page_report = self.__add_page(target_page)
                     report += target_page_report
-                    pages[target_pages] = target_node
+                    pages[target_page] = target_node
+                    target_blocks.append(target_node.block)
+                else:
+                    target_blocks.append(pages[target_page].block)
+
+                inlinks[target_page].append(source_page)
+
+            store.add_outlinks(source_node, target_blocks)
+
+        # Node possibly mutated by creation rules etc.
+        for node in pages.values():
+            node.read(node.block)
+
+        for target_page, source_pages in inlinks.items():
+            target_node = pages[target_page]
+            source_blocks = (pages[source_page].block for source_page in source_pages)
+            store.add_inlinks(target_node, source_blocks)
+
+        return report
 
 
     def close(self):
