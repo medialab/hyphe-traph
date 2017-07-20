@@ -155,22 +155,40 @@ webentity_store.data['webentities'].update(report.created_webentities)
 
 print ' - Simulate page crawls with links to the list of target pages'
 
-for i in range(len(SOURCE_PAGES)):
-    lru = SOURCE_PAGES[i]
+use_index_batch_crawl=True
 
-    # add page
-    report = traph.add_page(lru)
+if use_index_batch_crawl:
+    data = {}
+    for i in range(len(SOURCE_PAGES)):
+        lru = SOURCE_PAGES[i]
+
+        # build links
+        links = []
+        for j in range(len(TARGET_PAGES)):
+            if j%4 == i:
+                links.append(TARGET_PAGES[j])
+
+        data[lru] = links
+    report = traph.index_batch_crawl(data)
     webentity_store.data['webentities'].update(report.created_webentities)
 
-    # build links
-    links = []
-    for j in range(len(TARGET_PAGES)):
-        if j%4 == i:
-            links.append([lru, TARGET_PAGES[j]])
-    
-    # add links
-    links_report = traph.add_links(links)
-    webentity_store.data['webentities'].update(links_report.created_webentities)
+else:
+    for i in range(len(SOURCE_PAGES)):
+        lru = SOURCE_PAGES[i]
+
+        # add page
+        report = traph.add_page(lru)
+        webentity_store.data['webentities'].update(report.created_webentities)
+
+        # build links
+        links = []
+        for j in range(len(TARGET_PAGES)):
+            if j%4 == i:
+                links.append([lru, TARGET_PAGES[j]])
+        
+        # add links
+        links_report = traph.add_links(links)
+        webentity_store.data['webentities'].update(links_report.created_webentities)
 
 
 print '\n:: Stats'
