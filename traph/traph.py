@@ -617,17 +617,19 @@ class Traph(object):
             outlinks[source_page].append(target_page)
             inlinks[target_page].append(source_page)
 
-        # Node possibly mutated by creation rules etc.
-        for node in pages.values():
-            node.read(node.block)
-
         for source_page, target_pages in outlinks.items():
             source_node = pages[source_page]
+
+            # Refreshing node's data
+            source_node.read(source_node.block)
             target_blocks = (pages[target_page].block for target_page in target_pages)
             store.add_outlinks(source_node, target_blocks)
 
         for target_page, source_pages in inlinks.items():
             target_node = pages[target_page]
+
+            # Refreshing node's data
+            target_node.read(target_node.block)
             source_blocks = (pages[source_page].block for source_page in source_pages)
             store.add_inlinks(target_node, source_blocks)
 
@@ -665,16 +667,15 @@ class Traph(object):
                 else:
                     target_blocks.append(pages[target_page].block)
 
+                # TODO: possible to store block as value rather
                 inlinks[target_page].append(source_page)
 
+            source_node.read(source_node.block)
             store.add_outlinks(source_node, target_blocks)
-
-        # Node possibly mutated by creation rules etc.
-        for node in pages.values():
-            node.read(node.block)
 
         for target_page, source_pages in inlinks.items():
             target_node = pages[target_page]
+            target_node.read(target_node.block)
             source_blocks = (pages[source_page].block for source_page in source_pages)
             store.add_inlinks(target_node, source_blocks)
 
