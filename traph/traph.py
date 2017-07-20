@@ -491,8 +491,10 @@ class Traph(object):
                     weids.add(weid2)
         return weids
 
-    def get_webentity_pagelinks(self, weid, prefixes, include_internal=False):
+    def get_webentity_pagelinks(self, weid, prefixes, include_inbound=False, include_internal=True, include_outbound=False):
         '''
+        Returns all or part of: pagelinks to the entity, internal pagelinks, pagelinks out of the entity.
+        Default is only internal pagelinks.
         Note: the prefixes are supposed to match the webentity id. We do not check.
         '''
 
@@ -515,7 +517,7 @@ class Traph(object):
                     continue
 
                 # Iterating over the page's outlinks
-                if node.has_outlinks():
+                if node.has_outlinks() and (include_outbound or include_internal):
                     links_block = node.outlinks()
                     for link_node in self.link_store.link_nodes_iter(links_block):
 
@@ -523,11 +525,11 @@ class Traph(object):
                         target_lru = self.lru_trie.windup_lru(target_node.block)
                         target_webentity = self.lru_trie.windup_lru_for_webentity(target_node)
 
-                        if include_internal or target_webentity != weid:
+                        if (include_outbound and target_webentity != weid) or (include_internal and target_webentity == weid):
                             pagelinks.append([lru, target_lru, link_node.weight()])
 
                 # Iterating over the page's inlinks
-                if node.has_inlinks():
+                if node.has_inlinks() and include_inbound:
                     links_block = node.inlinks()
                     for link_node in self.link_store.link_nodes_iter(links_block):
 
@@ -535,7 +537,7 @@ class Traph(object):
                         source_lru = self.lru_trie.windup_lru(source_node.block)
                         source_webentity = self.lru_trie.windup_lru_for_webentity(source_node)
 
-                        if source_webentity != weid: # Note: if include_internal, we have the links above
+                        if source_webentity != weid:
                             pagelinks.append([source_lru, lru, link_node.weight()])
 
         return pagelinks

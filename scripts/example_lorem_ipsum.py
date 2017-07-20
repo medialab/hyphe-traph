@@ -234,10 +234,22 @@ for weid in webentities:
     for lru in we_most_linked_pages:
         print ' \t- %s' % (lru)
 
-    pagelinks = traph.get_webentity_pagelinks(weid, we_prefixes)
-    print ' - %s page links (traph, excluding internal)' % (len(pagelinks))
+    internal_pagelinks = traph.get_webentity_pagelinks(weid, we_prefixes)
+    print ' - %s internal page links (traph)' % (len(internal_pagelinks))
 
-    for source_lru, target_lru, weight in pagelinks:
+    for source_lru, target_lru, weight in internal_pagelinks:
+        print ' \t- weight %s: %s  \t->  \t%s' % (weight, source_lru, target_lru)
+
+    inbound_pagelinks = traph.get_webentity_pagelinks(weid, we_prefixes, include_inbound=True, include_internal=False, include_outbound=False)
+    print ' - %s inbound page links (traph)' % (len(inbound_pagelinks))
+
+    for source_lru, target_lru, weight in inbound_pagelinks:
+        print ' \t- weight %s: %s  \t->  \t%s' % (weight, source_lru, target_lru)
+
+    outbound_pagelinks = traph.get_webentity_pagelinks(weid, we_prefixes, include_inbound=False, include_internal=False, include_outbound=True)
+    print ' - %s outbound page links (traph)' % (len(outbound_pagelinks))
+
+    for source_lru, target_lru, weight in outbound_pagelinks:
         print ' \t- weight %s: %s  \t->  \t%s' % (weight, source_lru, target_lru)
 
 
