@@ -7,6 +7,7 @@
 import errno
 import os
 import re
+import warnings
 from collections import defaultdict, Counter
 from traph_write_report import TraphWriteReport
 from storage import FileStorage, MemoryStorage
@@ -225,7 +226,16 @@ class Traph(object):
 
         # Nothing worked, we need to apply the default creation rule
         longest_candidate_prefix = self.__apply_webentity_default_creation_rule(lru)
-        report += self.__create_webentity(longest_candidate_prefix, expand=True)
+
+        # If the default rule failed to find a prefix, we emit an error
+        if not longest_candidate_prefix:
+            warnings.warn(
+                'Default rule failed to find a prefix for "%s"!' % lru,
+                RuntimeWarning
+            )
+        else:
+            report += self.__create_webentity(longest_candidate_prefix, expand=True)
+
         node.read(node.block) # update node
         return node, report
 
@@ -484,7 +494,7 @@ class Traph(object):
                 raise Exception('LRU %s not in the traph' % (prefix))  # TODO: raise custom exception
 
             for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix):
-                
+
                 if not node.is_page():
                     continue
 
@@ -499,7 +509,7 @@ class Traph(object):
 
                         if include_internal or target_webentity != weid:
                             pagelinks.append([lru, target_lru, link_node.weight()])
-                    
+
                 # Iterating over the page's inlinks
                 if node.has_inlinks():
                     links_block = node.inlinks()
@@ -511,9 +521,9 @@ class Traph(object):
 
                         if source_webentity != weid: # Note: if include_internal, we have the links above
                             pagelinks.append([source_lru, lru, link_node.weight()])
-                    
+
         return pagelinks
-            
+
 
     def get_webentities_links(self):
         graph = defaultdict(Counter)
