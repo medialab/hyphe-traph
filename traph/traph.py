@@ -542,6 +542,42 @@ class Traph(object):
 
         return pagelinks
 
+    def get_webentity_outlinks(self, weid, prefixes):
+        '''
+        Returns the list of cited web entities
+        Note: the prefixes are supposed to match the webentity id. We do not check.
+        '''
+
+        done_blocks = set()
+        weids = set()
+
+        # TODO: we should probably get a node helper another way
+        source_node = LRUTrieNode(self.lru_trie_storage)
+        target_node = LRUTrieNode(self.lru_trie_storage)
+
+        for prefix in prefixes:
+            prefix = self.__encode(prefix)
+
+            starting_node, _ = self.lru_trie.follow_lru(prefix)
+            if not starting_node:
+                raise Exception('LRU %s not in the traph' % (prefix))  # TODO: raise custom exception
+
+            for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix):
+
+                if not node.is_page():
+                    continue
+
+                # Iterating over the page's outlinks
+                if node.has_outlinks():
+                    links_block = node.outlinks()
+                    for link_node in self.link_store.link_nodes_iter(links_block):
+                        target_node.read(link_node.target())
+                        if target_node.block not in done_blocks:
+                            target_webentity = self.lru_trie.windup_lru_for_webentity(target_node)
+                            done_blocks.add(target_node.block)
+                            weids.add(target_webentity)
+                            
+        return weids
 
     def get_webentities_links(self):
         graph = defaultdict(Counter)
