@@ -708,7 +708,7 @@ class Traph(object):
         else:
             return len(self.get_page_links(lru, include_inbound=False, include_internal=False, include_outbound=True))
 
-    def get_page_outdegree(self, lru, weighted=False):
+    def get_page_degree(self, lru, weighted=False):
         '''
         Convenience method relying on get_page_links (thus NOT more efficient)
         '''
