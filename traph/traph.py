@@ -647,6 +647,43 @@ class Traph(object):
         '''
         return self.get_webentity_indegree(weid, prefixes) + self.get_webentity_indegree(weid, prefixes)
 
+    def get_page_links(self, lru, include_inbound=True, include_internal=True, include_outbound=True):
+        lru = self.__encode(lru)
+        node = self.lru_trie.lru_node(lru)
+
+        if not node or not node.is_page():
+            return []
+
+        pagelinks = []
+
+        # TODO: we should probably get a node helper another way
+        source_node = LRUTrieNode(self.lru_trie_storage)
+        target_node = LRUTrieNode(self.lru_trie_storage)
+
+        # Iterating over the page's outlinks
+        if node.has_outlinks() and (include_outbound or include_internal):
+            links_block = node.outlinks()
+            for link_node in self.link_store.link_nodes_iter(links_block):
+
+                target_node.read(link_node.target())
+                target_lru = self.lru_trie.windup_lru(target_node.block)
+
+                if (include_outbound and target_lru != lru) or (include_internal and target_lru == lru):
+                    pagelinks.append([lru, target_lru, link_node.weight()])
+
+        # Iterating over the page's inlinks
+        if node.has_inlinks() and include_inbound:
+            links_block = node.inlinks()
+            for link_node in self.link_store.link_nodes_iter(links_block):
+
+                source_node.read(link_node.target())
+                source_lru = self.lru_trie.windup_lru(source_node.block)
+                
+                if source_lru != lru:
+                    pagelinks.append([source_lru, lru, link_node.weight()])
+
+        return pagelinks
+
     def get_webentities_links(self):
         graph = defaultdict(Counter)
         page_to_webentity = dict()
