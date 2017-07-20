@@ -376,6 +376,10 @@ class Traph(object):
         return self.move_prefix_to_webentity(prefix, weid_target, weid_source)
 
     def retrieve_prefix(self, lru):
+        '''
+        Returns the closest prefix to contain the LRU
+        (the prefix defining the webentity that the LRU belongs to)
+        '''
         lru = self.__encode(lru)
 
         node, history = self.lru_trie.follow_lru(lru)
@@ -386,6 +390,10 @@ class Traph(object):
         return history.webentity_prefix
 
     def retrieve_webentity(self, lru):
+        '''
+        Returns the closest webentity id to contain the LRU
+        (the webentity it belongs to)
+        '''
         lru = self.__encode(lru)
 
         node, history = self.lru_trie.follow_lru(lru)
@@ -632,6 +640,13 @@ class Traph(object):
         '''
         return len(self.get_webentity_inlinks(weid, prefixes))
 
+    def get_webentity_degree(self, weid, prefixes):
+        '''
+        Note: relies on get_webentity_inlinks() and get_webentity_outlinks(),
+        thus not more efficient than calling these.
+        '''
+        return self.get_webentity_indegree(weid, prefixes) + self.get_webentity_indegree(weid, prefixes)
+
     def get_webentities_links(self):
         graph = defaultdict(Counter)
         page_to_webentity = dict()
@@ -777,7 +792,6 @@ class Traph(object):
             store.add_inlinks(target_node, source_blocks)
 
         return report
-
 
     def close(self):
 
