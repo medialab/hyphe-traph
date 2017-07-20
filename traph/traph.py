@@ -242,14 +242,6 @@ class Traph(object):
     # =========================================================================
     # Public interface
     # =========================================================================
-    def index_batch_crawl(self, data):
-        # data is supposed to be a JSON of this form:
-        # {pages:{'lru':'<lru>', 'lrulinks':[<lrulink1>, ...]}}
-        #
-        # TODO: return a JSON containing created entities:
-        # {stats:{}, webentities:{'<weid>':[<prefix1>, ...]}}
-        pass
-
     def add_webentity_creation_rule(self, rule_prefix, pattern, write_in_trie=True):
         rule_prefix = self.__encode(rule_prefix)
 
@@ -604,19 +596,47 @@ class Traph(object):
             outlinks[source_page].append(target_page)
             inlinks[target_page].append(source_page)
 
+        # Node possibly mutated by creation rules etc.
+        for node in pages.values():
+            node.read(node.block)
+
         for source_page, target_pages in outlinks.items():
             source_node = pages[source_page]
             target_blocks = (pages[target_page].block for target_page in target_pages)
-
             store.add_outlinks(source_node, target_blocks)
 
         for target_page, source_pages in inlinks.items():
             target_node = pages[target_page]
             source_blocks = (pages[source_page].block for source_page in source_pages)
-
             store.add_inlinks(target_node, source_blocks)
 
         return report
+
+    def index_batch_crawl(self, data):
+        # Data is supposed to be a multimap 'source_lru' => 'target_lrus'
+
+        store = self.link_store
+        report = TraphWriteReport()
+        pages = dict()
+        inlinks = defaultdict(list)
+
+        for source_page, target_pages in data.items():
+            source_page = self.__encode(source_page)
+
+            # We need to add the page
+            if source_page not in pages:
+                source_node, source_page_report = self.add_page(source_page)
+                report += source_page_report
+                pages[source_page] = source_node
+
+            for target_page in target_pages:
+                target_page = self.__encode(target_page)
+
+                if target_page not in pages:
+                    target_node, target_page_report = self.__add_page(target_page)
+                    report += target_page_report
+                    pages[target_pages] = target_node
+
 
     def close(self):
 
