@@ -37,13 +37,16 @@ class Traph(object):
         # Files
         self.lru_trie_file = None
         self.link_store_file = None
+        self.lru_trie_path = None
+        self.link_store_path = None
 
         create = overwrite
+        self.in_memory = bool(folder)
 
         # Solving paths
-        if folder:
-            lru_trie_path = os.path.join(folder, 'lru_trie.dat')
-            link_store_path = os.path.join(folder, 'link_store.dat')
+        if not self.in_memory:
+            self.lru_trie_path = os.path.join(folder, 'lru_trie.dat')
+            self.link_store_path = os.path.join(folder, 'link_store.dat')
 
             # Ensuring the given folder exists
             try:
@@ -55,8 +58,8 @@ class Traph(object):
                     raise
 
             # Testing existence of files
-            lru_trie_file_exists = os.path.isfile(lru_trie_path)
-            link_store_file_exists = os.path.isfile(link_store_path)
+            lru_trie_file_exists = os.path.isfile(self.lru_trie_path)
+            link_store_file_exists = os.path.isfile(self.link_store_path)
 
             # Checking consistency
             if lru_trie_file_exists and not link_store_file_exists:
@@ -74,8 +77,8 @@ class Traph(object):
 
             flags = 'wb+' if create else 'rb+'
 
-            self.lru_trie_file = open(lru_trie_path, flags)
-            self.link_store_file = open(link_store_path, flags)
+            self.lru_trie_file = open(self.lru_trie_path, flags)
+            self.link_store_file = open(self.link_store_path, flags)
 
             self.lru_trie_storage = FileStorage(
                 LRU_TRIE_NODE_BLOCK_SIZE,
@@ -88,12 +91,12 @@ class Traph(object):
             )
 
             # Checking for corruption
-            if self.lru_trie_storage.check_for_corruption():
+            if not create and self.lru_trie_storage.check_for_corruption():
                 raise TraphException(
                     'File corrupted: `lru_trie.dat`'
                 )
 
-            if self.links_store_storage.check_for_corruption():
+            if not create and self.links_store_storage.check_for_corruption():
                 raise TraphException(
                     'File corrupted: `link_store.dat`'
                 )
@@ -809,10 +812,23 @@ class Traph(object):
             self.link_store_file.close()
 
     def clear(self):
-        '''
-        /!\ NOT IMPLEMENTED YET
-        '''
-        pass
+        self.close()
+
+        if self.in_memory:
+            self.lru_trie_storage.clear()
+            self.links_store_storage.clear()
+        else:
+            self.lru_trie_file = open(self.lru_trie_path, 'wb+')
+            self.link_store_file = open(self.link_store_path, 'wb+')
+
+            self.lru_trie_storage.file = self.lru_trie_file
+            self.links_store_storage.file = self.link_store_file
+
+        # LRU Trie re-initialization
+        self.lru_trie = LRUTrie(self.lru_trie_storage, encoding=self.encoding)
+
+        # Link Store re-initialization
+        self.link_store = LinkStore(self.links_store_storage)
 
     # =========================================================================
     # Iteration methods

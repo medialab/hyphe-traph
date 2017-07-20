@@ -15,6 +15,10 @@ class MemoryStorage(object):
         self.block_size = block_size
         self.array = bytearray()
 
+    # Method clearing the memory
+    def clear(self):
+        self.array = bytearray()
+
     # Method reading a block in the bytearray
     def read(self, block):
         try:

@@ -5,4 +5,5 @@ __pycache__
 
 # Scripts data etc.
 scripts/data
+scripts/data_backup_mongo
 scripts/config.py
