@@ -57,7 +57,7 @@ domain_sizes = [1,2,3]
 links_per_page = [0,0,0,0,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,4,4,4,4,4,5,5,5,5,6,6,6,7,7,7,8,8,9,10,16,25,75]
 
 # Generate random pages
-pages_count = 10000
+pages_count = 100000
 crawled_pages = set()
 for i in range(pages_count):
     lru = random_lru(voc, domain_sizes, path_sizes)
@@ -84,13 +84,19 @@ for lru in crawled_pages:
     # print '%s links for \t%s' % (len(links), lru)
 
 add_links_duration = time.time() - add_links_start
-print '\t...%s page links added in %s ms' % (links_count, format(1000*add_links_duration, ',.0f') )
+print '\t...%s page links added in %s ms' % (format(links_count, ',.0f'), format(1000*add_links_duration, ',.0f') )
+
+print '\n:: Stats'
+print ' - %s webentities (from Store)' % (format(len(webentity_store.data['webentities']), ',.0f'))
 
 print '\n:: Get network...'
 get_network_start = time.time()
-webentity_links = traph.get_webentities_links()
+webentities_network = traph.get_webentities_links()
 get_network_duration = time.time() - get_network_start
-print '\t...%s webentity links obtained in %s ms' % (len(webentity_links), format(1000*get_network_duration, ',.0f') )
+webentity_links_count = 0
+for source, targets in webentities_network.items():
+    webentity_links_count += len(targets)
+print '\t...%s webentity links obtained in %s ms' % (format(webentity_links_count, ',.0f'), format(1000*get_network_duration, ',.0f') )
 
 # print '\n:: Breakdown by webentity'
 # webentities = set()
