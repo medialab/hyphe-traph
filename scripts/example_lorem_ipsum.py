@@ -258,5 +258,11 @@ for weid in webentities:
     for weid2 in we_outlinks:
         print ' \t-> webentity %s' % weid2
 
+    we_inlinks = traph.get_webentity_inlinks(weid, we_prefixes)
+    print ' - Cited by %s other webentities' % len(we_inlinks)
+
+    for weid2 in we_inlinks:
+        print ' \t<- webentity %s' % weid2
+
 
 traph.close()

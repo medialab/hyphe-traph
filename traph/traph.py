@@ -552,7 +552,6 @@ class Traph(object):
         weids = set()
 
         # TODO: we should probably get a node helper another way
-        source_node = LRUTrieNode(self.lru_trie_storage)
         target_node = LRUTrieNode(self.lru_trie_storage)
 
         for prefix in prefixes:
@@ -585,6 +584,49 @@ class Traph(object):
         Note: the prefixes are supposed to match the webentity id. We do not check.
         '''
         return len(self.get_webentity_outlinks(weid, prefixes))
+
+    def get_webentity_inlinks(self, weid, prefixes):
+        '''
+        Returns the list of citing web entities
+        Note: the prefixes are supposed to match the webentity id. We do not check.
+        '''
+
+        done_blocks = set()
+        weids = set()
+
+        # TODO: we should probably get a node helper another way
+        source_node = LRUTrieNode(self.lru_trie_storage)
+
+        for prefix in prefixes:
+            prefix = self.__encode(prefix)
+
+            starting_node, _ = self.lru_trie.follow_lru(prefix)
+            if not starting_node:
+                raise Exception('LRU %s not in the traph' % (prefix))  # TODO: raise custom exception
+
+            for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix):
+
+                if not node.is_page():
+                    continue
+
+                # Iterating over the page's inlinks
+                if node.has_inlinks():
+                    links_block = node.inlinks()
+                    for link_node in self.link_store.link_nodes_iter(links_block):
+                        source_node.read(link_node.target())
+                        if source_node.block not in done_blocks:
+                            source_webentity = self.lru_trie.windup_lru_for_webentity(source_node)
+                            done_blocks.add(source_node.block)
+                            weids.add(source_webentity)
+
+        return weids
+
+    def get_webentity_indegree(self, weid, prefixes):
+        '''
+        Convenience method relying on get_webentity_inlinks (thus NOT more efficient)
+        Note: the prefixes are supposed to match the webentity id. We do not check.
+        '''
+        return len(self.get_webentity_inlinks(weid, prefixes))
 
     def get_webentities_links(self):
         graph = defaultdict(Counter)
