@@ -243,6 +243,13 @@ class Traph(object):
     # Public interface
     # =========================================================================
     def add_webentity_creation_rule(self, rule_prefix, pattern, write_in_trie=True):
+        '''
+        Note: write_in_trie has 2 effects: store the rule in the trie, and apply it to existing entities.
+        write_in_trie=False is essentially for init on an existing traph.
+
+        Note 2: it seems obvious from the api design but let's restate it:
+        We can only have one rule for each prefix (or none).
+        '''
         rule_prefix = self.__encode(rule_prefix)
 
         self.webentity_creation_rules[rule_prefix] = re.compile(
@@ -283,6 +290,9 @@ class Traph(object):
         return True
 
     def create_webentity(self, prefixes):
+        '''
+        Note: will raise an error if any of the prefixes is already defining an existing entity
+        '''
         prefixes = [self.__encode(prefix) for prefix in prefixes]
 
         report = TraphWriteReport()
@@ -292,6 +302,10 @@ class Traph(object):
         return report
 
     def delete_webentity(self, weid, weid_prefixes, check_for_corruption=True):
+        '''
+        Note: weid is only useful to check data consistency, but not strictly necessary to the method.
+        It there is no weid, a consistency check will be skipped but the method will execute regardless.
+        '''
         weid_prefixes = [self.__encode(weid_prefix) for weid_prefix in weid_prefixes]
 
         # Note: weid is ignored if no check for data consistency
@@ -341,6 +355,10 @@ class Traph(object):
             raise Exception('Prefix %s not attributed to webentity %s' % (prefix, node.webentity()))  # TODO: raise custom exception
 
     def move_prefix_to_webentity(self, prefix, weid_target, weid_source=False):
+        '''
+        Note: pay attention to the unintuitive order of arguments.
+        You may prefer the more explicit alias move_prefix_to_webentity_from_webentity
+        '''
         prefix = self.__encode(prefix)
 
         if self.remove_prefix_from_webentity(prefix, weid_source):
@@ -348,6 +366,9 @@ class Traph(object):
         return False
 
     def move_prefix_to_webentity_from_webentity(self, prefix, weid_target, weid_source=False):
+        '''
+        A more explicit alias of move_prefix_to_webentity
+        '''
         prefix = self.__encode(prefix)
 
         # Just an alias for clarity
