@@ -410,6 +410,15 @@ print '\nWebentities:'
 for weid, prefixes in webentity_store.data['webentities'].items():
     print ' - Webentity %s\t%s + %s other prefixes' % (weid, prefixes[0], len(prefixes)-1)
 
+print '\nFocus on Valjean:'
+valjean_inlinks = traph.get_page_links('s:http|h:com|h:valjean|', include_inbound=True, include_internal=False, include_outbound=False)
+for source_lru, lru, weight in valjean_inlinks:
+    print '\t<- (weight %s) \t%s' % (weight, source_lru)
+print ''
+valjean_outlinks = traph.get_page_links('s:http|h:com|h:valjean|', include_inbound=False, include_internal=False, include_outbound=True)
+for lru, target_lru, weight in valjean_outlinks:
+    print '\t-> (weight %s) \t%s' % (weight, target_lru)
+
 # import networkx as nx
 
 # g = nx.Graph()
