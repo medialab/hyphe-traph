@@ -657,6 +657,8 @@ class Traph(object):
                 source_node.write()
                 report += source_page_report
                 pages[source_page] = source_node
+            else:
+                source_node = pages[source_page]
 
             target_blocks = []
 

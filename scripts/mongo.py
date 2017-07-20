@@ -46,9 +46,9 @@ links = []
 for page in collection.find({}, {'lru': 1, 'lrulinks': 1}, sort=[('_job', 1)]).limit(1000):
     i += 1
 
-    links.extend(links_generator(page))
+    # links.extend(links_generator(page))
 
-    # links_multimap[page['lru']].extend(page['lrulinks'])
+    links_multimap[page['lru']].extend(page['lrulinks'])
 
     # traph.add_links(links_generator(page))
 
@@ -59,11 +59,11 @@ for page in collection.find({}, {'lru': 1, 'lrulinks': 1}, sort=[('_job', 1)]).l
     #     traph.add_page(link)
 
 print 'Gathered links'
-traph.add_links(links)
+# traph.add_links(links)
 # print links_multimap
 # print links
 # print len(links)
 # print sum([len(i) for i in links_multimap.values()])
-# traph.index_batch_crawl(links_multimap)
+traph.index_batch_crawl(links_multimap)
 
 traph.close()

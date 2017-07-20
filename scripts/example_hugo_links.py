@@ -369,7 +369,7 @@ traph = Traph(overwrite=True, folder='./scripts/data/',
 
 print '\n:: Store network...'
 
-use_index_batch_crawl=False
+use_index_batch_crawl=True
 
 if use_index_batch_crawl:
     data = {}
@@ -400,8 +400,11 @@ for node, lru in traph.pages_iter():
     print ' - '+lru
 
 print '\nPage Links:'
+i = 0
 for source_lru, target_lru in traph.links_iter():
+    i += 1
     print ' - %s\t->  %s' % (source_lru, target_lru)
+print 'Total: %s' % i
 
 print '\nWebentities:'
 for weid, prefixes in webentity_store.data['webentities'].items():
