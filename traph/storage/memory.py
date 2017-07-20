@@ -5,8 +5,6 @@
 # Class storing the data in a byte array.
 #
 
-# TODO: this does not work currently and must be partially rewritten!
-
 
 # Main class
 class MemoryStorage(object):
@@ -16,7 +14,6 @@ class MemoryStorage(object):
         # Properties
         self.block_size = block_size
         self.array = bytearray()
-        self.size = 0
 
     # Method reading a block in the bytearray
     def read(self, block):
@@ -31,8 +28,9 @@ class MemoryStorage(object):
     def write(self, data, block=None):
         if block is None:
             self.array.extend(data)
-            block = self.size
-            self.size += self.block_size
+
+            # TODO: cache the length maybe?
+            block = len(self.array) - self.block_size
         else:
             self.array[block:block + self.block_size] = data
 

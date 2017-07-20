@@ -43,6 +43,7 @@ class FileStorage(object):
 
         self.file.write(data)
 
+        # TODO: can be avoided if we do not append
         block = self.file.tell() - self.block_size
 
         return block

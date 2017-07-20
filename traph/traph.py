@@ -34,6 +34,10 @@ class Traph(object):
         # Handling encoding
         self.encoding = encoding
 
+        # Files
+        self.lru_trie_file = None
+        self.link_store_file = None
+
         create = overwrite
 
         # Solving paths
