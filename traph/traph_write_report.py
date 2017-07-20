@@ -24,6 +24,11 @@ class TraphWriteReport(object):
             'created_webentities': self.created_webentities
         }
 
+    def __dict__(self):
+        return {
+            'created_webentities': self.created_webentities
+        }
+
     def __iadd__(self, other):
         self.created_webentities.update(other.created_webentities)
         return self
