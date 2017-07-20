@@ -7,6 +7,7 @@
 # Note that we only process raw ascii bytes as string for the moment and not
 # UTF-16 characters.
 #
+import warnings
 from traph.lru_trie.node import LRUTrieNode, LRU_TRIE_FIRST_DATA_BLOCK
 from traph.lru_trie.header import LRUTrieHeader
 from traph.lru_trie.iteration_state import LRUTrieDetailedDFSIterationState
@@ -243,8 +244,13 @@ class LRUTrie(object):
             if parent.has_webentity():
                 return parent.webentity()
 
-        # TODO: custom exception
-        raise Exception('The given page does not belong to a webentity!')
+        # We could not find a webentity for the given node, we should warn
+        warnings.warn(
+            'Could not find a webentity for the given node %s!' % node.__repr__(),
+            RuntimeWarning
+        )
+
+        return None
 
     # =========================================================================
     # Iteration methods

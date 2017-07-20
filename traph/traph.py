@@ -550,6 +550,11 @@ class Traph(object):
 
                 if target_webentity is None:
                     target_webentity = self.lru_trie.windup_lru_for_webentity(target_node)
+
+                    # Beware: it's possible that we could not find a webentity
+                    if not target_webentity:
+                        continue
+
                     page_to_webentity[target_node.block] = target_webentity
 
                 # Adding to the graph
