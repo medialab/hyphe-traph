@@ -7,6 +7,7 @@
 from traph import Traph
 from scripts.utils.webentity_store import WebEntityStore
 import random
+import time
 
 webentity_creation_rules_regexp = {
     'domain':       '(s:[a-zA-Z]+\\|(t:[0-9]+\\|)?(h:[^\\|]+\\|(h:[^\\|]+\\|)|h:(localhost|(\\d{1,3}\\.){3}\\d{1,3}|\\[[\\da-f]*:[\\da-f:]*\\])\\|))',
@@ -56,13 +57,15 @@ domain_sizes = [1,2,3]
 links_per_page = [0,0,0,0,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,4,4,4,4,4,5,5,5,5,6,6,6,7,7,7,8,8,9,10,16,25,75]
 
 # Generate random pages
-pages_count = 100
+pages_count = 10000
 crawled_pages = set()
 for i in range(pages_count):
     lru = random_lru(voc, domain_sizes, path_sizes)
     crawled_pages.add(lru)
 
-print '\n:: %s pages generated' % (len(crawled_pages))
+print '\n:: %s pages generated. Generate and add links...' % (len(crawled_pages))
+add_links_start = time.time()
+links_count = 0
 for lru in crawled_pages:
     report = traph.add_page(lru)
     webentity_store.data['webentities'].update(report.created_webentities)
@@ -76,45 +79,55 @@ for lru in crawled_pages:
         links.append([lru, target_lru])
     links_report = traph.add_links(links)
     webentity_store.data['webentities'].update(links_report.created_webentities)
+    links_count += len(links)
 
-    print '%s links for \t%s' % (len(links), lru)
+    # print '%s links for \t%s' % (len(links), lru)
 
-print '\n:: Breakdown by webentity'
-webentities = set()
-for node, lru in traph.webentity_prefix_iter():
-    webentities.add(node.webentity())
-for weid in webentities:
-    print '\nWebentity %s' % (weid)
+add_links_duration = time.time() - add_links_start
+print '\t...%s page links added in %s ms' % (links_count, format(1000*add_links_duration, ',.0f') )
 
-    we_prefixes = webentity_store.data['webentities'][weid]
-    print ' - %s prefixes (store)' % (len(we_prefixes))
+print '\n:: Get network...'
+get_network_start = time.time()
+webentity_links = traph.get_webentities_links()
+get_network_duration = time.time() - get_network_start
+print '\t...%s webentity links obtained in %s ms' % (len(webentity_links), format(1000*get_network_duration, ',.0f') )
 
-    for prefix in we_prefixes:
-        print ' \t- %s' % (prefix)
+# print '\n:: Breakdown by webentity'
+# webentities = set()
+# for node, lru in traph.webentity_prefix_iter():
+#     webentities.add(node.webentity())
+# for weid in webentities:
+#     print '\nWebentity %s' % (weid)
 
-    we_pages = traph.get_webentity_pages(weid, we_prefixes)
-    print ' - %s pages (traph)' % (len(we_pages))
+#     we_prefixes = webentity_store.data['webentities'][weid]
+#     print ' - %s prefixes (store)' % (len(we_prefixes))
 
-    for lru in we_pages:
-        print ' \t- %s' % (lru)
+#     for prefix in we_prefixes:
+#         print ' \t- %s' % (prefix)
 
-    we_crawled_pages = traph.get_webentity_crawled_pages(weid, we_prefixes)
-    print ' - %s crawled pages (traph)' % (len(we_crawled_pages))
+#     we_pages = traph.get_webentity_pages(weid, we_prefixes)
+#     print ' - %s pages (traph)' % (len(we_pages))
 
-    for lru in we_crawled_pages:
-        print ' \t- %s' % (lru)
+#     for lru in we_pages:
+#         print ' \t- %s' % (lru)
 
-    we_most_linked_pages = traph.get_webentity_most_linked_pages(weid, we_prefixes, 3)
-    print ' - %s most linked pages (traph, max 3)' % (len(we_most_linked_pages))
+#     we_crawled_pages = traph.get_webentity_crawled_pages(weid, we_prefixes)
+#     print ' - %s crawled pages (traph)' % (len(we_crawled_pages))
 
-    for lru in we_most_linked_pages:
-        print ' \t- %s' % (lru)
+#     for lru in we_crawled_pages:
+#         print ' \t- %s' % (lru)
 
-    pagelinks = traph.get_webentity_pagelinks(weid, we_prefixes)
-    print ' - %s page links (traph, excluding internal)' % (len(pagelinks))
+#     we_most_linked_pages = traph.get_webentity_most_linked_pages(weid, we_prefixes, 3)
+#     print ' - %s most linked pages (traph, max 3)' % (len(we_most_linked_pages))
 
-    for source_lru, target_lru, weight in pagelinks:
-        print ' \t- weight %s: %s  \t->  \t%s' % (weight, source_lru, target_lru)
+#     for lru in we_most_linked_pages:
+#         print ' \t- %s' % (lru)
+
+#     pagelinks = traph.get_webentity_pagelinks(weid, we_prefixes)
+#     print ' - %s page links (traph, excluding internal)' % (len(pagelinks))
+
+#     for source_lru, target_lru, weight in pagelinks:
+#         print ' \t- weight %s: %s  \t->  \t%s' % (weight, source_lru, target_lru)
 
 
 traph.close()
