@@ -28,13 +28,13 @@ traph = Traph(folder='./scripts/data/',
 
 webentities_network = traph.get_webentities_links()
 
-g = nx.Graph()
+# g = nx.Graph()
 
-for source, targets in webentities_network.items():
-    g.add_node(source, label=source)
+# for source, targets in webentities_network.items():
+#     g.add_node(source, label=source)
 
-    for target in targets:
-        g.add_node(target, label=target)
-        g.add_edge(source, target)
+#     for target in targets:
+#         g.add_node(target, label=target)
+#         g.add_edge(source, target)
 
-nx.write_gexf(g, './scripts/data/dump.gexf')
+# nx.write_gexf(g, './scripts/data/dump.gexf')

@@ -16,28 +16,24 @@ class MemoryStorage(object):
         # Properties
         self.block_size = block_size
         self.array = bytearray()
-
-    # Method returning a block offset in the file
-    def __block_offset(self, block):
-        return self.block_size * block
+        self.size = 0
 
     # Method reading a block in the bytearray
     def read(self, block):
-        offset = self.__block_offset(block)
-
-        if len(offset + 1 > self.array):
+        try:
+            return self.array[block:block + self.block_size] or None
+        except IndexError:
             return None
+        except:
+            raise
 
-        data = self.array[offset:self.block_size]
-
-        return data
-
-    # Method writing a node
+    # Method writing nodes to the bytearray
     def write(self, data, block=None):
         if block is None:
-            block = len(self.array)
-
-        offset = this.__block_offset(block)
-        self.array[offset:self.block_size] = data
+            self.array.extend(data)
+            block = self.size
+            self.size += self.block_size
+        else:
+            self.array[block:block + self.block_size] = data
 
         return block
