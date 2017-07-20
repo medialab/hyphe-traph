@@ -637,8 +637,9 @@ class Traph(object):
         return report
 
     def index_batch_crawl(self, data):
-        # Data is supposed to be a multimap 'source_lru' => 'target_lrus'
-
+        '''
+        returns a multimap 'source_lru' => 'target_lrus'
+        '''
         store = self.link_store
         report = TraphWriteReport()
         pages = dict()
@@ -694,7 +695,9 @@ class Traph(object):
             self.link_store_file.close()
 
     def clear(self):
-        # TODO
+        '''
+        /!\ NOT IMPLEMENTED YET
+        '''
         pass
 
     # =========================================================================
