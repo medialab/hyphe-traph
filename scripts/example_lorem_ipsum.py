@@ -252,5 +252,11 @@ for weid in webentities:
     for source_lru, target_lru, weight in outbound_pagelinks:
         print ' \t- weight %s: %s  \t->  \t%s' % (weight, source_lru, target_lru)
 
+    we_outlinks = traph.get_webentity_outlinks(weid, we_prefixes)
+    print ' - Cites %s other webentities' % len(we_outlinks)
+
+    for weid2 in we_outlinks:
+        print ' \t-> webentity %s' % weid2
+
 
 traph.close()

@@ -576,8 +576,15 @@ class Traph(object):
                             target_webentity = self.lru_trie.windup_lru_for_webentity(target_node)
                             done_blocks.add(target_node.block)
                             weids.add(target_webentity)
-                            
+
         return weids
+
+    def get_webentity_outdegree(self, weid, prefixes):
+        '''
+        Convenience method relying on get_webentity_outlinks (thus NOT more efficient)
+        Note: the prefixes are supposed to match the webentity id. We do not check.
+        '''
+        return len(self.get_webentity_outlinks(weid, prefixes))
 
     def get_webentities_links(self):
         graph = defaultdict(Counter)
