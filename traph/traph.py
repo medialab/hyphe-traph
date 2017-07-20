@@ -41,7 +41,7 @@ class Traph(object):
         self.link_store_path = None
 
         create = overwrite
-        self.in_memory = bool(folder)
+        self.in_memory = not bool(folder)
 
         # Solving paths
         if not self.in_memory:
@@ -682,7 +682,7 @@ class Traph(object):
 
                 source_node.read(link_node.target())
                 source_lru = self.lru_trie.windup_lru(source_node.block)
-                
+
                 if source_lru != lru:
                     pagelinks.append([source_lru, lru, link_node.weight()])
 
