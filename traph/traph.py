@@ -369,9 +369,6 @@ class Traph(object):
         '''
         A more explicit alias of move_prefix_to_webentity
         '''
-        prefix = self.__encode(prefix)
-
-        # Just an alias for clarity
         return self.move_prefix_to_webentity(prefix, weid_target, weid_source)
 
     def retrieve_prefix(self, lru):
@@ -405,8 +402,9 @@ class Traph(object):
         return node.webentity()
 
     def get_webentity_pages(self, weid, prefixes):
-        # Note: the prefixes are thoses of the webentity whose id is weid
-        # No need to check
+        '''
+        Note: the prefixes are supposed to match the webentity id. We do not check.
+        '''
         pages = []
         for prefix in prefixes:
             prefix = self.__encode(prefix)
@@ -420,8 +418,9 @@ class Traph(object):
         return pages
 
     def get_webentity_crawled_pages(self, weid, prefixes):
-        # Note: the prefixes are thoses of the webentity whose id is weid
-        # No need to check
+        '''
+        Note: the prefixes are supposed to match the webentity id. We do not check.
+        '''
         pages = []
         for prefix in prefixes:
             prefix = self.__encode(prefix)
@@ -435,8 +434,9 @@ class Traph(object):
         return pages
 
     def get_webentity_most_linked_pages(self, weid, prefixes, pages_count=10):
-        # Note: the prefixes are thoses of the webentity whose id is weid
-        # No need to check
+        '''
+        Note: the prefixes are supposed to match the webentity id. We do not check.
+        '''
         pages = []
         for prefix in prefixes:
             prefix = self.__encode(prefix)
@@ -456,8 +456,9 @@ class Traph(object):
         return [page['lru'] for page in sorted_pages[0:pages_count]]
 
     def get_webentity_parent_webentities(self, weid, prefixes):
-        # Note: the prefixes are thoses of the webentity whose id is weid
-        # No need to check
+        '''
+        Note: the prefixes are supposed to match the webentity id. We do not check.
+        '''
         weids = set()
         for prefix in prefixes:
             prefix = self.__encode(prefix)
@@ -473,8 +474,9 @@ class Traph(object):
         return weids
 
     def get_webentity_child_webentities(self, weid, prefixes):
-        # Note: the prefixes are thoses of the webentity whose id is weid
-        # No need to check
+        '''
+        Note: the prefixes are supposed to match the webentity id. We do not check.
+        '''
         weids = set()
         for prefix in prefixes:
             prefix = self.__encode(prefix)
@@ -490,8 +492,9 @@ class Traph(object):
         return weids
 
     def get_webentity_pagelinks(self, weid, prefixes, include_internal=False):
-        # Note: the prefixes are thoses of the webentity whose id is weid
-        # No need to check
+        '''
+        Note: the prefixes are supposed to match the webentity id. We do not check.
+        '''
 
         pagelinks = []
 
