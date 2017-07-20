@@ -487,7 +487,8 @@ class Traph(object):
                 weid2 = node.webentity()
                 if weid2 and weid2 > 0 and weid2 != weid:
                     weids.add(weid2)
-        return weids
+
+        return list(weids)
 
     def get_webentity_child_webentities(self, weid, prefixes):
         '''
@@ -505,7 +506,8 @@ class Traph(object):
                 weid2 = node.webentity()
                 if weid2 and weid2 > 0 and weid2 != weid:
                     weids.add(weid2)
-        return weids
+
+        return list(weids)
 
     def get_webentity_pagelinks(self, weid, prefixes, include_inbound=False, include_internal=True, include_outbound=False):
         '''
