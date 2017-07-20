@@ -773,6 +773,9 @@ class Traph(object):
         return lru_variations(prefix)
 
     def add_page(self, lru):
+        '''
+        Returns a webentity creation report as {weid:[prefixes]}
+        '''
         lru = self.__encode(lru)
 
         node, report = self.__add_page(lru)
