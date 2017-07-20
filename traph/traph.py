@@ -684,6 +684,42 @@ class Traph(object):
 
         return pagelinks
 
+    def get_page_indegree(self, lru, weighted=False):
+        '''
+        Convenience method relying on get_page_links (thus NOT more efficient)
+        '''
+        if weighted:
+            total = 0
+            for _, _, weight in self.get_page_links(lru, include_inbound=True, include_internal=False, include_outbound=False):
+                total += weight
+            return total
+        else:
+            return len(self.get_page_links(lru, include_inbound=True, include_internal=False, include_outbound=False))
+
+    def get_page_outdegree(self, lru, weighted=False):
+        '''
+        Convenience method relying on get_page_links (thus NOT more efficient)
+        '''
+        if weighted:
+            total = 0
+            for _, _, weight in self.get_page_links(lru, include_inbound=False, include_internal=False, include_outbound=True):
+                total += weight
+            return total
+        else:
+            return len(self.get_page_links(lru, include_inbound=False, include_internal=False, include_outbound=True))
+
+    def get_page_outdegree(self, lru, weighted=False):
+        '''
+        Convenience method relying on get_page_links (thus NOT more efficient)
+        '''
+        if weighted:
+            total = 0
+            for _, _, weight in self.get_page_links(lru, include_inbound=True, include_internal=True, include_outbound=True):
+                total += weight
+            return total
+        else:
+            return len(self.get_page_links(lru, include_inbound=True, include_internal=True, include_outbound=True))
+
     def get_webentities_links(self):
         graph = defaultdict(Counter)
         page_to_webentity = dict()
