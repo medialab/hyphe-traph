@@ -382,6 +382,7 @@ class Traph(object):
         '''
         Returns the closest prefix to contain the LRU
         (the prefix defining the webentity that the LRU belongs to)
+        Note: does not apply creation rules. For that feature see get_potential_prefix()
         '''
         lru = self.__encode(lru)
 
@@ -391,6 +392,43 @@ class Traph(object):
         if not history.webentity_prefix:
             raise Exception('No webentity prefix found for %s' % (lru))  # TODO: raise custom exception
         return history.webentity_prefix
+
+    def get_potential_prefix(self, lru):
+        '''
+        Returns the longest of prefixes or "potentil prefixes" ie. from creation rules.
+        Very similar to internal method __add_page except it does not add the lru.
+        '''
+        lru = self.__encode(lru)
+        node, history = self.lru_trie.follow_lru(lru)
+
+        # Retrieving the longest candidate prefix
+        longest_candidate_prefix = ''
+        for rule_prefix in history.rules_to_apply():
+            candidate_prefix = self.__apply_webentity_creation_rule(rule_prefix, lru)
+
+            if candidate_prefix and len(candidate_prefix) > len(longest_candidate_prefix):
+                longest_candidate_prefix = candidate_prefix
+
+        # If the longest rules prefix is shorter than the webentity prefix, or there is no rules prefix
+        if len(longest_candidate_prefix) <= history.webentity_position + 1:
+            return history.webentity_prefix
+
+        # If there is a rules prefix and it is longer than the webentity prefix
+        if longest_candidate_prefix:
+            return longest_candidate_prefix
+
+        # If there is neither a webentity prefix nor a rules prefix, look for the default rule
+        longest_candidate_prefix = self.__apply_webentity_default_creation_rule(lru)
+
+        # If the default rule failed to find a prefix, we emit an error
+        if not longest_candidate_prefix:
+            warnings.warn(
+                'Default rule failed to find a prefix for "%s"!' % lru,
+                RuntimeWarning
+            )
+            return False
+        else:
+            return longest_candidate_prefix
 
     def retrieve_webentity(self, lru):
         '''
