@@ -395,7 +395,7 @@ class Traph(object):
 
     def get_potential_prefix(self, lru):
         '''
-        Returns the longest of prefixes or "potentil prefixes" ie. from creation rules.
+        Returns the longest of prefixes or "potential prefixes" ie. from creation rules.
         Very similar to internal method __add_page except it does not add the lru.
         '''
         lru = self.__encode(lru)
@@ -410,7 +410,7 @@ class Traph(object):
                 longest_candidate_prefix = candidate_prefix
 
         # If the longest rules prefix is shorter than the webentity prefix, or there is no rules prefix
-        if len(longest_candidate_prefix) <= history.webentity_position + 1:
+        if longest_candidate_prefix and len(longest_candidate_prefix) <= history.webentity_position + 1:
             return history.webentity_prefix
 
         # If there is a rules prefix and it is longer than the webentity prefix
