@@ -204,7 +204,7 @@ class LRUTrie(object):
             if node.has_webentity():
                 history.update_webentity(
                     node.webentity(),
-                    lru[:i],
+                    lru[:i + 1],
                     i
                 )
 
