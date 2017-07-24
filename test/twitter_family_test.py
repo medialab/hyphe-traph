@@ -4,7 +4,7 @@
 #
 # Gathering the unit tests in order to run them.
 #
-from test.test_case import TraphTestCase
+from test.test_cases import TraphTestCase
 
 PAGES = [
     's:http|h:com|h:twitter|p:daughter|',
