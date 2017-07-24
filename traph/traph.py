@@ -782,9 +782,11 @@ class Traph(object):
         else:
             return len(self.get_page_links(lru, include_inbound=True, include_internal=True, include_outbound=True))
 
-    def get_webentities_links(self):
+    def get_webentities_links(self, out=True, include_auto=False):
         graph = defaultdict(Counter)
         page_to_webentity = dict()
+
+        # TODO: unit test this!
 
         # TODO: we can try a version where we do a DFS for solving the page/webentity relation
         # then solve the network
@@ -797,14 +799,14 @@ class Traph(object):
         for state in self.lru_trie.detailed_dfs_iter():
             node = state.node
 
-            if not node.is_page() or not node.has_outlinks():
+            if not node.is_page() or not node.has_links(out=out):
                 continue
 
             source_webentity = state.current_webentity()
             page_to_webentity[node.block] = source_webentity
 
             # Iterating over the page's links
-            links_block = node.outlinks()
+            links_block = node.links(out=out)
             for link_node in self.link_store.link_nodes_iter(links_block):
 
                 target_block = link_node.target()
@@ -818,12 +820,22 @@ class Traph(object):
                     if not target_webentity:
                         continue
 
+                    # Allowing auto links?
+                    if not include_auto and source_webentity == target_webentity:
+                        continue
+
                     page_to_webentity[target_block] = target_webentity
 
                 # Adding to the graph
                 graph[source_webentity][target_webentity] += link_node.weight()
 
         return graph
+
+    def get_webentities_inlinks(self, include_auto=False):
+        return self.get_webentities_links(out=False, include_auto=include_auto)
+
+    def get_webentities_outlinks(self, include_auto=False):
+        return self.get_webentities_links(out=True, include_auto=include_auto)
 
     def expand_prefix(self, prefix):
         prefix = self.__encode(prefix)
