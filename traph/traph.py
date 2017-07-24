@@ -408,8 +408,10 @@ class Traph(object):
         lru = self.__encode(lru)
 
         node, history = self.lru_trie.follow_lru(lru)
-        if not node:
-            raise TraphException('LRU %s not in the traph' % (lru))
+
+        # NOTE: it should not throw here.
+        # if not node:
+        #     raise TraphException('LRU %s not in the traph' % (lru))
         if not history.webentity_prefix:
             raise TraphException('No webentity prefix found for %s' % (lru))
         return history.webentity_prefix
@@ -459,8 +461,10 @@ class Traph(object):
         lru = self.__encode(lru)
 
         node, history = self.lru_trie.follow_lru(lru)
-        if not node:
-            raise TraphException('LRU %s not in the traph' % (lru))
+
+        # NOTE: it should not throw here.
+        # if not node:
+        #     raise TraphException('LRU %s not in the traph' % (lru))
         if not history.webentity:
             raise TraphException('No webentity found for %s' % (lru))
         return history.webentity
