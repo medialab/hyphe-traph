@@ -17,7 +17,7 @@ class TraphTestCase(unittest.TestCase):
 
     folder = FOLDER
 
-    def traph(self, **kwargs):
+    def get_traph(self, **kwargs):
         options = {
             'overwrite': False,
             'default_webentity_creation_rule': DEFAULT_WEBENTITY_CREATION_RULE,
