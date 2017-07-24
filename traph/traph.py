@@ -965,3 +965,14 @@ class Traph(object):
 
     def webentity_prefix_iter(self):
         return self.lru_trie.webentity_prefix_iter()
+
+    # =========================================================================
+    # Counting methods
+    # =========================================================================
+    def count_pages(self):
+        nb = 0
+
+        for page in self.pages_iter():
+            nb += 1
+
+        return nb
