@@ -27,12 +27,28 @@ class Traph(object):
     # =========================================================================
     # Constructor
     # =========================================================================
-    def __init__(self, overwrite=False, folder=None, encoding='utf-8',
-                 default_webentity_creation_rule=None,
+    def __init__(self, folder=None, overwrite=False, encoding='utf-8',
+                 debug=False, default_webentity_creation_rule=None,
                  webentity_creation_rules=None):
 
         # Handling encoding
         self.encoding = encoding
+
+        # Debugging mode
+        if debug:
+            if not default_webentity_creation_rule:
+                default_webentity_creation_rule = ''
+            if not webentity_creation_rules:
+                webentity_creation_rules = {}
+        else:
+
+            # Ensuring the creation rules are set
+            if type(default_webentity_creation_rule) not in [str, unicode]:
+                raise TraphException('Given default webentity creation rule is not a string!')
+
+            if not isinstance(webentity_creation_rules, dict):
+                raise TraphException('Given webentity creation rules is not a dict!')
+                # TODO: check if each value is correctly a string
 
         # Files
         self.lru_trie_file = None
@@ -112,15 +128,16 @@ class Traph(object):
         self.link_store = LinkStore(self.links_store_storage)
 
         # Webentity creation rules are stored in RAM
-        self.default_webentity_creation_rule = re.compile(
-            default_webentity_creation_rule,
-            re.I
-        )
+        if not debug:
+            self.default_webentity_creation_rule = re.compile(
+                default_webentity_creation_rule,
+                re.I
+            )
 
-        self.webentity_creation_rules = {}
+            self.webentity_creation_rules = {}
 
-        for prefix, pattern in webentity_creation_rules.items():
-            self.add_webentity_creation_rule(prefix, pattern, create)
+            for prefix, pattern in webentity_creation_rules.items():
+                self.add_webentity_creation_rule(prefix, pattern, create)
 
     # =========================================================================
     # Internal methods
