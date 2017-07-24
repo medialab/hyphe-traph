@@ -1,8 +1,8 @@
 # =============================================================================
-# Unit Tests Endpoint
+# Traph Unit Tests
 # =============================================================================
 #
-# Gathering the unit tests in order to run them.
+# Testing the Traph class itself.
 #
 from test.test_cases import TraphTestCase
 

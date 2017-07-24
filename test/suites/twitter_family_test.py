@@ -1,8 +1,9 @@
 # =============================================================================
-# Unit Tests Endpoint
+# Twitter Family Unit Tests
 # =============================================================================
 #
-# Gathering the unit tests in order to run them.
+# Simple use cases representing a family through Twitter accounts. Here we are
+# just testing page & link addition as well as basic webentity creation.
 #
 from test.test_cases import TraphTestCase
 

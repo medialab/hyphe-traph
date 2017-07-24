@@ -93,7 +93,7 @@ webentity_store.data['webentities'].update(report.created_webentities)
 
 print '\nResult - Existing webentities:'
 for weid, prefixes in webentity_store.data['webentities'].items():
-    print ' - Webentity %s\t%s + %s other prefixes' % (weid, prefixes[0], len(prefixes)-1) 
+    print ' - Webentity %s\t%s + %s other prefixes' % (weid, prefixes[0], len(prefixes)-1)
 
 print '\nResult - Existing pages:'
 for node, lru in traph.pages_iter():
@@ -109,7 +109,7 @@ webentity_store.data['webentities'].update(report.created_webentities)
 
 print '\nResult - Existing webentities:'
 for weid, prefixes in webentity_store.data['webentities'].items():
-    print ' - Webentity %s\t%s + %s other prefixes' % (weid, prefixes[0], len(prefixes)-1) 
+    print ' - Webentity %s\t%s + %s other prefixes' % (weid, prefixes[0], len(prefixes)-1)
 
 # Step 7
 print '\n:: Step 7: Add the "European Country" rule'
@@ -121,7 +121,7 @@ webentity_store.data['webentities'].update(report.created_webentities)
 
 print '\nResult - Existing webentities:'
 for weid, prefixes in webentity_store.data['webentities'].items():
-    print ' - Webentity %s\t%s + %s other prefixes' % (weid, prefixes[0], len(prefixes)-1) 
+    print ' - Webentity %s\t%s + %s other prefixes' % (weid, prefixes[0], len(prefixes)-1)
 
 # Step 8
 print '\n:: Step 8: Add the "Berlin" page'
@@ -135,10 +135,10 @@ webentity_store.data['webentities'].update(report.created_webentities)
 
 print '\nResult - Existing webentities:'
 for weid, prefixes in webentity_store.data['webentities'].items():
-    print ' - Webentity %s\t%s + %s other prefixes' % (weid, prefixes[0], len(prefixes)-1) 
+    print ' - Webentity %s\t%s + %s other prefixes' % (weid, prefixes[0], len(prefixes)-1)
 
 # Step 9
-print '\n:: Step 8: Add the "Barcelona" page'
+print '\n:: Step 9: Add the "Barcelona" page'
 print 'Expected: The "Barcelona" webentity is created. We currently have two rules doing the same'
 print '          thing: "City" rule and "Spanish City" rule. "Barcelona" should be created only once.'
 
@@ -147,7 +147,7 @@ webentity_store.data['webentities'].update(report.created_webentities)
 
 print '\nResult - Existing webentities:'
 for weid, prefixes in webentity_store.data['webentities'].items():
-    print ' - Webentity %s\t%s + %s other prefixes' % (weid, prefixes[0], len(prefixes)-1) 
+    print ' - Webentity %s\t%s + %s other prefixes' % (weid, prefixes[0], len(prefixes)-1)
 
 print '\nResult - Existing pages:'
 for node, lru in traph.pages_iter():

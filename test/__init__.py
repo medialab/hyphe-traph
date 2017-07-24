@@ -4,5 +4,6 @@
 #
 # Gathering the unit tests in order to run them.
 #
-from test.traph_test import TestTraph
-from test.twitter_family_test import TestTwitterFamily
+from test.suites.traph_test import TestTraph
+from test.suites.twitter_family_test import TestTwitterFamily
+from test.suites.creation_rules_test import TestCreationRules
