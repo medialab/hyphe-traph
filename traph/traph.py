@@ -168,8 +168,7 @@ class Traph(object):
                 valid_prefixes_index.update({prefix: [node, history]})
 
         if len(invalid_prefixes) > 0 and not use_best_case:
-            raise Exception('Some prefixes were already set: %s' % (invalid_prefixes))  # TODO: raise custom exception
-            return
+            raise TraphException('Some prefixes were already set: %s' % (invalid_prefixes))
 
         elif len(invalid_prefixes) == len(prefixes):
             # No prefix is valid!
@@ -288,7 +287,7 @@ class Traph(object):
         if write_in_trie:
             node, history = self.lru_trie.add_lru(rule_prefix)
             if not node:
-                raise Exception('Prefix not in tree: ' + rule_prefix)  # TODO: raise custom exception
+                raise TraphException('Prefix not in tree: ' + rule_prefix)
             node.flag_as_webentity_creation_rule()
             node.write()
             # Spawn necessary web entities
@@ -304,12 +303,12 @@ class Traph(object):
         rule_prefix = self.__encode(rule_prefix)
 
         if not self.webentity_creation_rules[rule_prefix]:
-            raise Exception('Prefix not in creation rules: ' + rule_prefix)  # TODO: raise custom exception
+            raise TraphException('Prefix not in creation rules: ' + rule_prefix)
         del self.webentity_creation_rules[rule_prefix]
 
         node = self.lru_trie.lru_node(rule_prefix)
         if not node:
-            raise Exception('Prefix %s cannot be found' % (prefix))  # TODO: raise custom exception
+            raise TraphException('Prefix %s cannot be found' % (prefix))
         node.unflag_as_webentity_creation_rule()
         node.write()
 
@@ -340,10 +339,10 @@ class Traph(object):
             for prefix in weid_prefixes:
                 node = self.lru_trie.lru_node(prefix)
                 if not node:
-                    raise Exception('Prefix %s cannot be found' % (prefix))  # TODO: raise custom exception
+                    raise TraphException('Prefix %s cannot be found' % (prefix))
                 prefix_index.update({prefix: node})
                 if not node.has_webentity() or node.webentity() != weid:
-                    raise Exception('Prefix %s not attributed to webentity %s' % (prefix, weid))  # TODO: raise custom exception
+                    raise TraphException('Prefix %s not attributed to webentity %s' % (prefix, weid))
         else:
             prefix_index = {}
             for prefix in weid_prefixes:
@@ -362,7 +361,7 @@ class Traph(object):
         # check prefix
         node, history = self.lru_trie.add_lru(prefix)
         if node.has_webentity():
-            raise Exception('Prefix %s already attributed to webentity %s' % (prefix, node.webentity()))  # TODO: raise custom exception
+            raise TraphException('Prefix %s already attributed to webentity %s' % (prefix, node.webentity()))
         else:
             node.set_webentity(weid)
             node.write()
@@ -378,7 +377,7 @@ class Traph(object):
             node.write()
             return True
         else:
-            raise Exception('Prefix %s not attributed to webentity %s' % (prefix, node.webentity()))  # TODO: raise custom exception
+            raise TraphException('Prefix %s not attributed to webentity %s' % (prefix, node.webentity()))
 
     def move_prefix_to_webentity(self, prefix, weid_target, weid_source=False):
         '''
@@ -407,9 +406,9 @@ class Traph(object):
 
         node, history = self.lru_trie.follow_lru(lru)
         if not node:
-            raise Exception('LRU %s not in the traph' % (lru))  # TODO: raise custom exception
+            raise TraphException('LRU %s not in the traph' % (lru))
         if not history.webentity_prefix:
-            raise Exception('No webentity prefix found for %s' % (lru))  # TODO: raise custom exception
+            raise TraphException('No webentity prefix found for %s' % (lru))
         return history.webentity_prefix
 
     def get_potential_prefix(self, lru):
@@ -458,9 +457,9 @@ class Traph(object):
 
         node, history = self.lru_trie.follow_lru(lru)
         if not node:
-            raise Exception('LRU %s not in the traph' % (lru))  # TODO: raise custom exception
+            raise TraphException('LRU %s not in the traph' % (lru))
         if not history.webentity:
-            raise Exception('No webentity found for %s' % (lru))  # TODO: raise custom exception
+            raise TraphException('No webentity found for %s' % (lru))
         return history.webentity
 
     def get_webentity_by_prefix(self, prefix):
@@ -468,9 +467,9 @@ class Traph(object):
 
         node, history = self.lru_trie.follow_lru(prefix)
         if not node:
-            raise Exception('LRU %s not in the traph' % (prefix))  # TODO: raise custom exception
+            raise TraphException('LRU %s not in the traph' % (prefix))
         if not node.has_webentity():
-            raise Exception('LRU %s is not a webentity prefix' % (prefix))  # TODO: raise custom exception
+            raise TraphException('LRU %s is not a webentity prefix' % (prefix))
         return node.webentity()
 
     def get_webentity_pages(self, weid, prefixes):
@@ -483,7 +482,7 @@ class Traph(object):
 
             starting_node, _ = self.lru_trie.follow_lru(prefix)
             if not starting_node:
-                raise Exception('LRU %s not in the traph' % (prefix))  # TODO: raise custom exception
+                raise TraphException('LRU %s not in the traph' % (prefix))
             for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix):
                 if node.is_page():
                     pages.append(lru)
@@ -499,7 +498,7 @@ class Traph(object):
 
             starting_node, _ = self.lru_trie.follow_lru(prefix)
             if not starting_node:
-                raise Exception('LRU %s not in the traph' % (prefix))  # TODO: raise custom exception
+                raise TraphException('LRU %s not in the traph' % (prefix))
             for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix):
                 if node.is_page() and node.is_crawled():
                     pages.append(lru)
@@ -516,7 +515,7 @@ class Traph(object):
 
             starting_node, _ = self.lru_trie.follow_lru(prefix)
             if not starting_node:
-                raise Exception('LRU %s not in the traph' % (prefix))  # TODO: raise custom exception
+                raise TraphException('LRU %s not in the traph' % (prefix))
             for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix):
                 if node.is_page():
                     # Iterate over link nodes
@@ -538,7 +537,7 @@ class Traph(object):
 
             starting_node, _ = self.lru_trie.follow_lru(prefix)
             if not starting_node:
-                raise Exception('LRU %s not in the traph' % (prefix))  # TODO: raise custom exception
+                raise TraphException('LRU %s not in the traph' % (prefix))
 
             for node in self.lru_trie.node_parents_iter(starting_node):
                 weid2 = node.webentity()
@@ -557,7 +556,7 @@ class Traph(object):
 
             starting_node, _ = self.lru_trie.follow_lru(prefix)
             if not starting_node:
-                raise Exception('LRU %s not in the traph' % (prefix))  # TODO: raise custom exception
+                raise TraphException('LRU %s not in the traph' % (prefix))
 
             for node, _ in self.lru_trie.dfs_iter(starting_node, prefix):
                 weid2 = node.webentity()
@@ -584,7 +583,7 @@ class Traph(object):
 
             starting_node, _ = self.lru_trie.follow_lru(prefix)
             if not starting_node:
-                raise Exception('LRU %s not in the traph' % (prefix))  # TODO: raise custom exception
+                raise TraphException('LRU %s not in the traph' % (prefix))
 
             for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix):
 
@@ -634,7 +633,7 @@ class Traph(object):
 
             starting_node, _ = self.lru_trie.follow_lru(prefix)
             if not starting_node:
-                raise Exception('LRU %s not in the traph' % (prefix))  # TODO: raise custom exception
+                raise TraphException('LRU %s not in the traph' % (prefix))
 
             for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix):
 
@@ -677,7 +676,7 @@ class Traph(object):
 
             starting_node, _ = self.lru_trie.follow_lru(prefix)
             if not starting_node:
-                raise Exception('LRU %s not in the traph' % (prefix))  # TODO: raise custom exception
+                raise TraphException('LRU %s not in the traph' % (prefix))
 
             for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix):
 
