@@ -369,4 +369,3 @@ class TestHugoLinks(TraphTestCase):
         self.assertTrue(links_in_traph == set(LINKS))
 
         traph.close()
-

@@ -11,11 +11,12 @@ WEBENTITY_CREATION_RULES = {
     's:http|h:com|h:world|': WEBENTITY_CREATION_RULES_REGEXES['path1'],
 }
 
+
 def compare_webentities(actual, expected):
     webentities = set()
 
     for prefixes in actual.values():
-        webentities.add(next(p for p in prefixes if p.startswith('s:http|') and not 'www' in p))
+        webentities.add(next(p for p in prefixes if p.startswith('s:http|') and 'www' not in p))
 
     return webentities == set(expected)
 
