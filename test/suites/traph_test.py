@@ -9,6 +9,10 @@ from test.test_cases import TraphTestCase
 
 class TestTraph(TraphTestCase):
 
+    def test_add_page(self):
+        # traph = self.get_traph
+        pass
+
     def test_clear(self):
         traph = self.get_traph()
         traph.add_page('s:http|h:fr|h:sciences-po|h:medialab|')
