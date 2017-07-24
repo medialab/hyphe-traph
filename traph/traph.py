@@ -150,11 +150,11 @@ class Traph(object):
             else:
                 valid_prefixes_index.update({prefix: [node, history]})
 
-        if len(invalid_prefixes)>0 and not use_best_case:
+        if len(invalid_prefixes) > 0 and not use_best_case:
             raise Exception('Some prefixes were already set: %s' % (invalid_prefixes))  # TODO: raise custom exception
             return
 
-        elif len(invalid_prefixes)==len(prefixes):
+        elif len(invalid_prefixes) == len(prefixes):
             # No prefix is valid!
             return None, []
 
@@ -162,15 +162,17 @@ class Traph(object):
             webentity_id = self.__generated_web_entity_id()
 
             for prefix, [node, history] in valid_prefixes_index.items():
-                node.read(node.block) # node update necessary
+                node.read(node.block)  # node update necessary
                 node.set_webentity(webentity_id)
                 node.write()
 
             return webentity_id, valid_prefixes_index.keys()
 
     def __create_webentity(self, prefix, expand=True, use_best_case=True):
-        if expand: expanded_prefixes = self.expand_prefix(prefix)
-        else: expanded_prefixes = [prefix]
+        if expand:
+            expanded_prefixes = self.expand_prefix(prefix)
+        else:
+            expanded_prefixes = [prefix]
 
         report = TraphWriteReport()
         webentity_id, valid_prefixes = self.__add_prefixes(expanded_prefixes, use_best_case)
@@ -222,13 +224,13 @@ class Traph(object):
 
         # In this case, the webentity already exists
         if longest_candidate_prefix and len(longest_candidate_prefix) <= history.webentity_position + 1:
-            node.read(node.block) # update node
+            node.read(node.block)  # update node
             return node, report
 
         # Else we need to expand the prefix and create relevant web entities
         if longest_candidate_prefix:
             report += self.__create_webentity(longest_candidate_prefix, expand=True)
-            node.read(node.block) # update node
+            node.read(node.block)  # update node
             return node, report
 
         # Nothing worked, we need to apply the default creation rule
@@ -243,7 +245,7 @@ class Traph(object):
         else:
             report += self.__create_webentity(longest_candidate_prefix, expand=True)
 
-        node.read(node.block) # update node
+        node.read(node.block)  # update node
         return node, report
 
     # =========================================================================
@@ -505,7 +507,7 @@ class Traph(object):
                     # TODO: use a bounded heap for more efficiency
                     for linknode in self.link_store.link_nodes_iter(node.inlinks()):
                         indegree += 1
-                    pages.append({'lru':lru, 'indegree':indegree})
+                    pages.append({'lru': lru, 'indegree': indegree})
         sorted_pages = sorted(pages, key=lambda p: p['indegree'])
         return pages
 
