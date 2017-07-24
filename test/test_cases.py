@@ -40,7 +40,7 @@ class TraphTestCase(unittest.TestCase):
 
         return Traph(**options)
 
-    def traph_transaction(self, **kwargs):
+    def open_traph(self, **kwargs):
         traph = self.get_traph(**kwargs)
 
         return TraphTransaction(traph)
