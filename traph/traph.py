@@ -484,15 +484,12 @@ class Traph(object):
         Note: the prefixes are supposed to match the webentity id. We do not check.
         '''
         pages = []
-        for prefix in prefixes:
-            prefix = self.__encode(prefix)
+        for node, lru in self.webentity_page_nodes_iter(weid, prefixes):
+            pages.append({
+                'lru': lru,
+                'crawled': node.is_crawled()
+            })
 
-            starting_node, _ = self.lru_trie.follow_lru(prefix)
-            if not starting_node:
-                raise TraphException('LRU %s not in the traph' % (prefix))
-            for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix):
-                if node.is_page():
-                    pages.append(lru)
         return pages
 
     def get_webentity_crawled_pages(self, weid, prefixes):
@@ -500,15 +497,13 @@ class Traph(object):
         Note: the prefixes are supposed to match the webentity id. We do not check.
         '''
         pages = []
-        for prefix in prefixes:
-            prefix = self.__encode(prefix)
+        for node, lru in self.webentity_page_nodes_iter(weid, prefixes):
+            if node.is_crawled():
+                pages.append({
+                    'lru': lru,
+                    'crawled': True
+                })
 
-            starting_node, _ = self.lru_trie.follow_lru(prefix)
-            if not starting_node:
-                raise TraphException('LRU %s not in the traph' % (prefix))
-            for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix):
-                if node.is_page() and node.is_crawled():
-                    pages.append(lru)
         return pages
 
     def get_webentity_most_linked_pages(self, weid, prefixes, pages_count=10):
@@ -1000,6 +995,20 @@ class Traph(object):
 
     def webentity_prefix_iter(self):
         return self.lru_trie.webentity_prefix_iter()
+
+    def webentity_page_nodes_iter(self, weid, prefixes):
+        '''
+        Note: the prefixes are supposed to match the webentity id. We do not check.
+        '''
+        for prefix in prefixes:
+            prefix = self.__encode(prefix)
+
+            starting_node, _ = self.lru_trie.follow_lru(prefix)
+            if not starting_node:
+                raise TraphException('LRU %s not in the traph' % (prefix))
+            for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix):
+                if node.is_page():
+                    yield node, lru
 
     # =========================================================================
     # Counting methods
