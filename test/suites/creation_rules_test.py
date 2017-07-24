@@ -195,3 +195,5 @@ class TestCreationRules(TraphTestCase):
             's:http|h:com|h:world|p:europe|p:germany|p:berlin|',
             's:http|h:com|h:world|p:asia|p:japan|p:tokyo|'
         ]))
+
+        traph.close()

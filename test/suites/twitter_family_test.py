@@ -76,3 +76,5 @@ class TestTwitterFamily(TraphTestCase):
         links_in_traph = set(link for link in traph.links_iter())
 
         self.assertTrue(links_in_traph == set(LINKS))
+
+        traph.close()

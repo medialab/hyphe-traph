@@ -18,3 +18,5 @@ class TestTraph(TraphTestCase):
         traph.clear()
 
         self.assertEqual(traph.count_pages(), 0)
+
+        traph.close()
