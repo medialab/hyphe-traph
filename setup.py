@@ -6,4 +6,4 @@ setup(name='hyphe-traph',
       url='http://github.com/medialab/hyphe-traph',
       license='MIT',
       packages=['traph'],
-      zip_safe=False)
+      zip_safe=True)
