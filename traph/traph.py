@@ -819,11 +819,11 @@ class Traph(object):
                     if not target_webentity:
                         continue
 
-                    # Allowing auto links?
-                    if not include_auto and source_webentity == target_webentity:
-                        continue
-
                     page_to_webentity[target_block] = target_webentity
+
+                # Allowing auto links?
+                if not include_auto and source_webentity == target_webentity:
+                    continue
 
                 # Adding to the graph
                 graph[source_webentity][target_webentity] += link_node.weight()
