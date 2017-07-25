@@ -57,3 +57,26 @@ class TestNetwork(TraphTestCase):
             })
 
             # Keeping auto-links
+            network = legible_network(webentities, traph.get_webentities_links(include_auto=True))
+
+            self.assertIdenticalMultimaps(network, {
+                's:http|h:com|h:world|p:europe|': [
+                    's:http|h:com|h:world|p:america|',
+                    's:http|h:com|h:world|p:europe|'
+                ],
+                's:http|h:com|h:world|p:america|': [
+                    's:http|h:com|h:world|p:asia|'
+                ]
+            })
+
+            # Inlinks
+            network = legible_network(webentities, traph.get_webentities_links(out=False))
+
+            self.assertIdenticalMultimaps(network, {
+                's:http|h:com|h:world|p:america|': [
+                    's:http|h:com|h:world|p:europe|'
+                ],
+                's:http|h:com|h:world|p:asia|': [
+                    's:http|h:com|h:world|p:america|'
+                ]
+            })
