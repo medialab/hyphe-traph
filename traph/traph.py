@@ -1014,11 +1014,7 @@ class Traph(object):
     # Counting methods
     # =========================================================================
     def count_pages(self):
-        nb = 0
+        return self.lru_trie.count_pages()
 
-        # Here we don't need a DFS so we can plainly iterate over the nodes
-        for node in self.lru_trie.nodes_iter():
-            if node.is_page():
-                nb += 1
-
-        return nb
+    def count_links(self):
+        return self.link_store.count_links()

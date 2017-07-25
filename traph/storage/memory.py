@@ -15,6 +15,13 @@ class MemoryStorage(object):
         self.block_size = block_size
         self.array = bytearray()
 
+    def __len__(self):
+        return len(self.array)
+
+    # Method returning the number of blocks
+    def count_blocks(self):
+        return self.__len__() / self.block_size
+
     # Method clearing the memory
     def clear(self):
         self.array = bytearray()

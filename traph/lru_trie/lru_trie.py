@@ -456,3 +456,16 @@ class LRUTrie(object):
         for node, lru in self.dfs_iter():
             if node.has_webentity():
                 yield node, lru
+
+    # =========================================================================
+    # Counting methods
+    # =========================================================================
+    def count_pages(self):
+        nb = 0
+
+        # Here we don't need a DFS so we can plainly iterate over the nodes
+        for node in self.nodes_iter():
+            if node.is_page():
+                nb += 1
+
+        return nb

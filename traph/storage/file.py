@@ -16,6 +16,14 @@ class FileStorage(object):
         self.block_size = block_size
         self.file = file
 
+    def __len__(self):
+        self.file.seek(0, os.SEEK_END)
+        return self.file.tell()
+
+    # Method returning the number of blocks
+    def count_blocks(self):
+        return self.__len__() / self.block_size
+
     # Method returning whether the file is corrupted
     def check_for_corruption(self):
         self.file.seek(0, os.SEEK_END)

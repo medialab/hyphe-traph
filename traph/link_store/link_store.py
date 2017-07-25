@@ -160,3 +160,11 @@ class LinkStore(object):
         while node.has_next():
             node.read_next()
             yield node
+
+    # =========================================================================
+    # Counting methods
+    # =========================================================================
+    def count_links(self):
+        blocks = self.storage.count_blocks()
+
+        return blocks / 2
