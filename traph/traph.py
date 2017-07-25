@@ -527,7 +527,9 @@ class Traph(object):
                         indegree += 1
                     pages.append({'lru': lru, 'indegree': indegree})
         sorted_pages = sorted(pages, key=lambda p: p['indegree'])
-        return pages
+
+        # TODO: unit test this!
+        return pages[0:pages_count]
 
     def get_webentity_parent_webentities(self, weid, prefixes):
         '''
