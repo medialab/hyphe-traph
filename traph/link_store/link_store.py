@@ -29,17 +29,16 @@ class LinkStore(object):
         self.header = LinkStoreHeader(storage)
 
     # =========================================================================
-    # Internal methods
+    # Read methods
     # =========================================================================
 
     # Method returning a node
-    def __node(self, **kwargs):
+    def node(self, **kwargs):
         return LinkStoreNode(self.storage, **kwargs)
 
     # Method returning the root
-    # TODO: memoize or cache
-    def __root(self):
-        return self.__node(block=LINK_STORE_FIRST_DATA_BLOCK)
+    def root(self):
+        return self.node(block=LINK_STORE_FIRST_DATA_BLOCK)
 
     # =========================================================================
     # Mutation methods
@@ -50,7 +49,7 @@ class LinkStore(object):
 
         # If the node does not have outlinks yet
         if not source_node.has_links(out=out):
-            link_node = self.__node()
+            link_node = self.node()
             link_node.set_target(target_block)
             link_node.write()
 
@@ -60,7 +59,7 @@ class LinkStore(object):
             return
 
         # Else:
-        link_node = self.__node(block=source_node.links(out=out))
+        link_node = self.node(block=source_node.links(out=out))
 
         if not link_node.exists:
             raise LinkStoreTraversalException('Block does not exist.')
@@ -71,7 +70,7 @@ class LinkStore(object):
 
         # If we did not find a matching link, we add it
         if link_node.target() != target_block:
-            sibling = self.__node()
+            sibling = self.node()
             sibling.set_target(target_block)
             sibling.write()
             link_node.set_next(sibling.block)
@@ -93,7 +92,7 @@ class LinkStore(object):
 
         # If the node does not have outlinks yet
         if not links_block:
-            link_node = self.__node()
+            link_node = self.node()
             link_node.set_target(first_target_block)
             link_node.write()
 
@@ -123,7 +122,7 @@ class LinkStore(object):
                 link_node.increment_weight()
                 link_node.write()
             else:
-                link_node = self.__node()
+                link_node = self.node()
                 link_node.set_target(target_block)
                 link_node.write()
 
@@ -143,14 +142,14 @@ class LinkStore(object):
     # Iteration methods
     # =========================================================================
     def nodes_iter(self):
-        node = self.__root()
+        node = self.root()
 
         while node.exists:
             yield node
             node.read(node.block + self.storage.block_size)
 
     def link_nodes_iter(self, block):
-        node = self.__node(block=block)
+        node = self.node(block=block)
 
         if not node.exists:
             raise LinkStoreTraversalException('Block does not exist.')

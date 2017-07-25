@@ -11,7 +11,7 @@ import warnings
 from collections import defaultdict, Counter
 from traph_write_report import TraphWriteReport
 from storage import FileStorage, MemoryStorage
-from lru_trie import LRUTrie, LRUTrieNode, LRU_TRIE_NODE_BLOCK_SIZE
+from lru_trie import LRUTrie, LRU_TRIE_NODE_BLOCK_SIZE
 from link_store import LinkStore, LINK_STORE_NODE_BLOCK_SIZE
 from helpers import lru_variations
 
@@ -788,15 +788,12 @@ class Traph(object):
         graph = defaultdict(Counter)
         page_to_webentity = dict()
 
-        # TODO: unit test this!
-
         # TODO: we can try a version where we do a DFS for solving the page/webentity relation
         # then solve the network
 
         # TODO: it's possible that it's the DFS which is slow => need to benchmark
 
-        # TODO: we should probably get a node helper another way
-        target_node = LRUTrieNode(self.lru_trie_storage)
+        target_node = self.lru_trie.node()
 
         for state in self.lru_trie.detailed_dfs_iter():
             node = state.node

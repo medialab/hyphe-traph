@@ -51,15 +51,6 @@ class LRUTrie(object):
     # Internal methods
     # =========================================================================
 
-    # Method returning a node
-    def __node(self, **kwargs):
-        return LRUTrieNode(self.storage, **kwargs)
-
-    # Method returning root node
-    # TODO: memoize or cache
-    def __root(self):
-        return self.__node(block=LRU_TRIE_FIRST_DATA_BLOCK)
-
     # Method ensuring that a sibling with the desired char exists
     def __ensure_char_from_siblings(self, node, char):
 
@@ -80,7 +71,7 @@ class LRUTrie(object):
                 break
 
         # We did not find a relevant sibling, let's add it
-        sibling = self.__node(char=char)
+        sibling = self.node(char=char)
 
         # The new sibling's parent is the same, obviously
         sibling.set_parent(node.parent())
@@ -102,7 +93,7 @@ class LRUTrie(object):
         l = len(lru)
         i = 0
         history = LRUTrieWalkHistory(lru)
-        node = self.__root()
+        node = self.root()
 
         # Descending the trie
         while i < l:
@@ -134,7 +125,7 @@ class LRUTrie(object):
             char = ord(lru[i])
 
             # Creating the child
-            child = self.__node(char=char)
+            child = self.node(char=char)
             child.set_parent(node.block)
             child.write()
 
@@ -162,8 +153,17 @@ class LRUTrie(object):
     # =========================================================================
     # Read methods
     # =========================================================================
+
+    # Method returning a node
+    def node(self, **kwargs):
+        return LRUTrieNode(self.storage, **kwargs)
+
+    # Method returning root node
+    def root(self):
+        return self.node(block=LRU_TRIE_FIRST_DATA_BLOCK)
+
     def lru_node(self, lru):
-        node = self.__root()
+        node = self.root()
 
         l = len(lru)
 
@@ -188,7 +188,7 @@ class LRUTrie(object):
         # and thus less efficient.
         # Very similar to add_lru too, but returns False if lru not in Trie
 
-        node = self.__root()
+        node = self.root()
         history = LRUTrieWalkHistory(lru)
 
         l = len(lru)
@@ -223,7 +223,7 @@ class LRUTrie(object):
 
     def windup_lru(self, block):
         # TODO: check block
-        node = self.__node(block=block)
+        node = self.node(block=block)
 
         lru = node.char_as_str()
 
@@ -252,7 +252,7 @@ class LRUTrie(object):
     # Iteration methods
     # =========================================================================
     def nodes_iter(self):
-        node = self.__root()
+        node = self.root()
 
         while node.exists:
             yield node
@@ -294,7 +294,7 @@ class LRUTrie(object):
             lru = starting_lru[:-1]
             # Note: unsure why we need to trim rule_prefix above, but it seems to work
         else:
-            node = self.__root()
+            node = self.root()
             starting_block = node.block
             lru = ''
 
@@ -380,7 +380,7 @@ class LRUTrie(object):
             return
 
     def detailed_dfs_iter(self):
-        node = self.__root()
+        node = self.root()
         state = LRUTrieDetailedDFSIterationState(node)
 
         starting_block = node.block
