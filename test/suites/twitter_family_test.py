@@ -5,7 +5,9 @@
 # Simple use cases representing a family through Twitter accounts. Here we are
 # just testing page & link addition as well as basic webentity creation.
 #
+from collections import defaultdict
 from test.test_cases import TraphTestCase
+from test.helpers import webentity_label_from_prefixes
 
 PAGES = [
     's:http|h:com|h:twitter|p:daughter|',
@@ -50,6 +52,11 @@ LINKS = [
     ('s:http|h:com|h:twitter|p:aunt|', 's:http|h:com|h:twitter|p:grandma|')
 ]
 
+NETWORK = defaultdict(list)
+
+for source, target in LINKS:
+    NETWORK[source].append(target)
+
 
 class TestTwitterFamily(TraphTestCase):
 
@@ -79,6 +86,18 @@ class TestTwitterFamily(TraphTestCase):
 
         # Network
         network = traph.get_webentities_links()
-        # print network
+
+        self.assertEqual(sum(len(targets) for targets in network.values()), 21)
+        self.assertEqual(len(network), len(NETWORK))
+
+        for source, targets in network.items():
+            source = webentity_label_from_prefixes(webentities[source])
+            self.assertTrue(source in NETWORK)
+
+            for weight in targets.values():
+                self.assertEqual(weight, 1)
+
+            targets = [webentity_label_from_prefixes(webentities[target]) for target in targets]
+            self.assertEqual(set(targets), set(NETWORK[source]))
 
         traph.close()
