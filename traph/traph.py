@@ -43,7 +43,7 @@ class Traph(object):
         else:
 
             # Ensuring the creation rules are set
-            if type(default_webentity_creation_rule) not in [str, unicode]:
+            if not isinstance(default_webentity_creation_rule, basestring):
                 raise TraphException('Given default webentity creation rule is not a string!')
 
             if not isinstance(webentity_creation_rules, dict):
