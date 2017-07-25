@@ -472,7 +472,7 @@ class Traph(object):
     def get_webentity_by_prefix(self, prefix):
         prefix = self.__encode(prefix)
 
-        node, history = self.lru_trie.follow_lru(prefix)
+        node = self.lru_trie.lru_node(prefix)
         if not node:
             raise TraphException('LRU %s not in the traph' % (prefix))
         if not node.has_webentity():
@@ -515,7 +515,7 @@ class Traph(object):
         for prefix in prefixes:
             prefix = self.__encode(prefix)
 
-            starting_node, _ = self.lru_trie.follow_lru(prefix)
+            starting_node = self.lru_trie.lru_node(prefix)
             if not starting_node:
                 raise TraphException('LRU %s not in the traph' % (prefix))
             for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix):
@@ -537,7 +537,7 @@ class Traph(object):
         for prefix in prefixes:
             prefix = self.__encode(prefix)
 
-            starting_node, _ = self.lru_trie.follow_lru(prefix)
+            starting_node = self.lru_trie.lru_node(prefix)
             if not starting_node:
                 raise TraphException('LRU %s not in the traph' % (prefix))
 
@@ -556,7 +556,7 @@ class Traph(object):
         for prefix in prefixes:
             prefix = self.__encode(prefix)
 
-            starting_node, _ = self.lru_trie.follow_lru(prefix)
+            starting_node = self.lru_trie.lru_node(prefix)
             if not starting_node:
                 raise TraphException('LRU %s not in the traph' % (prefix))
 
@@ -583,7 +583,7 @@ class Traph(object):
         for prefix in prefixes:
             prefix = self.__encode(prefix)
 
-            starting_node, _ = self.lru_trie.follow_lru(prefix)
+            starting_node = self.lru_trie.lru_node(prefix)
             if not starting_node:
                 raise TraphException('LRU %s not in the traph' % (prefix))
 
@@ -633,7 +633,7 @@ class Traph(object):
         for prefix in prefixes:
             prefix = self.__encode(prefix)
 
-            starting_node, _ = self.lru_trie.follow_lru(prefix)
+            starting_node = self.lru_trie.lru_node(prefix)
             if not starting_node:
                 raise TraphException('LRU %s not in the traph' % (prefix))
 
@@ -676,7 +676,7 @@ class Traph(object):
         for prefix in prefixes:
             prefix = self.__encode(prefix)
 
-            starting_node, _ = self.lru_trie.follow_lru(prefix)
+            starting_node = self.lru_trie.lru_node(prefix)
             if not starting_node:
                 raise TraphException('LRU %s not in the traph' % (prefix))
 
@@ -1003,7 +1003,7 @@ class Traph(object):
         for prefix in prefixes:
             prefix = self.__encode(prefix)
 
-            starting_node, _ = self.lru_trie.follow_lru(prefix)
+            starting_node = self.lru_trie.lru_node(prefix)
             if not starting_node:
                 raise TraphException('LRU %s not in the traph' % (prefix))
             for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix):
