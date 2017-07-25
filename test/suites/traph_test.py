@@ -77,6 +77,13 @@ class TestTraph(TraphTestCase):
             self.assertEqual(traph.count_pages(), 3)
             self.assertEqual(traph.count_links(), 2)
 
+    def test_prefix_methods(self):
+        with self.open_traph() as traph:
+
+            # Potential prefix
+            prefix = traph.get_potential_prefix('s:http|h:fr|h:sciences-po|h:medialab|')
+            self.assertEqual(prefix, 's:http|h:fr|h:sciences-po|')
+
     def test_clear(self):
         with self.open_traph() as traph:
             traph = self.get_traph()

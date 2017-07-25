@@ -198,7 +198,7 @@ class LRUTrie(object):
 
             while node.char() != char:
                 if not node.has_next():
-                    return
+                    return None, history
                 node.read_next()
 
             if node.has_webentity():
@@ -215,7 +215,7 @@ class LRUTrie(object):
 
             if i < l - 1:
                 if not node.has_child():
-                    return
+                    return None, history
                 else:
                     node.read_child()
 
