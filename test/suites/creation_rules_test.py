@@ -6,6 +6,7 @@
 #
 from test.test_cases import TraphTestCase
 from test.config import WEBENTITY_CREATION_RULES_REGEXES
+from test.helpers import webentity_label_from_prefixes
 
 WEBENTITY_CREATION_RULES = {
     's:http|h:com|h:world|': WEBENTITY_CREATION_RULES_REGEXES['path1'],
@@ -16,7 +17,7 @@ def compare_webentities(actual, expected):
     webentities = set()
 
     for prefixes in actual.values():
-        webentities.add(next(p for p in prefixes if p.startswith('s:http|') and 'www' not in p))
+        webentities.add(webentity_label_from_prefixes(prefixes))
 
     return webentities == set(expected)
 
