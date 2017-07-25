@@ -26,8 +26,7 @@ class FileStorage(object):
 
     # Method returning whether the file is corrupted
     def check_for_corruption(self):
-        self.file.seek(0, os.SEEK_END)
-        file_length = self.file.tell()
+        file_length = self.__len__()
 
         if file_length % self.block_size:
             return True
