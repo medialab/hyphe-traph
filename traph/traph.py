@@ -1016,7 +1016,9 @@ class Traph(object):
     def count_pages(self):
         nb = 0
 
-        for page in self.pages_iter():
-            nb += 1
+        # Here we don't need a DFS so we can plainly iterate over the nodes
+        for node in self.lru_trie.nodes_iter():
+            if node.is_page():
+                nb += 1
 
         return nb
