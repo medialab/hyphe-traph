@@ -850,12 +850,13 @@ class Traph(object):
         '''
         This method should be faster than the slow version because it avoids
         unnecessary upward traversal.
+
+        Note that it is also possible to solve the links right away and store
+        them to solve their webentities later but this is most costly in RAM.
         '''
         graph = defaultdict(Counter)
         page_to_webentity = dict()
         link_pointers = []
-
-        # TODO: might be possible not to solve the pointer but solve the links rightaway
 
         # Solving the page => webentity relation
         for state in self.lru_trie.lean_detailed_dfs_iter():
