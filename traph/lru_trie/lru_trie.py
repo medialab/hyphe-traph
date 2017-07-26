@@ -316,6 +316,10 @@ class LRUTrie(object):
                 node.read_child()
                 continue
 
+            # Do we need to stop?
+            if node.block == starting_block:
+                break
+
             # If we have no child, we follow the next sibling
             if node.has_next():
                 descending = True
@@ -323,13 +327,9 @@ class LRUTrie(object):
                 continue
 
             # Else we bubble up
-            if node.block != starting_block:
-                descending = False
-                lru = lru[:-1]
-                node.read_parent()
-                continue
-
-            return
+            descending = False
+            lru = lru[:-1]
+            node.read_parent()
 
     def webentity_dfs_iter(self, weid, starting_node, starting_lru):
         '''
@@ -365,7 +365,6 @@ class LRUTrie(object):
                     continue
 
             # Do we need to stop?
-            # TODO: use this algo for the other DFS!
             if node.block == starting_block:
                 break
 
@@ -423,6 +422,10 @@ class LRUTrie(object):
                 node.read_child()
                 continue
 
+            # Do we need to stop?
+            if node.block == starting_block:
+                break
+
             # If we have no child, we follow the next sibling
             if node.has_next():
                 descending = True
@@ -439,20 +442,16 @@ class LRUTrie(object):
                 continue
 
             # Else we bubble up
-            if node.block != starting_block:
-                state.lru = state.lru[:-1]
-                descending = False
-                state.last_block = node.block
+            state.lru = state.lru[:-1]
+            descending = False
+            state.last_block = node.block
 
-                webentity = node.webentity()
+            webentity = node.webentity()
 
-                if webentity and webentity == state.current_webentity():
-                    state.webentities.pop()
+            if webentity and webentity == state.current_webentity():
+                state.webentities.pop()
 
-                node.read_parent()
-                continue
-
-            return
+            node.read_parent()
 
     def pages_iter(self):
         for node, lru in self.dfs_iter():
