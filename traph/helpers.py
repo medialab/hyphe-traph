@@ -7,6 +7,10 @@
 
 
 def https_variation(lru):
+    '''
+    Returning the http(s) variation of the given lru
+    '''
+
     if 's:http|' in lru:
         return lru.replace('s:http|', 's:https|', 1)
     if 's:https|' in lru:
@@ -15,6 +19,9 @@ def https_variation(lru):
 
 
 def lru_variations(lru):
+    '''
+    Returning the www/http(s) variations of the given lru
+    '''
     variations = [lru]
 
     if not lru:
