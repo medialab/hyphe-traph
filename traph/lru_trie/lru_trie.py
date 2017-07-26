@@ -4,9 +4,6 @@
 #
 # Class representing the Trie indexing the LRUs.
 #
-# Note that we only process raw ascii bytes as string for the moment and not
-# UTF-16 characters.
-#
 import warnings
 from traph.lru_trie.node import LRUTrieNode, LRU_TRIE_FIRST_DATA_BLOCK
 from traph.lru_trie.header import LRUTrieHeader
