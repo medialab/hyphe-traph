@@ -526,10 +526,10 @@ class Traph(object):
                     for linknode in self.link_store.link_nodes_iter(node.inlinks()):
                         indegree += 1
                     pages.append({'lru': lru, 'indegree': indegree})
-        sorted_pages = sorted(pages, key=lambda p: p['indegree'])
+        sorted_pages = sorted(pages, key=lambda p: -p['indegree'])
 
         # TODO: unit test this!
-        return pages[0:pages_count]
+        return sorted_pages[0:pages_count]
 
     def get_webentity_parent_webentities(self, weid, prefixes):
         '''
@@ -853,6 +853,21 @@ class Traph(object):
 
         node.flag_as_crawled()
         node.write()
+
+        return report
+
+    def add_pages(self, lrus):
+
+        report = TraphWriteReport()
+
+        for lru in lrus:
+            lru = self.__encode(lru)
+
+            node, page_report = self.__add_page(lru)
+            report += page_report
+
+            node.flag_as_crawled()
+            node.write()
 
         return report
 

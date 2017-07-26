@@ -80,3 +80,74 @@ class TestNetwork(TraphTestCase):
                     's:http|h:com|h:world|p:america|'
                 ]
             })
+
+            report = traph.add_pages([
+                's:http|h:com|h:world|p:africa|',
+                's:http|h:com|h:world|p:oceania|',
+            ])
+
+            for weid, prefixes in report.created_webentities.items():
+                webentities[weid] = webentity_label_from_prefixes(prefixes)
+
+            traph.add_links([
+                ('s:http|h:com|h:world|p:america|', 's:http|h:com|h:world|p:africa|p:raba|'),
+                ('s:http|h:com|h:world|p:asia|', 's:http|h:com|h:world|p:africa|p:raba|'),
+                ('s:http|h:com|h:world|p:europe|p:spain|p:madrid|', 's:http|h:com|h:world|p:africa|p:raba|'),
+                ('s:http|h:com|h:world|p:asia|', 's:http|h:com|h:world|p:africa|p:tunis|'),
+                ('s:http|h:com|h:world|p:europe|p:spain|p:madrid|', 's:http|h:com|h:world|p:africa|p:tunis|'),
+                ('s:http|h:com|h:world|p:europe|p:spain|p:madrid|', 's:http|h:com|h:world|p:africa|p:bamako|')
+            ])
+
+            network = legible_network(webentities, traph.get_webentities_links())
+
+            self.assertEqual(traph.count_pages(), 9)
+
+            self.assertIdenticalMultimaps(network, {
+                's:http|h:com|h:world|p:europe|': [
+                    's:http|h:com|h:world|p:america|',
+                    's:http|h:com|h:world|p:africa|'
+                ],
+                's:http|h:com|h:world|p:america|': [
+                    's:http|h:com|h:world|p:africa|',
+                    's:http|h:com|h:world|p:asia|'
+                ],
+                's:http|h:com|h:world|p:asia|': [
+                    's:http|h:com|h:world|p:africa|'
+                ]
+            })
+
+            europe_pages = traph.get_webentity_pages(1, ['s:http|h:com|h:world|p:europe|'])
+
+            self.assertEqual(set(page['lru'] for page in europe_pages), set([
+                's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
+                's:http|h:com|h:world|p:europe|p:spain|'
+            ]))
+
+            most_linked_pages = traph.get_webentity_most_linked_pages(
+                4,
+                ['s:http|h:com|h:world|p:africa|']
+            )
+
+            self.assertEqual(
+                set((page['lru'], page['indegree']) for page in most_linked_pages),
+                set([
+                    ('s:http|h:com|h:world|p:africa|p:raba|', 3),
+                    ('s:http|h:com|h:world|p:africa|p:tunis|', 2),
+                    ('s:http|h:com|h:world|p:africa|', 1),
+                    ('s:http|h:com|h:world|p:africa|p:bamako|', 1)
+                ])
+            )
+
+            most_linked_pages = traph.get_webentity_most_linked_pages(
+                4,
+                ['s:http|h:com|h:world|p:africa|'],
+                pages_count=2
+            )
+
+            self.assertEqual(
+                set((page['lru'], page['indegree']) for page in most_linked_pages),
+                set([
+                    ('s:http|h:com|h:world|p:africa|p:raba|', 3),
+                    ('s:http|h:com|h:world|p:africa|p:tunis|', 2)
+                ])
+            )
