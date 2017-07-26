@@ -12,7 +12,7 @@ import struct
 # NOTE: Since python mimics C struct, the block size should be respecting
 # some rules (namely have even addresses or addresses divisble by 4 on some
 # architecture).
-LRU_TRIE_HEADER_FORMAT = 'IxxxxQQQQQ'
+LRU_TRIE_HEADER_FORMAT = 'IBBBBBBBBBBBBBBxxIQQQQQ'
 
 # Header blocks
 # -
@@ -40,6 +40,22 @@ class LRUTrieHeader(object):
             0,
             0,
             0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
             0
         ] * LRU_TRIE_HEADER_BLOCKS
 
@@ -60,7 +76,7 @@ class LRUTrieHeader(object):
     def __ensure(self):
         block = 0
 
-        empty_data = struct.pack(LRU_TRIE_HEADER_FORMAT, *([0] * 6))
+        empty_data = struct.pack(LRU_TRIE_HEADER_FORMAT, *([0] * 21))
 
         while block < LRU_TRIE_HEADER_BLOCKS:
             data = self.storage.read(block)

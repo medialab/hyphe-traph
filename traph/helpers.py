@@ -55,3 +55,15 @@ def lru_iter(lru):
         if lru[i] == '|':
             yield lru[last:i + 1]
             last = i + 1
+
+
+def lru_chunks_iter(chunk_size, lru):
+    '''
+    Returning an iterator over a lru's chunks of the given size.
+    '''
+    if len(lru) <= chunk_size:
+        yield lru
+
+    for chunk in xrange(len(lru) / chunk_size):
+        start = chunk * chunk_size
+        yield lru[start:start + chunk_size]

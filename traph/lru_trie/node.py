@@ -17,19 +17,22 @@ from traph.lru_trie.header import LRU_TRIE_HEADER_BLOCKS
 # NOTE: Since python mimics C struct, the block size should be respecting
 # some rules (namely have even addresses or addresses divisble by 4 on some
 # architecture).
-LRU_TRIE_NODE_FORMAT = 'BBxxIQQQQQ'
+LRU_TRIE_NODE_FORMAT = 'BBBBBBBBBBBBBBBBBBxxIQQQQQ'
 LRU_TRIE_NODE_BLOCK_SIZE = struct.calcsize(LRU_TRIE_NODE_FORMAT)
 LRU_TRIE_FIRST_DATA_BLOCK = LRU_TRIE_HEADER_BLOCKS * LRU_TRIE_NODE_BLOCK_SIZE
 
 # Node Positions
 LRU_TRIE_NODE_CHAR = 0
-LRU_TRIE_NODE_FLAGS = 1
-LRU_TRIE_NODE_WEBENTITY = 2
-LRU_TRIE_NODE_NEXT_BLOCK = 3
-LRU_TRIE_NODE_CHILD_BLOCK = 4
-LRU_TRIE_NODE_PARENT_BLOCK = 5
-LRU_TRIE_NODE_OUTLINKS_BLOCK = 6
-LRU_TRIE_NODE_INLINKS_BLOCK = 7
+# --
+LRU_TRIE_NODE_STEM_START = 0
+LRU_TRIE_NODE_STEM_END = 16
+LRU_TRIE_NODE_FLAGS = 17
+LRU_TRIE_NODE_WEBENTITY = 18
+LRU_TRIE_NODE_NEXT_BLOCK = 19
+LRU_TRIE_NODE_CHILD_BLOCK = 20
+LRU_TRIE_NODE_PARENT_BLOCK = 21
+LRU_TRIE_NODE_OUTLINKS_BLOCK = 22
+LRU_TRIE_NODE_INLINKS_BLOCK = 23
 
 # Flags (Currently allocating 5/8 bits)
 LRU_TRIE_NODE_FLAG_PAGE = 0
@@ -86,7 +89,23 @@ class LRUTrieNode(object):
 
     def __set_default_data(self, char=None):
         self.data = [
-            char or 0,  # Character
+            char or 0,  # Stem
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
             0,          # Flags
             0,          # Webentity
             0,          # Next block
