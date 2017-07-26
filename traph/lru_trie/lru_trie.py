@@ -332,6 +332,12 @@ class LRUTrie(object):
             return
 
     def webentity_dfs_iter(self, weid, starting_node, starting_lru):
+        '''
+        Note that this algorithm will peruse the webentity nodes only for the
+        given prefix. We would need a refined algorithm for the cases when
+        then prefixes are not given and we need to peruse the webentity's
+        whole realm.
+        '''
         node = starting_node
         starting_block = starting_node.block
         lru = starting_lru[:-1]
@@ -358,6 +364,11 @@ class LRUTrie(object):
                     node = child_node
                     continue
 
+            # Do we need to stop?
+            # TODO: use this algo for the other DFS!
+            if node.block == starting_block:
+                break
+
             # If we have no child, we follow the next VALID sibling
             valid_next = False
             while node.has_next() and not valid_next:
@@ -372,13 +383,9 @@ class LRUTrie(object):
                 continue
 
             # Else we bubble up
-            if node.block != starting_block:
-                descending = False
-                lru = lru[:-1]
-                node.read_parent()
-                continue
-
-            return
+            descending = False
+            lru = lru[:-1]
+            node.read_parent()
 
     def detailed_dfs_iter(self):
         node = self.root()

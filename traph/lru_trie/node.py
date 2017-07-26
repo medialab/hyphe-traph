@@ -291,6 +291,11 @@ class LRUTrieNode(object):
 
     # read the parent
     def read_parent(self):
+        parent = self.parent()
+
+        if parent < LRU_TRIE_FIRST_DATA_BLOCK:
+            raise LRUTrieNodeTraversalException('Node has no parent (root).')
+
         self.read(self.parent())
 
     # get parent node
