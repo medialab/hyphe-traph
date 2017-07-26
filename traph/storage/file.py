@@ -5,6 +5,7 @@
 # Class abstracting random access file handling for the Traph.
 #
 import os
+from traph.storage.memmap import MemMapStorage
 
 
 # Main class
@@ -54,3 +55,7 @@ class FileStorage(object):
         block = self.file.tell() - self.block_size
 
         return block
+
+    # Method returning a map
+    def map(self):
+        return MemMapStorage(self.block_size, self.file)

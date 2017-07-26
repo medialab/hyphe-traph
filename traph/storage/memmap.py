@@ -16,7 +16,7 @@ class MemMapStorage(object):
         # Properties
         self.block_size = block_size
         self.file = file
-        self.map = mmap.mmap(file.fileno(), access=mmap.ACCESS_READ)
+        self.map = mmap.mmap(file.fileno(), access=mmap.ACCESS_READ, length=0)
 
     # Method reading a block in the map and returning the contained node
     def read(self, block):
