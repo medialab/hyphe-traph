@@ -312,7 +312,6 @@ class LRUTrie(object):
 
             # If we have a child, we descend
             if descending and node.has_child():
-                descending = True
                 lru = lru + node.char_as_str()
                 node.read_child()
                 continue
@@ -351,11 +350,13 @@ class LRUTrie(object):
                 yield node, lru + node.char_as_str()
 
             # If we have a VALID child, we descend
-            if descending and node.has_child() and not node.child_node().has_webentity():
-                descending = True
-                lru = lru + node.char_as_str()
-                node.read_child()
-                continue
+            if descending and node.has_child():
+                child_node = node.child_node()
+
+                if not child_node.has_webentity():
+                    lru = lru + node.char_as_str()
+                    node = child_node
+                    continue
 
             # If we have no child, we follow the next VALID sibling
             valid_next = False
@@ -409,7 +410,6 @@ class LRUTrie(object):
             # If we have a child, we descend
             if descending and node.has_child():
                 state.lru += node.char_as_str()
-                descending = True
                 state.last_block = node.block
                 state.direction = 'down'
 
