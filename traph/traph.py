@@ -518,14 +518,17 @@ class Traph(object):
             starting_node = self.lru_trie.lru_node(prefix)
             if not starting_node:
                 raise TraphException('LRU %s not in the traph' % (prefix))
+
             for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix):
                 if node.is_page():
+
                     # Iterate over link nodes
                     indegree = 0
                     # TODO: use a bounded heap for more efficiency
                     for linknode in self.link_store.link_nodes_iter(node.inlinks()):
                         indegree += 1
                     pages.append({'lru': lru, 'indegree': indegree})
+
         sorted_pages = sorted(pages, key=lambda p: -p['indegree'])
 
         # TODO: unit test this!

@@ -324,7 +324,7 @@ class LRUTrie(object):
                 continue
 
             # Else we bubble up
-            if not node.block == starting_block:
+            if node.block != starting_block:
                 descending = False
                 lru = lru[:-1]
                 node.read_parent()
@@ -371,7 +371,7 @@ class LRUTrie(object):
                 continue
 
             # Else we bubble up
-            if not node.block == starting_block:
+            if node.block != starting_block:
                 descending = False
                 lru = lru[:-1]
                 node.read_parent()
@@ -432,7 +432,7 @@ class LRUTrie(object):
                 continue
 
             # Else we bubble up
-            if not node.block == starting_block:
+            if node.block != starting_block:
                 state.lru = state.lru[:-1]
                 descending = False
                 state.last_block = node.block
