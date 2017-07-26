@@ -5,6 +5,7 @@
 # Main class representing the Traph data structure.
 #
 import errno
+import heapq
 import os
 import re
 import warnings
@@ -512,6 +513,7 @@ class Traph(object):
         Note: the prefixes are supposed to match the webentity id. We do not check.
         '''
         pages = []
+        c = 0
         for prefix in prefixes:
             prefix = self.__encode(prefix)
 
@@ -524,15 +526,25 @@ class Traph(object):
 
                     # Iterate over link nodes
                     indegree = 0
-                    # TODO: use a bounded heap for more efficiency
+
                     for linknode in self.link_store.link_nodes_iter(node.inlinks()):
                         indegree += 1
-                    pages.append({'lru': lru, 'indegree': indegree})
 
-        sorted_pages = sorted(pages, key=lambda p: -p['indegree'])
+                    c += 1
+                    heapq.heappush(pages, (indegree, c, lru))
 
-        # TODO: unit test this!
-        return sorted_pages[0:pages_count]
+                    if len(pages) > pages_count:
+                        heapq.heappop(pages)
+
+        sorted_pages = range(len(pages))
+        i = len(pages) - 1
+
+        while len(pages):
+            page = heapq.heappop(pages)
+            sorted_pages[i] = {'lru': page[2], 'indegree': page[0]}
+            i -= 1
+
+        return sorted_pages
 
     def get_webentity_parent_webentities(self, weid, prefixes):
         '''
