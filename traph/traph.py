@@ -801,14 +801,9 @@ class Traph(object):
         else:
             return len(self.get_page_links(lru, include_inbound=True, include_internal=True, include_outbound=True))
 
-    def get_webentities_links(self, out=True, include_auto=False):
+    def get_webentities_links_slow(self, out=True, include_auto=False):
         graph = defaultdict(Counter)
         page_to_webentity = dict()
-
-        # TODO: we can try a version where we do a DFS for solving the page/webentity relation
-        # then solve the network
-
-        # TODO: it's possible that it's the DFS which is slow => need to benchmark
 
         target_node = self.lru_trie.node()
 
@@ -843,6 +838,53 @@ class Traph(object):
                     page_to_webentity[target_block] = target_webentity
 
                 # Allowing auto links?
+                if not include_auto and source_webentity == target_webentity:
+                    continue
+
+                # Adding to the graph
+                graph[source_webentity][target_webentity] += link_node.weight()
+
+        return graph
+
+    def get_webentities_links(self, out=True, include_auto=False):
+        '''
+        This method should be faster than the slow version because it avoids
+        unnecessary upward traversal.
+        '''
+        graph = defaultdict(Counter)
+        page_to_webentity = dict()
+        link_pointers = []
+
+        # TODO: might be possible not to solve the pointer but solve the links rightaway
+
+        # Solving the page => webentity relation
+        for state in self.lru_trie.lean_detailed_dfs_iter():
+            node = state.node
+
+            if not node.is_page():
+                continue
+
+            source_webentity = state.current_webentity()
+
+            if not source_webentity:
+                continue
+
+            page_to_webentity[node.block] = source_webentity
+
+            if node.has_links(out=out):
+                link_pointers.append((node.block, node.links(out=out)))
+
+        # Computing the links
+        for source_block, links_block in link_pointers:
+            source_webentity = page_to_webentity[source_block]
+
+            for link_node in self.link_store.link_nodes_iter(links_block):
+                target_webentity = page_to_webentity.get(link_node.target())
+
+                # The target page might not have a target webentity
+                if not target_webentity:
+                    continue
+
                 if not include_auto and source_webentity == target_webentity:
                     continue
 
