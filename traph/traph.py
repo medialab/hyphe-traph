@@ -812,13 +812,17 @@ class Traph(object):
 
         target_node = self.lru_trie.node()
 
-        for state in self.lru_trie.detailed_dfs_iter():
+        for state in self.lru_trie.lean_detailed_dfs_iter():
             node = state.node
 
             if not node.is_page() or not node.has_links(out=out):
                 continue
 
             source_webentity = state.current_webentity()
+
+            if not source_webentity:
+                continue
+
             page_to_webentity[node.block] = source_webentity
 
             # Iterating over the page's links

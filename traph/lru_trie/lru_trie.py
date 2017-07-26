@@ -450,6 +450,62 @@ class LRUTrie(object):
 
             node.read_parent()
 
+    def lean_detailed_dfs_iter(self):
+        node = self.root()
+
+        # TODO: use a degraded version of the iteration state
+        state = LRUTrieDetailedDFSIterationState(node)
+
+        starting_block = node.block
+
+        # If there is no root node, we can stop right there
+        if not node.exists:
+            return
+
+        descending = True
+
+        while True:
+
+            # When descending, we yield
+            if descending:
+                webentity = node.webentity()
+
+                if webentity:
+                    state.webentities.append(webentity)
+
+                yield state
+
+            # If we have a child, we descend
+            if descending and node.has_child():
+                node.read_child()
+                continue
+
+            # Do we need to stop?
+            if node.block == starting_block:
+                break
+
+            # If we have no child, we follow the next sibling
+            if node.has_next():
+                descending = True
+
+                webentity = node.webentity()
+
+                if webentity and webentity == state.current_webentity():
+                    state.webentities.pop()
+
+                node.read_next()
+
+                continue
+
+            # Else we bubble up
+            descending = False
+            webentity = node.webentity()
+
+            if webentity and webentity == state.current_webentity():
+                state.webentities.pop()
+
+            node.read_parent()
+
     def pages_iter(self):
         for node, lru in self.dfs_iter():
             if node.is_page():
