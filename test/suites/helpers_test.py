@@ -6,7 +6,7 @@
 # Testing the helper functions.
 #
 from unittest import TestCase
-from traph.helpers import lru_variations
+from traph.helpers import lru_variations, lru_iter
 
 
 class TestHelpers(TestCase):
@@ -20,4 +20,10 @@ class TestHelpers(TestCase):
                 's:http|h:fr|h:sciences-po|h:medialab|h:www|',
                 's:https|h:fr|h:sciences-po|h:medialab|h:www|'
             ])
+        )
+
+    def test_lru_iter(self):
+        self.assertEqual(
+            list(lru_iter('s:http|h:fr|h:sciences-po|h:medialab|')),
+            ['s:http|', 'h:fr|', 'h:sciences-po|', 'h:medialab|']
         )

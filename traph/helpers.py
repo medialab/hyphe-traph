@@ -44,3 +44,14 @@ def lru_variations(lru):
     if https_var:
         variations.append(https_var.replace(hosts_str, www_hosts_var, 1))
     return variations
+
+
+def lru_iter(lru):
+    '''
+    Returning an iterator over a lru's stems.
+    '''
+    last = 0
+    for i in xrange(len(lru)):
+        if lru[i] == '|':
+            yield lru[last:i + 1]
+            last = i + 1
