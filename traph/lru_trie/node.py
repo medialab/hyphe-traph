@@ -172,13 +172,11 @@ class LRUTrieNode(object):
             self.block = block
             self.tail = ''
 
-            # Reading the tail
-            node = self
-
-            # # TODO: it's possible not to read the tail in some cases
-            while node.has_tail():
+            # Reading the tail recursively
+            # TODO: it's possible not to read the tail in some cases
+            if self.has_tail():
                 node = LRUTrieNode(self.storage, block=self.block + self.storage.block_size)
-                self.tail += node.stem_as_str()
+                self.tail = node.stem_as_str()
 
     # pack the node to binary form
     def pack(self):
@@ -189,7 +187,7 @@ class LRUTrieNode(object):
         block = self.storage.write(self.pack(), self.block)
         self.block = block
 
-        # Writing the tail if necessary
+        # Writing the tail recursively
         # TODO: it's possible not to write the tail in some cases
         if self.tail:
             if not self.exists:

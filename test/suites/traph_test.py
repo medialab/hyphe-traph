@@ -83,6 +83,18 @@ class TestTraph(TraphTestCase):
             prefix = traph.get_potential_prefix('s:http|h:fr|h:sciences-po|h:medialab|')
             self.assertEqual(prefix, 's:http|h:fr|h:sciences-po|')
 
+    def test_long_stems(self):
+        with self.open_traph() as traph:
+
+            traph.add_page('s:http|h:fr|h:sciences-po|p:thisisaveryveryveryverylooooooooooooooooongstem|p:thisalsoisquitethelongstemisntitnotsomuchtobehonest|')
+
+            pages_in_traph = [lru for _, lru in traph.pages_iter()]
+
+            self.assertEqual(
+                pages_in_traph,
+                ['s:http|h:fr|h:sciences-po|p:thisisaveryveryveryverylooooooooooooooooongstem|p:thisalsoisquitethelongstemisntitnotsomuchtobehonest|']
+            )
+
     def test_clear(self):
         with self.open_traph() as traph:
             traph = self.get_traph()
