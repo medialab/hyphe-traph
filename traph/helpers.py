@@ -4,6 +4,7 @@
 #
 # Miscellaneous helper functions used throughout the code.
 #
+import math
 
 
 def https_variation(lru):
@@ -57,13 +58,20 @@ def lru_iter(lru):
             last = i + 1
 
 
-def chunks_iter(chunk_size, string):
+def detailed_chunks_iter(chunk_size, string):
     '''
     Returning an iterator over a string's chunks of the given size.
     '''
     if len(string) <= chunk_size:
         yield string
 
-    for chunk in xrange(len(string) / chunk_size):
+    nb_chunks = int(math.ceil(len(string) / float(chunk_size)))
+
+    for chunk in xrange(nb_chunks):
         start = chunk * chunk_size
-        yield string[start:start + chunk_size]
+        yield chunk == nb_chunks - 1, string[start:start + chunk_size]
+
+
+def chunks_iter(chunk_size, string):
+    for _, chunk in detailed_chunks_iter(chunk_size, string):
+        yield chunk

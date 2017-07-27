@@ -4,7 +4,7 @@
 #
 # Gathering the unit tests in order to run them.
 #
-# from test.suites.helpers_test import TestHelpers
+from test.suites.helpers_test import TestHelpers
 from test.suites.traph_test import TestTraph
 from test.suites.network_test import TestNetwork
 from test.suites.twitter_family_test import TestTwitterFamily

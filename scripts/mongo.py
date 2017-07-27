@@ -64,7 +64,6 @@ print 'Gathered links'
 # print links
 # print len(links)
 # print sum([len(i) for i in links_multimap.values()])
-import cProfile
-cProfile.run('traph.index_batch_crawl(links_multimap)')
+traph.index_batch_crawl(links_multimap)
 
 traph.close()

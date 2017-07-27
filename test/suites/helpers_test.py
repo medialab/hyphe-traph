@@ -31,10 +31,10 @@ class TestHelpers(TestCase):
     def test_chunks_iter(self):
         self.assertEqual(
             list(chunks_iter(5, 's:http|h:fr|h:sciences-po|h:medialab|')),
-            ['s:htt', 'p|h:f', 'r|h:s', 'cienc', 'es-po', '|h:me', 'diala']
+            ['s:htt', 'p|h:f', 'r|h:s', 'cienc', 'es-po', '|h:me', 'diala', 'b|']
         )
 
         self.assertEqual(
             list(chunks_iter(7, 's:http|h:fr|h:sciences-po|h:medialab|')),
-            ['s:http|', 'h:fr|h:', 'science', 's-po|h:', 'mediala']
+            ['s:http|', 'h:fr|h:', 'science', 's-po|h:', 'mediala', 'b|']
         )
