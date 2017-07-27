@@ -27,7 +27,6 @@ LRU_TRIE_STEM_SIZE = 19
 
 # Node Positions
 LRU_TRIE_NODE_STEM_START = 0
-LRU_TRIE_NODE_STEM_END = 18
 LRU_TRIE_NODE_FLAGS = 19
 LRU_TRIE_NODE_WEBENTITY = 20
 LRU_TRIE_NODE_NEXT_BLOCK = 21
@@ -146,6 +145,8 @@ class LRUTrieNode(object):
 
             # Reading the tail recursively
             # TODO: it's possible not to read the tail in some cases
+            # TODO: the recursion might hurt us here and an iterative method
+            # reading using the storage itself and not a node might more performant
             if self.has_tail():
                 node = LRUTrieNode(self.storage, block=self.block + self.storage.block_size)
                 self.tail = node.stem_as_str()
@@ -161,6 +162,8 @@ class LRUTrieNode(object):
 
         # Writing the tail recursively
         # TODO: it's possible not to write the tail in some cases
+        # TODO: the recursion might hurt us here and an iterative method
+        # reading using the storage itself and not a node might more performant
         if self.tail:
             if not self.exists:
                 node = LRUTrieNode(self.storage, stem=self.tail)

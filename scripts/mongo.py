@@ -43,7 +43,7 @@ links_multimap = defaultdict(list)
 
 i = 0
 links = []
-for page in collection.find({}, {'lru': 1, 'lrulinks': 1}, sort=[('_job', 1)]):
+for page in collection.find({}, {'lru': 1, 'lrulinks': 1}, sort=[('_job', 1)]).limit(100):
     i += 1
 
     # links.extend(links_generator(page))
@@ -64,6 +64,7 @@ print 'Gathered links'
 # print links
 # print len(links)
 # print sum([len(i) for i in links_multimap.values()])
-traph.index_batch_crawl(links_multimap)
+import cProfile
+cProfile.run('traph.index_batch_crawl(links_multimap)')
 
 traph.close()
