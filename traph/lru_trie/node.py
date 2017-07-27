@@ -11,6 +11,7 @@
 #
 import struct
 from traph.lru_trie.header import LRU_TRIE_HEADER_BLOCKS
+from traph.helpers import chunks_iter
 
 # Binary format
 # -
@@ -19,6 +20,7 @@ from traph.lru_trie.header import LRU_TRIE_HEADER_BLOCKS
 # architecture).
 
 # TODO: reclaim the padding bytes!
+# TODO: it's possible to differentiate the tail's blocks format if needed
 LRU_TRIE_NODE_FORMAT = 'BBBBBBBBBBBBBBBBBBxxIQQQQQ'
 LRU_TRIE_NODE_BLOCK_SIZE = struct.calcsize(LRU_TRIE_NODE_FORMAT)
 LRU_TRIE_FIRST_DATA_BLOCK = LRU_TRIE_HEADER_BLOCKS * LRU_TRIE_NODE_BLOCK_SIZE
@@ -37,12 +39,14 @@ LRU_TRIE_NODE_PARENT_BLOCK = 21
 LRU_TRIE_NODE_OUTLINKS_BLOCK = 22
 LRU_TRIE_NODE_INLINKS_BLOCK = 23
 
-# Flags (Currently allocating 5/8 bits)
+# Flags (Currently allocating 7/8 bits)
 LRU_TRIE_NODE_FLAG_PAGE = 0
 LRU_TRIE_NODE_FLAG_CRAWLED = 1
 LRU_TRIE_NODE_FLAG_LINKED = 2
 LRU_TRIE_NODE_FLAG_DELETED = 3
 LRU_TRIE_NODE_FLAG_WEBENTITY_CREATION_RULE = 4
+LRU_TRIE_NODE_FLAG_HAS_TAIL = 5
+LRU_TRIE_NODE_FLAG_IS_TAIL = 6
 
 
 # Helpers
@@ -79,6 +83,7 @@ class LRUTrieNode(object):
         self.storage = storage
         self.block = None
         self.exists = False
+        self.tail = None
 
         # Loading node from storage
         if block is not None:
@@ -126,7 +131,7 @@ class LRUTrieNode(object):
 
         return (
             '<%(class_name)s "%(stem)s"'
-            ' block=%(block)s exists=%(exists)s'
+            ' block=%(block)s exists=%(exists)s has_tail=%(has_tail)s'
             ' parent=%(parent)s child=%(child)s next=%(next)s'
             ' out=%(outlinks)s we=%(webentity)s wecr=%(webentity_creation_rule)s>'
         ) % {
@@ -134,6 +139,7 @@ class LRUTrieNode(object):
             'stem': self.stem(),
             'block': self.block,
             'exists': str(self.exists),
+            'has_tail': str(self.has_tail()),
             'page': self.is_page(),
             'crawled': self.is_crawled(),
             'parent': self.parent(),
@@ -159,10 +165,20 @@ class LRUTrieNode(object):
         if data is None:
             self.exists = False
             self.__set_default_data()
+            self.tail = ''
         else:
             self.exists = True
             self.data = self.unpack(data)
             self.block = block
+            self.tail = ''
+
+            # Reading the tail
+            node = self
+
+            # # TODO: it's possible not to read the tail in some cases
+            while node.has_tail():
+                node = LRUTrieNode(self.storage, block=self.block + self.storage.block_size)
+                self.tail += node.stem_as_str()
 
     # pack the node to binary form
     def pack(self):
@@ -172,6 +188,18 @@ class LRUTrieNode(object):
     def write(self):
         block = self.storage.write(self.pack(), self.block)
         self.block = block
+
+        # Writing the tail if necessary
+        # TODO: it's possible not to write the tail in some cases
+        if self.tail:
+            if not self.exists:
+                node = LRUTrieNode(self.storage, stem=self.tail)
+                node.flag_as_tail()
+            else:
+                node = LRUTrieNode(self.storage, stem=self.tail, block=self.block + self.storage.block_size)
+
+            node.write()
+
         self.exists = True
 
     # Method returning whether this node is the root
@@ -208,6 +236,18 @@ class LRUTrieNode(object):
     def unflag_as_webentity_creation_rule(self):
         unflag(self.data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_WEBENTITY_CREATION_RULE)
 
+    def has_tail(self):
+        return test(self.data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_HAS_TAIL)
+
+    def flag_as_having_tail(self):
+        flag(self.data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_HAS_TAIL)
+
+    def is_tail(self):
+        return test(self.data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_IS_TAIL)
+
+    def flag_as_tail(self):
+        flag(self.data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_IS_TAIL)
+
     # =========================================================================
     # Character methods
     # =========================================================================
@@ -240,6 +280,9 @@ class LRUTrieNode(object):
             chars.append(char)
             i += 1
 
+        if self.tail:
+            chars += self.tail
+
         return chars
 
     def stem_as_str(self):
@@ -247,10 +290,20 @@ class LRUTrieNode(object):
 
     def set_stem(self, stem):
 
-        # TODO: for now, it will break if the stem is too long!
-        for i in range(min(len(stem), LRU_TRIE_STEM_SIZE)):
-            char = ord(stem[i])
-            self.data[LRU_TRIE_NODE_STEM_START + i] = char
+        # If the stem can be stored in our block, things are simple
+        if len(stem) < LRU_TRIE_STEM_SIZE:
+            for i in xrange(len(stem)):
+                char = ord(stem[i])
+                self.data[LRU_TRIE_NODE_STEM_START + i] = char
+
+        # Else, we need to chunk the stem and write a tail
+        else:
+            for i in xrange(LRU_TRIE_STEM_SIZE):
+                char = ord(stem[i])
+                self.data[LRU_TRIE_NODE_STEM_START + i] = char
+
+            self.tail = stem[LRU_TRIE_STEM_SIZE:]
+            self.flag_as_having_tail()
 
     # =========================================================================
     # Next block methods

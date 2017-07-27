@@ -16,7 +16,7 @@ PAGES = [
     's:http|h:com|h:twitter|p:son|',
     's:http|h:com|h:twitter|p:niece|',
     's:http|h:com|h:twitter|p:nephew|',
-    's:http|h:com|h:twitter|p:significant|',
+    's:http|h:com|h:twitter|p:significantother|',
     's:http|h:com|h:twitter|p:ego|',
     's:http|h:com|h:twitter|p:sister|',
     's:http|h:com|h:twitter|p:cousin|',
@@ -32,9 +32,9 @@ PAGES = [
 
 LINKS = [
     ('s:http|h:com|h:twitter|p:daughter|', 's:http|h:com|h:twitter|p:ego|'),
-    ('s:http|h:com|h:twitter|p:daughter|', 's:http|h:com|h:twitter|p:significant|'),
+    ('s:http|h:com|h:twitter|p:daughter|', 's:http|h:com|h:twitter|p:significantother|'),
     ('s:http|h:com|h:twitter|p:son|', 's:http|h:com|h:twitter|p:ego|'),
-    ('s:http|h:com|h:twitter|p:son|', 's:http|h:com|h:twitter|p:significant|'),
+    ('s:http|h:com|h:twitter|p:son|', 's:http|h:com|h:twitter|p:significantother|'),
     ('s:http|h:com|h:twitter|p:niece|', 's:http|h:com|h:twitter|p:sister|'),
     ('s:http|h:com|h:twitter|p:niece|', 's:http|h:com|h:twitter|p:brotherinlaw|'),
     ('s:http|h:com|h:twitter|p:nephew|', 's:http|h:com|h:twitter|p:sister|'),
