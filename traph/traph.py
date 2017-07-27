@@ -912,10 +912,7 @@ class Traph(object):
         '''
         lru = self.__encode(lru)
 
-        node, report = self.__add_page(lru)
-
-        node.flag_as_crawled()
-        node.write()
+        node, report = self.__add_page(lru, crawled=True)
 
         return report
 
@@ -938,7 +935,6 @@ class Traph(object):
         store = self.link_store
         report = TraphWriteReport()
 
-        # TODO: this will need to return created web entities
         inlinks = defaultdict(list)
         outlinks = defaultdict(list)
         pages = dict()
@@ -998,6 +994,11 @@ class Traph(object):
                 pages[source_page] = source_node
             else:
                 source_node = pages[source_page]
+
+                if not source_node.is_crawled():
+                    source_node.read(source_node.block)
+                    source_node.flag_as_crawled()
+                    source_node.write()
 
             target_blocks = []
 

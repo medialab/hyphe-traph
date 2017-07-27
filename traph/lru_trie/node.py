@@ -35,13 +35,14 @@ LRU_TRIE_NODE_PARENT_BLOCK = 5
 LRU_TRIE_NODE_OUTLINKS_BLOCK = 6
 LRU_TRIE_NODE_INLINKS_BLOCK = 7
 
-# Flags (Currently allocating 6/8 bits)
+# Flags (Currently allocating 7/8 bits)
 LRU_TRIE_NODE_FLAG_PAGE = 0
 LRU_TRIE_NODE_FLAG_CRAWLED = 1
 LRU_TRIE_NODE_FLAG_LINKED = 2
 LRU_TRIE_NODE_FLAG_DELETED = 3
 LRU_TRIE_NODE_FLAG_WEBENTITY_CREATION_RULE = 4
 LRU_TRIE_NODE_FLAG_HAS_TAIL = 5
+LRU_TRIE_NODE_FLAG_IS_TAIL = 6
 
 
 # Helpers
@@ -177,6 +178,8 @@ class LRUTrieNode(object):
             for is_last, chunk in detailed_chunks_iter(LRU_TRIE_STEM_SIZE, self.tail):
                 data = [chunk] + [0] * 7
 
+                flag(data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_IS_TAIL)
+
                 if not is_last:
                     flag(data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_HAS_TAIL)
 
@@ -228,6 +231,9 @@ class LRUTrieNode(object):
 
     def flag_as_having_tail(self):
         flag(self.data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_HAS_TAIL)
+
+    def is_tail(self):
+        return test(self.data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_IS_TAIL)
 
     # =========================================================================
     # Stem methods
