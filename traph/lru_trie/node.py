@@ -20,10 +20,10 @@ from traph.helpers import detailed_chunks_iter
 # architecture).
 
 # TODO: it's possible to differentiate the tail's blocks format if needed
-LRU_TRIE_NODE_FORMAT = '19sBI5Q'
+LRU_TRIE_NODE_FORMAT = '83sBI5Q'
 LRU_TRIE_NODE_BLOCK_SIZE = struct.calcsize(LRU_TRIE_NODE_FORMAT)
 LRU_TRIE_FIRST_DATA_BLOCK = LRU_TRIE_HEADER_BLOCKS * LRU_TRIE_NODE_BLOCK_SIZE
-LRU_TRIE_STEM_SIZE = 19
+LRU_TRIE_STEM_SIZE = 83
 
 # Node Positions
 LRU_TRIE_NODE_STEM = 0
@@ -150,12 +150,7 @@ class LRUTrieNode(object):
 
                 while True:
                     data = struct.unpack(LRU_TRIE_NODE_FORMAT, self.storage.read(current_block))
-                    chars = data[0]
-
-                    for i in xrange(LRU_TRIE_STEM_SIZE):
-                        if chars[i] == '\x00':
-                            chars = chars[:i]
-                            break
+                    chars = data[0].rstrip('\x00')
 
                     chunks.append(chars)
 
@@ -241,12 +236,7 @@ class LRUTrieNode(object):
     def stem(self):
         chars = self.data[LRU_TRIE_NODE_STEM]
 
-        # TODO: possible to do this check in log(n)?
-        for i in xrange(min(len(chars), LRU_TRIE_STEM_SIZE)):
-            if chars[i] == '\x00':
-                return chars[:i] + self.tail
-
-        return chars + self.tail
+        return chars.rstrip('\x00') + self.tail
 
     def stem_as_str(self):
 
