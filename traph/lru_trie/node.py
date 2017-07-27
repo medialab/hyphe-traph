@@ -26,8 +26,6 @@ LRU_TRIE_FIRST_DATA_BLOCK = LRU_TRIE_HEADER_BLOCKS * LRU_TRIE_NODE_BLOCK_SIZE
 LRU_TRIE_STEM_SIZE = 19
 
 # Node Positions
-LRU_TRIE_NODE_CHAR = 0
-# --
 LRU_TRIE_NODE_STEM_START = 0
 LRU_TRIE_NODE_STEM_END = 18
 LRU_TRIE_NODE_FLAGS = 19
@@ -221,20 +219,8 @@ class LRUTrieNode(object):
         flag(self.data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_IS_TAIL)
 
     # =========================================================================
-    # Character methods
+    # Stem methods
     # =========================================================================
-
-    # retrieve the node's char
-    def char(self):
-        return self.data[LRU_TRIE_NODE_CHAR]
-
-    # retrieve the node's char as a string
-    def char_as_str(self):
-        return chr(self.char())
-
-    # set the node's char
-    def set_char(self, char):
-        self.data[LRU_TRIE_NODE_CHAR] = char
 
     def stem(self):
         chars = bytearray()

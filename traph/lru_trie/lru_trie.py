@@ -31,6 +31,9 @@ class LRUTrie(object):
     # Debug
     # =========================================================================
     def representation(self):
+        '''
+        NOTE: deprecated, need to fix!
+        '''
 
         string = ''
 
