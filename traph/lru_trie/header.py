@@ -12,7 +12,7 @@ import struct
 # NOTE: Since python mimics C struct, the block size should be respecting
 # some rules (namely have even addresses or addresses divisble by 4 on some
 # architecture).
-LRU_TRIE_HEADER_FORMAT = 'I' + 'x' * 60
+LRU_TRIE_HEADER_FORMAT = 'I60x'
 LRU_TRIE_HEADER_BLOCK_SIZE = struct.calcsize(LRU_TRIE_HEADER_FORMAT)
 
 # Header blocks

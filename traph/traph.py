@@ -1020,8 +1020,6 @@ class Traph(object):
             source_node.read(source_node.block)
             store.add_outlinks(source_node, target_blocks)
 
-        print 'Finished indexing pages...'
-
         for target_page, source_pages in inlinks.items():
             target_node = pages[target_page]
             target_node.read(target_node.block)

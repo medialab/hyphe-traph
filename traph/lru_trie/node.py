@@ -20,7 +20,7 @@ from traph.helpers import chunks_iter
 # architecture).
 
 # TODO: it's possible to differentiate the tail's blocks format if needed
-LRU_TRIE_NODE_FORMAT = 'BBBBBBBBBBBBBBBBBBBBIQQQQQ'
+LRU_TRIE_NODE_FORMAT = '19BBI5Q'
 LRU_TRIE_NODE_BLOCK_SIZE = struct.calcsize(LRU_TRIE_NODE_FORMAT)
 LRU_TRIE_FIRST_DATA_BLOCK = LRU_TRIE_HEADER_BLOCKS * LRU_TRIE_NODE_BLOCK_SIZE
 LRU_TRIE_STEM_SIZE = 19
