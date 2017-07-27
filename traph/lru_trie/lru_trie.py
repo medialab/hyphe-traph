@@ -538,3 +538,13 @@ class LRUTrie(object):
                 nb += 1
 
         return nb
+
+    def count_crawled_pages(self):
+        nb = 0
+
+        # Here we don't need a DFS so we can plainly iterate over the nodes
+        for node in self.nodes_iter():
+            if node.is_page() and node.is_crawled():
+                nb += 1
+
+        return nb

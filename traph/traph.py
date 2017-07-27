@@ -1093,5 +1093,8 @@ class Traph(object):
     def count_pages(self):
         return self.lru_trie.count_pages()
 
+    def count_crawled_pages(self):
+        return self.lru_trie.count_crawled_pages()
+
     def count_links(self):
         return self.link_store.count_links()
