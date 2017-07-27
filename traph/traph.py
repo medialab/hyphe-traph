@@ -52,6 +52,7 @@ class Traph(object):
                 # TODO: check if each value is correctly a string
 
         # Files
+        self.folder = folder
         self.lru_trie_file = None
         self.link_store_file = None
         self.lru_trie_path = None
@@ -1060,10 +1061,10 @@ class Traph(object):
     # =========================================================================
     def links_iter(self, out=True):
         for page_node, lru in self.lru_trie.pages_iter():
-            if not page_node.has_outlinks():
+            if not page_node.links(out=out):
                 continue
 
-            for link_node in self.link_store.link_nodes_iter(page_node.outlinks()):
+            for link_node in self.link_store.link_nodes_iter(page_node.links(out=out)):
                 yield lru, self.lru_trie.windup_lru(link_node.target())
 
     def pages_iter(self):

@@ -57,13 +57,13 @@ def lru_iter(lru):
             last = i + 1
 
 
-def lru_chunks_iter(chunk_size, lru):
+def chunks_iter(chunk_size, string):
     '''
-    Returning an iterator over a lru's chunks of the given size.
+    Returning an iterator over a string's chunks of the given size.
     '''
-    if len(lru) <= chunk_size:
-        yield lru
+    if len(string) <= chunk_size:
+        yield string
 
-    for chunk in xrange(len(lru) / chunk_size):
+    for chunk in xrange(len(string) / chunk_size):
         start = chunk * chunk_size
-        yield lru[start:start + chunk_size]
+        yield string[start:start + chunk_size]

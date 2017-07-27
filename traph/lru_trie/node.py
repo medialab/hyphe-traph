@@ -17,9 +17,12 @@ from traph.lru_trie.header import LRU_TRIE_HEADER_BLOCKS
 # NOTE: Since python mimics C struct, the block size should be respecting
 # some rules (namely have even addresses or addresses divisble by 4 on some
 # architecture).
+
+# TODO: reclaim the padding bytes!
 LRU_TRIE_NODE_FORMAT = 'BBBBBBBBBBBBBBBBBBxxIQQQQQ'
 LRU_TRIE_NODE_BLOCK_SIZE = struct.calcsize(LRU_TRIE_NODE_FORMAT)
 LRU_TRIE_FIRST_DATA_BLOCK = LRU_TRIE_HEADER_BLOCKS * LRU_TRIE_NODE_BLOCK_SIZE
+LRU_TRIE_STEM_SIZE = 16
 
 # Node Positions
 LRU_TRIE_NODE_CHAR = 0
@@ -70,7 +73,7 @@ class LRUTrieNode(object):
     # =========================================================================
     # Constructor
     # =========================================================================
-    def __init__(self, storage, char=None, block=None, data=None):
+    def __init__(self, storage, stem=None, block=None, data=None):
 
         # Properties
         self.storage = storage
@@ -85,11 +88,11 @@ class LRUTrieNode(object):
         elif data:
             self.data = self.unpack(data)
         else:
-            self.__set_default_data(char)
+            self.__set_default_data(stem)
 
-    def __set_default_data(self, char=None):
+    def __set_default_data(self, stem=None):
         self.data = [
-            char or 0,  # Stem
+            0,         # Stem
             0,
             0,
             0,
@@ -115,17 +118,20 @@ class LRUTrieNode(object):
             0,          # Inlinks block
         ]
 
+        if stem:
+            self.set_stem(stem)
+
     def __repr__(self):
         class_name = self.__class__.__name__
 
         return (
-            '<%(class_name)s "%(char)s"'
+            '<%(class_name)s "%(stem)s"'
             ' block=%(block)s exists=%(exists)s'
             ' parent=%(parent)s child=%(child)s next=%(next)s'
             ' out=%(outlinks)s we=%(webentity)s wecr=%(webentity_creation_rule)s>'
         ) % {
             'class_name': class_name,
-            'char': self.char_as_str(),
+            'stem': self.stem(),
             'block': self.block,
             'exists': str(self.exists),
             'page': self.is_page(),
@@ -218,6 +224,34 @@ class LRUTrieNode(object):
     def set_char(self, char):
         self.data[LRU_TRIE_NODE_CHAR] = char
 
+    def stem(self):
+        chars = bytearray()
+
+        i = LRU_TRIE_NODE_STEM_START
+
+        # TODO: here I think we should increment STEM_END!!!
+        # Need to test on large stems
+        while i < LRU_TRIE_NODE_STEM_END:
+            char = self.data[i]
+
+            if char == 0:
+                break
+
+            chars.append(char)
+            i += 1
+
+        return chars
+
+    def stem_as_str(self):
+        return str(self.stem())
+
+    def set_stem(self, stem):
+
+        # TODO: for now, it will break if the stem is too long!
+        for i in range(min(len(stem), LRU_TRIE_STEM_SIZE)):
+            char = ord(stem[i])
+            self.data[LRU_TRIE_NODE_STEM_START + i] = char
+
     # =========================================================================
     # Next block methods
     # =========================================================================
@@ -297,6 +331,10 @@ class LRUTrieNode(object):
     # =========================================================================
     # Parent block methods
     # =========================================================================
+
+    # know whether the parent block is set
+    def has_parent(self):
+        return self.data[LRU_TRIE_NODE_PARENT_BLOCK] != 0
 
     # retrieve the parent block
     def parent(self):

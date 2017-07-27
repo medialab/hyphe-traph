@@ -5,6 +5,7 @@
 # Class representing the Trie indexing the LRUs.
 #
 import warnings
+from traph.helpers import lru_iter
 from traph.lru_trie.node import LRUTrieNode, LRU_TRIE_FIRST_DATA_BLOCK
 from traph.lru_trie.header import LRUTrieHeader
 from traph.lru_trie.iteration_state import LRUTrieDetailedDFSIterationState
@@ -23,7 +24,7 @@ class LRUTrie(object):
         self.storage = storage
         self.encoding = encoding
 
-        # Readin headers
+        # Reading headers
         self.header = LRUTrieHeader(storage)
 
     # =========================================================================
@@ -36,7 +37,7 @@ class LRUTrie(object):
         for state in self.detailed_dfs_iter():
             if state.direction == 'down':
                 node = state.node
-                string += node.char_as_str()
+                string += node.stem_as_str()
 
             if state.direction == 'right':
                 string += '\n'
@@ -49,17 +50,17 @@ class LRUTrie(object):
     # =========================================================================
 
     # Method ensuring that a sibling with the desired char exists
-    def __ensure_char_from_siblings(self, node, char):
+    def __ensure_stem_from_siblings(self, node, stem):
 
         # If the node does not exist, we create it
         if not node.exists:
-            node.set_char(char)
+            node.set_stem(stem)
             node.write()
             return node
 
         # Else we follow the siblings until we find a relevant one
         while True:
-            if node.char() == char:
+            if node.stem() == stem:
                 return node
 
             if node.has_next():
@@ -68,7 +69,7 @@ class LRUTrie(object):
                 break
 
         # We did not find a relevant sibling, let's add it
-        sibling = self.node(char=char)
+        sibling = self.node(stem=stem)
 
         # The new sibling's parent is the same, obviously
         sibling.set_parent(node.parent())
@@ -87,28 +88,32 @@ class LRUTrie(object):
     def add_lru(self, lru):
 
         # Iteration state
-        l = len(lru)
+        # TODO: we should be able to use an iterator and not keep a list!
+        stems = list(lru_iter(lru))
+        l = len(stems)
         i = 0
         history = LRUTrieWalkHistory(lru)
         node = self.root()
+        lru = ''
 
         # Descending the trie
         while i < l:
-            char = ord(lru[i])
+            stem = stems[i]
+            lru += stem
 
-            node = self.__ensure_char_from_siblings(node, char)
+            node = self.__ensure_stem_from_siblings(node, stem)
 
             # Tracking webentities
             if node.has_webentity():
                 history.update_webentity(
                     node.webentity(),
-                    lru[:i],
-                    i
+                    lru,
+                    len(lru)
                 )
 
             # Tracking webentity creation rules
             if node.has_webentity_creation_rule():
-                history.add_webentity_creation_rule(i)
+                history.add_webentity_creation_rule(len(lru))
 
             i += 1
 
@@ -119,10 +124,10 @@ class LRUTrie(object):
 
         # We went as far as possible, now we add the missing part
         while i < l:
-            char = ord(lru[i])
+            stem = stems[i]
 
             # Creating the child
-            child = self.node(char=char)
+            child = self.node(stem=stem)
             child.set_parent(node.block)
             child.write()
 
@@ -162,12 +167,13 @@ class LRUTrie(object):
     def lru_node(self, lru):
         node = self.root()
 
-        l = len(lru)
+        stems = list(lru_iter(lru))
+        l = len(stems)
 
         for i in range(l):
-            char = ord(lru[i])
+            stem = stems[i]
 
-            while node.char() != char:
+            while node.stem() != stem:
                 if not node.has_next():
                     return
                 node.read_next()
@@ -188,12 +194,15 @@ class LRUTrie(object):
         node = self.root()
         history = LRUTrieWalkHistory(lru)
 
-        l = len(lru)
+        stems = list(lru_iter(lru))
+        lru = ''
+        l = len(stems)
 
         for i in range(l):
-            char = ord(lru[i])
+            stem = stems[i]
+            lru += stem
 
-            while node.char() != char:
+            while node.stem() != stem:
                 if not node.has_next():
                     return None, history
                 node.read_next()
@@ -201,14 +210,12 @@ class LRUTrie(object):
             if node.has_webentity():
                 history.update_webentity(
                     node.webentity(),
-
-                    # TODO: this should become useless with a getter method
-                    lru[:i + 1],
-                    i
+                    lru,
+                    len(lru)
                 )
 
             if node.has_webentity_creation_rule():
-                history.add_webentity_creation_rule(i)
+                history.add_webentity_creation_rule(len(lru))
 
             if i < l - 1:
                 if not node.has_child():
@@ -222,10 +229,10 @@ class LRUTrie(object):
         # TODO: check block
         node = self.node(block=block)
 
-        lru = node.char_as_str()
+        lru = node.stem_as_str()
 
         for parent in self.node_parents_iter(node):
-            lru = parent.char_as_str() + lru
+            lru = parent.stem_as_str() + lru
 
         return lru
 
@@ -288,12 +295,12 @@ class LRUTrie(object):
         if starting_node:
             node = starting_node
             starting_block = starting_node.block
-            lru = starting_lru[:-1]
+            lru = list(lru_iter(starting_lru))[:-1]
             # Note: unsure why we need to trim rule_prefix above, but it seems to work
         else:
             node = self.root()
-            starting_block = node.block
-            lru = ''
+            starting_block = None
+            lru = []
 
         # If there is no root node, we can stop right there
         if not node.exists:
@@ -305,15 +312,15 @@ class LRUTrie(object):
 
             # When descending, we yield
             if descending:
-                yield node, lru + node.char_as_str()
+                yield node, ''.join(lru + [node.stem_as_str()])
 
             # If we have a child, we descend
             if descending and node.has_child():
-                lru = lru + node.char_as_str()
+                lru.append(node.stem_as_str())
                 node.read_child()
                 continue
 
-            # Do we need to stop?
+            # Stopping the traversal when we have a starting block
             if node.block == starting_block:
                 break
 
@@ -323,9 +330,13 @@ class LRUTrie(object):
                 node.read_next()
                 continue
 
+            # Stopping the traversal when performing a full DFS
+            if not node.has_parent():
+                break
+
             # Else we bubble up
             descending = False
-            lru = lru[:-1]
+            lru.pop()
             node.read_parent()
 
     def webentity_dfs_iter(self, weid, starting_node, starting_lru):
@@ -337,7 +348,7 @@ class LRUTrie(object):
         '''
         node = starting_node
         starting_block = starting_node.block
-        lru = starting_lru[:-1]
+        lru = list(lru_iter(starting_lru))[:-1]
         # Note: unsure why we need to trim rule_prefix above, but it seems to work
 
         # If there is no starting node, we can stop right there
@@ -350,14 +361,14 @@ class LRUTrie(object):
 
             # When descending, we yield
             if descending:
-                yield node, lru + node.char_as_str()
+                yield node, ''.join(lru + [node.stem_as_str()])
 
             # If we have a VALID child, we descend
             if descending and node.has_child():
                 child_node = node.child_node()
 
                 if not child_node.has_webentity():
-                    lru = lru + node.char_as_str()
+                    lru.append(node.stem_as_str())
                     node = child_node
                     continue
 
@@ -380,14 +391,12 @@ class LRUTrie(object):
 
             # Else we bubble up
             descending = False
-            lru = lru[:-1]
+            lru.pop()
             node.read_parent()
 
     def detailed_dfs_iter(self):
         node = self.root()
         state = LRUTrieDetailedDFSIterationState(node)
-
-        starting_block = node.block
 
         # If there is no root node, we can stop right there
         if not node.exists:
@@ -399,7 +408,7 @@ class LRUTrie(object):
 
             # When descending, we yield
             if descending:
-                state.lru += node.char_as_str()
+                state.lru += node.stem_as_str()
 
                 webentity = node.webentity()
 
@@ -412,16 +421,12 @@ class LRUTrie(object):
 
             # If we have a child, we descend
             if descending and node.has_child():
-                state.lru += node.char_as_str()
+                state.lru += node.stem_as_str()
                 state.last_block = node.block
                 state.direction = 'down'
 
                 node.read_child()
                 continue
-
-            # Do we need to stop?
-            if node.block == starting_block:
-                break
 
             # If we have no child, we follow the next sibling
             if node.has_next():
@@ -437,6 +442,10 @@ class LRUTrie(object):
                 node.read_next()
 
                 continue
+
+            # Do we need to stop?
+            if not node.has_parent():
+                break
 
             # Else we bubble up
             state.lru = state.lru[:-1]
@@ -456,8 +465,6 @@ class LRUTrie(object):
         # TODO: use a degraded version of the iteration state
         state = LRUTrieDetailedDFSIterationState(node)
 
-        starting_block = node.block
-
         # If there is no root node, we can stop right there
         if not node.exists:
             return
@@ -480,10 +487,6 @@ class LRUTrie(object):
                 node.read_child()
                 continue
 
-            # Do we need to stop?
-            if node.block == starting_block:
-                break
-
             # If we have no child, we follow the next sibling
             if node.has_next():
                 descending = True
@@ -496,6 +499,10 @@ class LRUTrie(object):
                 node.read_next()
 
                 continue
+
+            # Do we need to stop?
+            if not node.has_parent():
+                break
 
             # Else we bubble up
             descending = False

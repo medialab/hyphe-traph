@@ -362,10 +362,10 @@ class TestHugoLinks(TraphTestCase):
 
         # Checking pages
         pages_in_traph = set(lru for _, lru in traph.pages_iter())
-        self.assertTrue(pages_in_traph == set(PAGES))
+        self.assertEqual(pages_in_traph, set(PAGES))
 
         # Checking links
         links_in_traph = set(traph.links_iter())
-        self.assertTrue(links_in_traph == set(LINKS))
+        self.assertEqual(links_in_traph, set(LINKS))
 
         traph.close()

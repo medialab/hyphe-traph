@@ -12,7 +12,6 @@ class TestTraph(TraphTestCase):
 
     def test_add_page(self):
         with self.open_traph() as traph:
-
             report = traph.add_page('s:http|h:fr|h:sciences-po|h:medialab|')
 
             self.assertEqual(report.nb_created_pages, 1)

@@ -17,30 +17,23 @@ def gather_webentities_from_traph(traph):
     return webentities
 
 
-def compare_webentities(actual, expected):
-    if len(actual) != len(expected):
-        return False
-
-    for key in expected:
-        if key not in actual:
-            return False
-
-        if len(expected[key]) != len(actual[key]):
-            return False
-
-        if set(expected[key]) != set(actual[key]):
-            return False
-
-    return True
-
-
 class TestWebentities(TraphTestCase):
 
     def assertWebentities(self, traph, expected):
-        return self.assertTrue(compare_webentities(
-            gather_webentities_from_traph(traph),
-            expected
-        ))
+        actual = gather_webentities_from_traph(traph)
+
+        if len(actual) != len(expected):
+            raise AssertionError('Both collections do not have the same length.')
+
+        for key in expected:
+            if key not in actual:
+                raise AssertionError('The %s key does not exist in actual.' % key)
+
+            if len(expected[key]) != len(actual[key]):
+                raise AssertionError('Values for the %s key are not the same number.' % key)
+
+            if set(expected[key]) != set(actual[key]):
+                raise AssertionError('Values for the %s key are different.' % key)
 
     def test_webentities(self):
         traph = self.get_traph()

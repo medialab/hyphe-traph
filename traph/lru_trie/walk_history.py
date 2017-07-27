@@ -12,6 +12,8 @@ class LRUTrieWalkHistory(object):
     def __init__(self, lru):
 
         # Properties
+
+        # TODO: this should become a list
         self.lru = lru
         self.webentity = None
         self.webentity_prefix = ''
@@ -24,11 +26,13 @@ class LRUTrieWalkHistory(object):
 
         return (
             '<%(class_name)s prefix="%(prefix)s"'
-            ' weid=%(weid)s>'
+            ' weid=%(weid)s position=%(position)s wecr=%(wecr)s>'
         ) % {
             'class_name': class_name,
             'prefix': self.webentity_prefix,
-            'weid': self.webentity
+            'weid': self.webentity,
+            'position': self.webentity_position,
+            'wecr': '/'.join(str(wecr) for wecr in self.webentity_creation_rules) if self.webentity_creation_rules else None
         }
 
     def update_webentity(self, weid, prefix, position):
@@ -43,7 +47,7 @@ class LRUTrieWalkHistory(object):
         for position in reversed(self.webentity_creation_rules):
             if position >= 0:
 
-                prefix = self.lru[0:position + 1]  # FIXME: unsure of the +1
+                prefix = self.lru[0:position]
 
                 # Note that it remains to the user to apply default rule if
                 # none of the given rules would happen to succeed
