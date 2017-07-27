@@ -144,12 +144,16 @@ class LRUTrie(object):
         return node, history
 
     # Method adding a page to the trie
-    def add_page(self, lru):
+    def add_page(self, lru, crawled=False):
         node, history = self.add_lru(lru)
 
         # Flagging the node as a page
         if not node.is_page():
             node.flag_as_page()
+
+            if crawled:
+                node.flag_as_crawled()
+
             node.write()
             history.page_was_created = True
 

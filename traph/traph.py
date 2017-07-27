@@ -218,8 +218,8 @@ class Traph(object):
 
         return match.group()
 
-    def __add_page(self, lru):
-        node, history = self.lru_trie.add_page(lru)
+    def __add_page(self, lru, crawled=False):
+        node, history = self.lru_trie.add_page(lru, crawled=crawled)
 
         report = TraphWriteReport()
 
@@ -993,9 +993,7 @@ class Traph(object):
 
             # We need to add the page
             if source_page not in pages:
-                source_node, source_page_report = self.__add_page(source_page)
-                source_node.flag_as_crawled()
-                source_node.write()
+                source_node, source_page_report = self.__add_page(source_page, crawled=True)
                 report += source_page_report
                 pages[source_page] = source_node
             else:
