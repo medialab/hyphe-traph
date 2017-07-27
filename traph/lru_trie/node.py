@@ -144,11 +144,27 @@ class LRUTrieNode(object):
 
             # Reading the tail recursively
             # TODO: it's possible not to read the tail in some cases
-            # TODO: the recursion might hurt us here and an iterative method
-            # reading using the storage itself and not a node might more performant
             if self.has_tail():
-                node = LRUTrieNode(self.storage, block=self.block + self.storage.block_size)
-                self.tail = node.stem_as_str()
+                chunks = []
+                current_block = block + self.storage.block_size
+
+                while True:
+                    data = struct.unpack(LRU_TRIE_NODE_FORMAT, self.storage.read(current_block))
+                    chars = data[0]
+
+                    for i in xrange(LRU_TRIE_STEM_SIZE):
+                        if chars[i] == '\x00':
+                            chars = chars[:i]
+                            break
+
+                    chunks.append(chars)
+
+                    if not test(data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_HAS_TAIL):
+                        break
+
+                    current_block += self.storage.block_size
+
+                self.tail = ''.join(chunks)
 
     # pack the node to binary form
     def pack(self):
