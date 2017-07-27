@@ -19,25 +19,24 @@ from traph.helpers import chunks_iter
 # some rules (namely have even addresses or addresses divisble by 4 on some
 # architecture).
 
-# TODO: reclaim the padding bytes!
 # TODO: it's possible to differentiate the tail's blocks format if needed
-LRU_TRIE_NODE_FORMAT = 'BBBBBBBBBBBBBBBBBBxxIQQQQQ'
+LRU_TRIE_NODE_FORMAT = 'BBBBBBBBBBBBBBBBBBBBIQQQQQ'
 LRU_TRIE_NODE_BLOCK_SIZE = struct.calcsize(LRU_TRIE_NODE_FORMAT)
 LRU_TRIE_FIRST_DATA_BLOCK = LRU_TRIE_HEADER_BLOCKS * LRU_TRIE_NODE_BLOCK_SIZE
-LRU_TRIE_STEM_SIZE = 16
+LRU_TRIE_STEM_SIZE = 19
 
 # Node Positions
 LRU_TRIE_NODE_CHAR = 0
 # --
 LRU_TRIE_NODE_STEM_START = 0
-LRU_TRIE_NODE_STEM_END = 16
-LRU_TRIE_NODE_FLAGS = 17
-LRU_TRIE_NODE_WEBENTITY = 18
-LRU_TRIE_NODE_NEXT_BLOCK = 19
-LRU_TRIE_NODE_CHILD_BLOCK = 20
-LRU_TRIE_NODE_PARENT_BLOCK = 21
-LRU_TRIE_NODE_OUTLINKS_BLOCK = 22
-LRU_TRIE_NODE_INLINKS_BLOCK = 23
+LRU_TRIE_NODE_STEM_END = 18
+LRU_TRIE_NODE_FLAGS = 19
+LRU_TRIE_NODE_WEBENTITY = 20
+LRU_TRIE_NODE_NEXT_BLOCK = 21
+LRU_TRIE_NODE_CHILD_BLOCK = 22
+LRU_TRIE_NODE_PARENT_BLOCK = 23
+LRU_TRIE_NODE_OUTLINKS_BLOCK = 24
+LRU_TRIE_NODE_INLINKS_BLOCK = 25
 
 # Flags (Currently allocating 7/8 bits)
 LRU_TRIE_NODE_FLAG_PAGE = 0
@@ -96,32 +95,7 @@ class LRUTrieNode(object):
             self.__set_default_data(stem)
 
     def __set_default_data(self, stem=None):
-        self.data = [
-            0,         # Stem
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,          # Flags
-            0,          # Webentity
-            0,          # Next block
-            0,          # Child block
-            0,          # Parent block
-            0,          # Outlinks block
-            0,          # Inlinks block
-        ]
+        self.data = [0] * 26
 
         if stem:
             self.set_stem(stem)
@@ -269,7 +243,7 @@ class LRUTrieNode(object):
 
         # TODO: here I think we should increment STEM_END!!!
         # Need to test on large stems
-        while i < LRU_TRIE_NODE_STEM_END:
+        while i < LRU_TRIE_STEM_SIZE:
             char = self.data[i]
 
             if char == 0:
@@ -289,7 +263,7 @@ class LRUTrieNode(object):
     def set_stem(self, stem):
 
         # If the stem can be stored in our block, things are simple
-        if len(stem) < LRU_TRIE_STEM_SIZE:
+        if len(stem) <= LRU_TRIE_STEM_SIZE:
             for i in xrange(len(stem)):
                 char = ord(stem[i])
                 self.data[LRU_TRIE_NODE_STEM_START + i] = char

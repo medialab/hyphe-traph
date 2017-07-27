@@ -87,12 +87,16 @@ class TestTraph(TraphTestCase):
         with self.open_traph() as traph:
 
             traph.add_page('s:http|h:fr|h:sciences-po|p:thisisaveryveryveryverylooooooooooooooooongstem|p:thisalsoisquitethelongstemisntitnotsomuchtobehonest|')
+            traph.add_page('s:http|h:fr|h:sciences-po|p:sooooooofunnnnnnyyyyyyyyyyyyyyyyyyyyy|')
 
             pages_in_traph = [lru for _, lru in traph.pages_iter()]
 
             self.assertEqual(
-                pages_in_traph,
-                ['s:http|h:fr|h:sciences-po|p:thisisaveryveryveryverylooooooooooooooooongstem|p:thisalsoisquitethelongstemisntitnotsomuchtobehonest|']
+                set(pages_in_traph),
+                set([
+                    's:http|h:fr|h:sciences-po|p:thisisaveryveryveryverylooooooooooooooooongstem|p:thisalsoisquitethelongstemisntitnotsomuchtobehonest|',
+                    's:http|h:fr|h:sciences-po|p:sooooooofunnnnnnyyyyyyyyyyyyyyyyyyyyy|'
+                ])
             )
 
     def test_clear(self):
