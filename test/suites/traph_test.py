@@ -90,7 +90,8 @@ class TestTraph(TraphTestCase):
             traph.add_page('s:http|h:fr|h:sciences-po|p:sooooooofunnnnnnyyyyyyyyyyyyyyyyyyyyy|')
 
             pages_in_traph = [lru for _, lru in traph.pages_iter()]
-
+            for node in traph.lru_trie.nodes_iter():
+                pass
             self.assertEqual(
                 set(pages_in_traph),
                 set([

@@ -20,20 +20,20 @@ from traph.helpers import chunks_iter
 # architecture).
 
 # TODO: it's possible to differentiate the tail's blocks format if needed
-LRU_TRIE_NODE_FORMAT = '19BBI5Q'
+LRU_TRIE_NODE_FORMAT = '19sBI5Q'
 LRU_TRIE_NODE_BLOCK_SIZE = struct.calcsize(LRU_TRIE_NODE_FORMAT)
 LRU_TRIE_FIRST_DATA_BLOCK = LRU_TRIE_HEADER_BLOCKS * LRU_TRIE_NODE_BLOCK_SIZE
 LRU_TRIE_STEM_SIZE = 19
 
 # Node Positions
-LRU_TRIE_NODE_STEM_START = 0
-LRU_TRIE_NODE_FLAGS = 19
-LRU_TRIE_NODE_WEBENTITY = 20
-LRU_TRIE_NODE_NEXT_BLOCK = 21
-LRU_TRIE_NODE_CHILD_BLOCK = 22
-LRU_TRIE_NODE_PARENT_BLOCK = 23
-LRU_TRIE_NODE_OUTLINKS_BLOCK = 24
-LRU_TRIE_NODE_INLINKS_BLOCK = 25
+LRU_TRIE_NODE_STEM = 0
+LRU_TRIE_NODE_FLAGS = 1
+LRU_TRIE_NODE_WEBENTITY = 2
+LRU_TRIE_NODE_NEXT_BLOCK = 3
+LRU_TRIE_NODE_CHILD_BLOCK = 4
+LRU_TRIE_NODE_PARENT_BLOCK = 5
+LRU_TRIE_NODE_OUTLINKS_BLOCK = 6
+LRU_TRIE_NODE_INLINKS_BLOCK = 7
 
 # Flags (Currently allocating 7/8 bits)
 LRU_TRIE_NODE_FLAG_PAGE = 0
@@ -79,7 +79,7 @@ class LRUTrieNode(object):
         self.storage = storage
         self.block = None
         self.exists = False
-        self.tail = None
+        self.tail = ''
 
         # Loading node from storage
         if block is not None:
@@ -92,7 +92,7 @@ class LRUTrieNode(object):
             self.__set_default_data(stem)
 
     def __set_default_data(self, stem=None):
-        self.data = [0] * 26
+        self.data = [''] + [0] * 7
 
         if stem:
             self.set_stem(stem)
@@ -226,42 +226,28 @@ class LRUTrieNode(object):
     # =========================================================================
 
     def stem(self):
-        chars = bytearray()
+        chars = self.data[LRU_TRIE_NODE_STEM]
 
-        i = LRU_TRIE_NODE_STEM_START
+        for i in xrange(min(len(chars), LRU_TRIE_STEM_SIZE)):
+            if chars[i] == '\x00':
+                return chars[:i] + self.tail
 
-        # TODO: here I think we should increment STEM_END!!!
-        # Need to test on large stems
-        while i < LRU_TRIE_STEM_SIZE:
-            char = self.data[i]
-
-            if char == 0:
-                break
-
-            chars.append(char)
-            i += 1
-
-        if self.tail:
-            chars += self.tail
-
-        return chars
+        return chars + self.tail
 
     def stem_as_str(self):
-        return str(self.stem())
+
+        # TODO: drop this since it's the same as #.stem
+        return self.stem()
 
     def set_stem(self, stem):
 
         # If the stem can be stored in our block, things are simple
         if len(stem) <= LRU_TRIE_STEM_SIZE:
-            for i in xrange(len(stem)):
-                char = ord(stem[i])
-                self.data[LRU_TRIE_NODE_STEM_START + i] = char
+            self.data[LRU_TRIE_NODE_STEM] = stem
 
         # Else, we need to chunk the stem and write a tail
         else:
-            for i in xrange(LRU_TRIE_STEM_SIZE):
-                char = ord(stem[i])
-                self.data[LRU_TRIE_NODE_STEM_START + i] = char
+            self.data[LRU_TRIE_NODE_STEM] = stem[:LRU_TRIE_STEM_SIZE]
 
             self.tail = stem[LRU_TRIE_STEM_SIZE:]
             self.flag_as_having_tail()
