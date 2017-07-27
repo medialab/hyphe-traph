@@ -63,7 +63,7 @@ def detailed_chunks_iter(chunk_size, string):
     Returning an iterator over a string's chunks of the given size.
     '''
     if len(string) <= chunk_size:
-        yield string
+        yield True, string
 
     nb_chunks = int(math.ceil(len(string) / float(chunk_size)))
 

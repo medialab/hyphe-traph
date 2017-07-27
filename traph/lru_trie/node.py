@@ -241,6 +241,7 @@ class LRUTrieNode(object):
     def stem(self):
         chars = self.data[LRU_TRIE_NODE_STEM]
 
+        # TODO: possible to do this check in log(n)?
         for i in xrange(min(len(chars), LRU_TRIE_STEM_SIZE)):
             if chars[i] == '\x00':
                 return chars[:i] + self.tail
