@@ -194,6 +194,7 @@ class Traph(object):
 
         report = TraphWriteReport()
         webentity_id, valid_prefixes = self.__add_prefixes(expanded_prefixes, use_best_case)
+
         if webentity_id:
             report.created_webentities[webentity_id] = valid_prefixes
 
