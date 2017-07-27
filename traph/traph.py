@@ -161,6 +161,7 @@ class Traph(object):
         # Check that prefixes are not already defining a web entity
         valid_prefixes_index = {}
         invalid_prefixes = []
+
         for prefix in prefixes:
             node, history = self.lru_trie.add_lru(prefix)
 

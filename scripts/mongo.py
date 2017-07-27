@@ -43,7 +43,7 @@ links_multimap = defaultdict(list)
 
 i = 0
 links = []
-for page in collection.find({}, {'lru': 1, 'lrulinks': 1}, sort=[('_job', 1)]).limit(100):
+for page in collection.find({}, {'lru': 1, 'lrulinks': 1}, sort=[('_job', 1)]).limit(1000):
     i += 1
 
     # links.extend(links_generator(page))
