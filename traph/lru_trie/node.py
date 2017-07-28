@@ -20,20 +20,23 @@ from traph.helpers import detailed_chunks_iter
 # architecture).
 
 # TODO: it's possible to differentiate the tail's blocks format if needed
-LRU_TRIE_NODE_FORMAT = '83sBI5Q'
+LRU_TRIE_NODE_FORMAT = '75sBI6Q'
 LRU_TRIE_NODE_BLOCK_SIZE = struct.calcsize(LRU_TRIE_NODE_FORMAT)
 LRU_TRIE_FIRST_DATA_BLOCK = LRU_TRIE_HEADER_BLOCKS * LRU_TRIE_NODE_BLOCK_SIZE
-LRU_TRIE_STEM_SIZE = 83
+LRU_TRIE_STEM_SIZE = 75
 
 # Node Positions
 LRU_TRIE_NODE_STEM = 0
 LRU_TRIE_NODE_FLAGS = 1
 LRU_TRIE_NODE_WEBENTITY = 2
-LRU_TRIE_NODE_NEXT_BLOCK = 3
-LRU_TRIE_NODE_CHILD_BLOCK = 4
-LRU_TRIE_NODE_PARENT_BLOCK = 5
-LRU_TRIE_NODE_OUTLINKS_BLOCK = 6
-LRU_TRIE_NODE_INLINKS_BLOCK = 7
+LRU_TRIE_NODE_LEFT_BLOCK = 3
+LRU_TRIE_NODE_RIGHT_BLOCK = 4
+LRU_TRIE_NODE_CHILD_BLOCK = 5
+LRU_TRIE_NODE_PARENT_BLOCK = 6
+LRU_TRIE_NODE_OUTLINKS_BLOCK = 7
+LRU_TRIE_NODE_INLINKS_BLOCK = 8
+
+LRU_TRIE_NODE_REGISTERS = 8
 
 # Flags (Currently allocating 7/8 bits)
 LRU_TRIE_NODE_FLAG_PAGE = 0
@@ -92,7 +95,7 @@ class LRUTrieNode(object):
             self.__set_default_data(stem)
 
     def __set_default_data(self, stem=None):
-        self.data = [''] + [0] * 7
+        self.data = [''] + [0] * LRU_TRIE_NODE_REGISTERS
 
         if stem:
             self.set_stem(stem)
@@ -103,7 +106,7 @@ class LRUTrieNode(object):
         return (
             '<%(class_name)s "%(stem)s"'
             ' block=%(block)s exists=%(exists)s has_tail=%(has_tail)s'
-            ' parent=%(parent)s child=%(child)s next=%(next)s'
+            ' parent=%(parent)s child=%(child)s left=%(left)s right=%(right)s'
             ' out=%(outlinks)s we=%(webentity)s wecr=%(webentity_creation_rule)s>'
         ) % {
             'class_name': class_name,
@@ -115,7 +118,8 @@ class LRUTrieNode(object):
             'crawled': self.is_crawled(),
             'parent': self.parent(),
             'child': self.child(),
-            'next': self.next(),
+            'left': self.left(),
+            'right': self.right(),
             'outlinks': self.outlinks(),
             'webentity': self.webentity(),
             'webentity_creation_rule': self.has_webentity_creation_rule()
@@ -176,7 +180,7 @@ class LRUTrieNode(object):
         # TODO: does not work on subsequent updates
         if self.tail and not self.exists:
             for is_last, chunk in detailed_chunks_iter(LRU_TRIE_STEM_SIZE, self.tail):
-                data = [chunk] + [0] * 7
+                data = [chunk] + [0] * LRU_TRIE_NODE_REGISTERS
 
                 flag(data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_IS_TAIL)
 
@@ -263,16 +267,16 @@ class LRUTrieNode(object):
             self.flag_as_having_tail()
 
     # =========================================================================
-    # Next block methods
+    # Binary Treee block methods
     # =========================================================================
 
-    # know whether the next block is set
-    def has_next(self):
-        return self.data[LRU_TRIE_NODE_NEXT_BLOCK] != 0
+    # know whether the left block is set
+    def has_left(self):
+        return self.data[LRU_TRIE_NODE_LEFT_BLOCK] != 0
 
-    # retrieve the next block
-    def next(self):
-        block = self.data[LRU_TRIE_NODE_NEXT_BLOCK]
+    # retrieve the left block
+    def left(self):
+        block = self.data[LRU_TRIE_NODE_LEFT_BLOCK]
 
         if block < LRU_TRIE_FIRST_DATA_BLOCK:
             return None
@@ -280,25 +284,59 @@ class LRUTrieNode(object):
         return block
 
     # set a sibling
-    def set_next(self, block):
+    def set_left(self, block):
         if block < LRU_TRIE_FIRST_DATA_BLOCK:
-            raise LRUTrieNodeUsageException('Next node cannot be the root.')
+            raise LRUTrieNodeUsageException('Left node cannot be the root.')
 
-        self.data[LRU_TRIE_NODE_NEXT_BLOCK] = block
+        self.data[LRU_TRIE_NODE_LEFT_BLOCK] = block
 
-    # read the next sibling
-    def read_next(self):
-        if not self.has_next():
-            raise LRUTrieNodeTraversalException('Node has no next sibling.')
+    # read the left sibling
+    def read_left(self):
+        if not self.has_left():
+            raise LRUTrieNodeTraversalException('Node has no left sibling.')
 
-        self.read(self.next())
+        self.read(self.left())
 
-    # get next node
-    def next_node(self):
-        if not self.has_next():
-            raise LRUTrieNodeTraversalException('Node has no next sibling.')
+    # get left node
+    def left_node(self):
+        if not self.has_left():
+            raise LRUTrieNodeTraversalException('Node has no left sibling.')
 
-        return LRUTrieNode(self.storage, block=self.next())
+        return LRUTrieNode(self.storage, block=self.left())
+
+    # know whether the left block is set
+    def has_right(self):
+        return self.data[LRU_TRIE_NODE_RIGHT_BLOCK] != 0
+
+    # retrieve the right block
+    def right(self):
+        block = self.data[LRU_TRIE_NODE_RIGHT_BLOCK]
+
+        if block < LRU_TRIE_FIRST_DATA_BLOCK:
+            return None
+
+        return block
+
+    # set a sibling
+    def set_right(self, block):
+        if block < LRU_TRIE_FIRST_DATA_BLOCK:
+            raise LRUTrieNodeUsageException('right node cannot be the root.')
+
+        self.data[LRU_TRIE_NODE_RIGHT_BLOCK] = block
+
+    # read the right sibling
+    def read_right(self):
+        if not self.has_right():
+            raise LRUTrieNodeTraversalException('Node has no right sibling.')
+
+        self.read(self.right())
+
+    # get right node
+    def right_node(self):
+        if not self.has_right():
+            raise LRUTrieNodeTraversalException('Node has no right sibling.')
+
+        return LRUTrieNode(self.storage, block=self.right())
 
     # =========================================================================
     # Child block methods

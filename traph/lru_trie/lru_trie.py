@@ -28,27 +28,6 @@ class LRUTrie(object):
         self.header = LRUTrieHeader(storage)
 
     # =========================================================================
-    # Debug
-    # =========================================================================
-    def representation(self):
-        '''
-        NOTE: deprecated, need to fix!
-        '''
-
-        string = ''
-
-        for state in self.detailed_dfs_iter():
-            if state.direction == 'down':
-                node = state.node
-                string += node.stem_as_str()
-
-            if state.direction == 'right':
-                string += '\n'
-                string += (len(state.lru.decode(self.encoding, 'replace')) - 1) * '-' + state.lru[-1]
-
-        return string
-
-    # =========================================================================
     # Internal methods
     # =========================================================================
 
@@ -63,11 +42,16 @@ class LRUTrie(object):
 
         # Else we follow the siblings until we find a relevant one
         while True:
-            if node.stem() == stem:
+            current_stem = node.stem()
+
+            if current_stem == stem:
                 return node
 
-            if node.has_next():
-                node.read_next()
+            # Searching the BST
+            if current_stem < stem and node.has_left():
+                node.read_left()
+            elif node.has_right():
+                node.read_right()
             else:
                 break
 
@@ -78,7 +62,11 @@ class LRUTrie(object):
         sibling.set_parent(node.parent())
         sibling.write()
 
-        node.set_next(sibling.block)
+        if sibling.stem() < stem:
+            node.set_left(sibling.block)
+        else:
+            node.set_right(sibling.block)
+
         node.write()
 
         return sibling
@@ -180,10 +168,18 @@ class LRUTrie(object):
         for i in range(l):
             stem = stems[i]
 
-            while node.stem() != stem:
-                if not node.has_next():
+            while True:
+                current_stem = node.stem()
+
+                if current_stem == stem:
+                    break
+
+                if node.has_left() and current_stem < stem:
+                    node.read_left()
+                elif node.has_right():
+                    node.read_right()
+                else:
                     return
-                node.read_next()
 
             if i < l - 1:
                 if not node.has_child():
@@ -209,10 +205,18 @@ class LRUTrie(object):
             stem = stems[i]
             lru += stem
 
-            while node.stem() != stem:
-                if not node.has_next():
+            while True:
+                current_stem = node.stem()
+
+                if current_stem == stem:
+                    break
+
+                if node.has_left() and current_stem < stem:
+                    node.read_left()
+                elif node.has_right():
+                    node.read_right()
+                else:
                     return None, history
-                node.read_next()
 
             if node.has_webentity():
                 history.update_webentity(
@@ -272,79 +276,47 @@ class LRUTrie(object):
     def node_parents_iter(self, node):
 
         # TODO: block
-        if node.is_root():
+        if not node.has_parent():
             return
 
         parent = node.parent_node()
 
         yield parent
 
-        while not parent.is_root():
+        while parent.has_parent():
             parent.read_parent()
             yield parent
 
-    def node_siblings_iter(self, node):
-
-        # TODO: block
-        if not node.has_next():
-            return
-
-        sibling = node.next_node()
-
-        yield sibling
-
-        while sibling.has_next():
-            sibling.read_next()
-            yield sibling
-
-    def dfs_iter(self, starting_node=False, starting_lru=False):
-        # Note: if starting_node is set, starting_lru must be too
+    def dfs_iter(self, starting_node=None, starting_lru=''):
         if starting_node:
-            node = starting_node
             starting_block = starting_node.block
-            lru = list(lru_iter(starting_lru))[:-1]
-            # Note: unsure why we need to trim rule_prefix above, but it seems to work
         else:
-            node = self.root()
-            starting_block = None
-            lru = []
+            starting_node = self.root()
+            starting_block = self.root().block
 
-        # If there is no root node, we can stop right there
-        if not node.exists:
+        # If there is no starting node, there is no point in doing a DFS
+        if not starting_node.exists:
             return
 
-        descending = True
+        stack = [(starting_block, starting_lru)]
+        node = self.node()
 
-        while True:
+        while len(stack):
+            block, lru = stack.pop()
+            node.read(block)
 
-            # When descending, we yield
-            if descending:
-                yield node, ''.join(lru + [node.stem_as_str()])
+            current_lru = lru + node.stem_as_str()
 
-            # If we have a child, we descend
-            if descending and node.has_child():
-                lru.append(node.stem_as_str())
-                node.read_child()
-                continue
+            yield node, current_lru
 
-            # Stopping the traversal when we have a starting block
-            if node.block == starting_block:
-                break
+            if node.has_right():
+                stack.append((node.right(), lru))
 
-            # If we have no child, we follow the next sibling
-            if node.has_next():
-                descending = True
-                node.read_next()
-                continue
+            if node.has_left():
+                stack.append((node.left(), lru))
 
-            # Stopping the traversal when performing a full DFS
-            if not node.has_parent():
-                break
-
-            # Else we bubble up
-            descending = False
-            lru.pop()
-            node.read_parent()
+            if node.has_child():
+                stack.append((node.child(), current_lru))
 
     def webentity_dfs_iter(self, weid, starting_node, starting_lru):
         '''
@@ -399,71 +371,6 @@ class LRUTrie(object):
             # Else we bubble up
             descending = False
             lru.pop()
-            node.read_parent()
-
-    def detailed_dfs_iter(self):
-        node = self.root()
-        state = LRUTrieDetailedDFSIterationState(node)
-
-        # If there is no root node, we can stop right there
-        if not node.exists:
-            return
-
-        descending = True
-
-        while True:
-
-            # When descending, we yield
-            if descending:
-                state.lru += node.stem_as_str()
-
-                webentity = node.webentity()
-
-                if webentity:
-                    state.webentities.append(webentity)
-
-                yield state
-                # TODO: yield in next condition rather (also in DFS)
-                state.lru = state.lru[:-1]
-
-            # If we have a child, we descend
-            if descending and node.has_child():
-                state.lru += node.stem_as_str()
-                state.last_block = node.block
-                state.direction = 'down'
-
-                node.read_child()
-                continue
-
-            # If we have no child, we follow the next sibling
-            if node.has_next():
-                descending = True
-                state.last_block = node.block
-                state.direction = 'right'
-
-                webentity = node.webentity()
-
-                if webentity and webentity == state.current_webentity():
-                    state.webentities.pop()
-
-                node.read_next()
-
-                continue
-
-            # Do we need to stop?
-            if not node.has_parent():
-                break
-
-            # Else we bubble up
-            state.lru = state.lru[:-1]
-            descending = False
-            state.last_block = node.block
-
-            webentity = node.webentity()
-
-            if webentity and webentity == state.current_webentity():
-                state.webentities.pop()
-
             node.read_parent()
 
     def lean_detailed_dfs_iter(self):
