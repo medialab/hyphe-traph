@@ -524,7 +524,7 @@ class Traph(object):
             if not starting_node:
                 raise TraphException('LRU %s not in the traph' % (prefix))
 
-            for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix):
+            for node, lru in self.lru_trie.webentity_dfs_iter(starting_node, prefix):
                 if node.is_page():
 
                     # Iterate over link nodes
@@ -607,7 +607,7 @@ class Traph(object):
             if not starting_node:
                 raise TraphException('LRU %s not in the traph' % (prefix))
 
-            for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix):
+            for node, lru in self.lru_trie.webentity_dfs_iter(starting_node, prefix):
 
                 if not node.is_page():
                     continue
@@ -657,7 +657,7 @@ class Traph(object):
             if not starting_node:
                 raise TraphException('LRU %s not in the traph' % (prefix))
 
-            for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix):
+            for node, lru in self.lru_trie.webentity_dfs_iter(starting_node, prefix):
 
                 if not node.is_page():
                     continue
@@ -700,7 +700,7 @@ class Traph(object):
             if not starting_node:
                 raise TraphException('LRU %s not in the traph' % (prefix))
 
-            for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix):
+            for node, lru in self.lru_trie.webentity_dfs_iter(starting_node, prefix):
 
                 if not node.is_page():
                     continue
@@ -810,13 +810,10 @@ class Traph(object):
 
         target_node = self.lru_trie.node()
 
-        for state in self.lru_trie.lean_detailed_dfs_iter():
-            node = state.node
+        for node, source_webentity in self.lru_trie.dfs_with_webentity_iter():
 
             if not node.is_page() or not node.has_links(out=out):
                 continue
-
-            source_webentity = state.current_webentity()
 
             if not source_webentity:
                 continue
@@ -862,13 +859,9 @@ class Traph(object):
         link_pointers = []
 
         # Solving the page => webentity relation
-        for state in self.lru_trie.lean_detailed_dfs_iter():
-            node = state.node
-
+        for node, source_webentity in self.lru_trie.dfs_with_webentity_iter():
             if not node.is_page():
                 continue
-
-            source_webentity = state.current_webentity()
 
             if not source_webentity:
                 continue
@@ -1074,6 +1067,7 @@ class Traph(object):
     def webentity_prefix_iter(self):
         return self.lru_trie.webentity_prefix_iter()
 
+    # TODO: weid arg useless
     def webentity_page_nodes_iter(self, weid, prefixes):
         '''
         Note: the prefixes are supposed to match the webentity id. We do not check.
@@ -1084,7 +1078,7 @@ class Traph(object):
             starting_node = self.lru_trie.lru_node(prefix)
             if not starting_node:
                 raise TraphException('LRU %s not in the traph' % (prefix))
-            for node, lru in self.lru_trie.webentity_dfs_iter(weid, starting_node, prefix):
+            for node, lru in self.lru_trie.webentity_dfs_iter(starting_node, prefix):
                 if node.is_page():
                     yield node, lru
 

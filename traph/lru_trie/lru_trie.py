@@ -318,114 +318,73 @@ class LRUTrie(object):
             if node.has_child():
                 stack.append((node.child(), current_lru))
 
-    def webentity_dfs_iter(self, weid, starting_node, starting_lru):
+    def webentity_dfs_iter(self, starting_node, starting_lru):
         '''
         Note that this algorithm will peruse the webentity nodes only for the
         given prefix. We would need a refined algorithm for the cases when
         then prefixes are not given and we need to peruse the webentity's
         whole realm.
         '''
-        node = starting_node
         starting_block = starting_node.block
-        lru = list(lru_iter(starting_lru))[:-1]
-        # Note: unsure why we need to trim rule_prefix above, but it seems to work
+        starting_lru = ''.join(list(lru_iter(starting_lru))[:-1])
 
-        # If there is no starting node, we can stop right there
-        if not node.exists:
+        # If there is no starting node, there is no point in doing a DFS
+        if not starting_node.exists:
             return
 
-        descending = True
+        stack = [(starting_block, starting_lru)]
+        node = self.node()
 
-        while True:
+        while len(stack):
+            block, lru = stack.pop()
+            node.read(block)
 
-            # When descending, we yield
-            if descending:
-                yield node, ''.join(lru + [node.stem_as_str()])
-
-            # If we have a VALID child, we descend
-            if descending and node.has_child():
-                child_node = node.child_node()
-
-                if not child_node.has_webentity():
-                    lru.append(node.stem_as_str())
-                    node = child_node
-                    continue
-
-            # Do we need to stop?
-            if node.block == starting_block:
-                break
-
-            # If we have no child, we follow the next VALID sibling
-            valid_next = False
-            while node.has_next() and not valid_next:
-                node.read_next()
-                if node.has_webentity():
-                    continue
-                else:
-                    valid_next = True
-
-            if valid_next:
-                descending = True
+            if block != starting_block and node.has_webentity():
                 continue
 
-            # Else we bubble up
-            descending = False
-            lru.pop()
-            node.read_parent()
+            current_lru = lru + node.stem_as_str()
 
-    def lean_detailed_dfs_iter(self):
-        node = self.root()
+            yield node, current_lru
 
-        # TODO: use a degraded version of the iteration state
-        state = LRUTrieDetailedDFSIterationState(node)
+            if node.has_right():
+                stack.append((node.right(), lru))
 
-        # If there is no root node, we can stop right there
-        if not node.exists:
+            if node.has_left():
+                stack.append((node.left(), lru))
+
+            if node.has_child():
+                stack.append((node.child(), current_lru))
+
+    def dfs_with_webentity_iter(self):
+        starting_node = self.root()
+        starting_block = self.root().block
+
+        # If there is no starting node, there is no point in doing a DFS
+        if not starting_node.exists:
             return
 
-        descending = True
+        stack = [(starting_block, None)]
+        node = self.node()
 
-        while True:
+        while len(stack):
+            block, webentity = stack.pop()
+            node.read(block)
 
-            # When descending, we yield
-            if descending:
-                webentity = node.webentity()
+            current_webentity = webentity
 
-                if webentity:
-                    state.webentities.append(webentity)
+            if node.has_webentity():
+                current_webentity = node.webentity()
 
-                yield state
+            yield node, current_webentity
 
-            # If we have a child, we descend
-            if descending and node.has_child():
-                node.read_child()
-                continue
+            if node.has_right():
+                stack.append((node.right(), webentity))
 
-            # If we have no child, we follow the next sibling
-            if node.has_next():
-                descending = True
+            if node.has_left():
+                stack.append((node.left(), webentity))
 
-                webentity = node.webentity()
-
-                if webentity and webentity == state.current_webentity():
-                    state.webentities.pop()
-
-                node.read_next()
-
-                continue
-
-            # Do we need to stop?
-            if not node.has_parent():
-                break
-
-            # Else we bubble up
-            descending = False
-            webentity = node.webentity()
-
-            if webentity and webentity == state.current_webentity():
-                state.webentities.pop()
-
-            node.read_parent()
+            if node.has_child():
+                stack.append((node.child(), current_webentity))
 
     def pages_iter(self):
         for node, lru in self.dfs_iter():
