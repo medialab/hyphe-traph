@@ -290,6 +290,7 @@ class LRUTrie(object):
     def dfs_iter(self, starting_node=None, starting_lru=''):
         if starting_node:
             starting_block = starting_node.block
+            starting_lru = ''.join(list(lru_iter(starting_lru))[:-1])
         else:
             starting_node = self.root()
             starting_block = self.root().block
