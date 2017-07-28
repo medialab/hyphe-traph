@@ -48,12 +48,16 @@ class LRUTrie(object):
                 return node
 
             # Searching the BST
-            if current_stem < stem and node.has_left():
-                node.read_left()
-            elif node.has_right():
-                node.read_right()
+            if stem < current_stem:
+                if node.has_left():
+                    node.read_left()
+                else:
+                    break
             else:
-                break
+                if node.has_right():
+                    node.read_right()
+                else:
+                    break
 
         # We did not find a relevant sibling, let's add it
         sibling = self.node(stem=stem)
@@ -62,7 +66,7 @@ class LRUTrie(object):
         sibling.set_parent(node.parent())
         sibling.write()
 
-        if sibling.stem() < stem:
+        if stem < node.stem():
             node.set_left(sibling.block)
         else:
             node.set_right(sibling.block)
@@ -174,12 +178,16 @@ class LRUTrie(object):
                 if current_stem == stem:
                     break
 
-                if node.has_left() and current_stem < stem:
-                    node.read_left()
-                elif node.has_right():
-                    node.read_right()
+                if stem < current_stem:
+                    if node.has_left():
+                        node.read_left()
+                    else:
+                        return
                 else:
-                    return
+                    if node.has_right():
+                        node.read_right()
+                    else:
+                        return
 
             if i < l - 1:
                 if not node.has_child():
@@ -211,12 +219,16 @@ class LRUTrie(object):
                 if current_stem == stem:
                     break
 
-                if node.has_left() and current_stem < stem:
-                    node.read_left()
-                elif node.has_right():
-                    node.read_right()
+                if stem < current_stem:
+                    if node.has_left():
+                        node.read_left()
+                    else:
+                        return None, history
                 else:
-                    return None, history
+                    if node.has_right():
+                        node.read_right()
+                    else:
+                        return None, history
 
             if node.has_webentity():
                 history.update_webentity(
