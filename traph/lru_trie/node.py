@@ -252,11 +252,6 @@ class LRUTrieNode(object):
 
         return chars.rstrip('\x00') + self.tail
 
-    def stem_as_str(self):
-
-        # TODO: drop this since it's the same as #.stem
-        return self.stem()
-
     def set_stem(self, stem):
 
         # If the stem can be stored in our block, things are simple

@@ -252,10 +252,10 @@ class LRUTrie(object):
         # TODO: check block
         node = self.node(block=block)
 
-        lru = node.stem_as_str()
+        lru = node.stem()
 
         for parent in self.node_parents_iter(node):
-            lru = parent.stem_as_str() + lru
+            lru = parent.stem() + lru
 
         return lru
 
@@ -318,7 +318,7 @@ class LRUTrie(object):
             block, lru = stack.pop()
             node.read(block)
 
-            current_lru = lru + node.stem_as_str()
+            current_lru = lru + node.stem()
 
             yield node, current_lru
 
@@ -355,7 +355,7 @@ class LRUTrie(object):
             if block != starting_block and node.has_webentity():
                 continue
 
-            current_lru = lru + node.stem_as_str()
+            current_lru = lru + node.stem()
 
             yield node, current_lru
 
