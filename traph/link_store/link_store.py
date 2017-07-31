@@ -6,7 +6,7 @@
 #
 from itertools import chain
 from traph.link_store.node import LinkStoreNode, LINK_STORE_FIRST_DATA_BLOCK
-from traph.link_store.header import LinkStoreHeader
+from traph.link_store.header import LinkStoreHeader, LINK_STORE_HEADER_BLOCKS
 
 
 # Exceptions
@@ -164,6 +164,13 @@ class LinkStore(object):
     # Counting methods
     # =========================================================================
     def count_links(self):
-        blocks = self.storage.count_blocks()
+        blocks = self.storage.count_blocks() - LINK_STORE_HEADER_BLOCKS
 
         return blocks / 2
+
+    def metrics(self):
+        stats = {
+            'nb_links': self.count_links()
+        }
+
+        return stats

@@ -1089,3 +1089,9 @@ class Traph(object):
 
     def count_links(self):
         return self.link_store.count_links()
+
+    def metrics(self):
+        return {
+            'lru_trie': self.lru_trie.metrics(),
+            'link_store': self.link_store.metrics()
+        }

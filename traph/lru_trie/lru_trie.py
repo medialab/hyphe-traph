@@ -6,7 +6,7 @@
 #
 import warnings
 from traph.helpers import lru_iter
-from traph.lru_trie.node import LRUTrieNode, LRU_TRIE_FIRST_DATA_BLOCK
+from traph.lru_trie.node import LRUTrieNode, LRU_TRIE_FIRST_DATA_BLOCK, LRU_TRIE_STEM_SIZE
 from traph.lru_trie.header import LRUTrieHeader
 from traph.lru_trie.walk_history import LRUTrieWalkHistory
 
@@ -430,3 +430,54 @@ class LRUTrie(object):
                 nb += 1
 
         return nb
+
+    def metrics(self):
+        stats = {
+            'nb_nodes': 0,
+            'nb_pages': 0,
+            'nb_crawled_pages': 0,
+            'nb_tail_nodes': 0,
+            'nb_fragmented_nodes': 0,
+            'nb_stems': 0,
+            'avg_stem_filling': 0,
+            'max_tail': 0
+        }
+
+        current_tail_size = 0
+
+        for node in self.nodes_iter():
+            stats['nb_nodes'] += 1
+
+            if node.is_page():
+                stats['nb_pages'] += 1
+
+                if node.is_crawled():
+                    stats['nb_crawled_pages'] += 1
+
+            if node.is_tail():
+                stats['nb_tail_nodes'] += 1
+                current_tail_size += 1
+
+                if current_tail_size > stats['max_tail']:
+                    stats['max_tail'] = current_tail_size
+            else:
+                current_tail_size = 0
+                filling = len(node.stem()) / float(LRU_TRIE_STEM_SIZE)
+
+                stats['nb_stems'] += 1
+                stats['avg_stem_filling'] = (
+                    stats['avg_stem_filling'] +
+                    (
+                        (filling - stats['avg_stem_filling']) /
+                        float(stats['nb_stems'])
+                    )
+                )
+
+            if node.has_tail():
+                stats['nb_fragmented_nodes'] += 1
+
+        stats['prop_fragmented_stems'] = (
+            stats['nb_fragmented_nodes'] / float(stats['nb_stems'])
+        )
+
+        return stats
