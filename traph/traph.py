@@ -596,9 +596,8 @@ class Traph(object):
 
         pagelinks = []
 
-        # TODO: we should probably get a node helper another way
-        source_node = LRUTrieNode(self.lru_trie_storage)
-        target_node = LRUTrieNode(self.lru_trie_storage)
+        source_node = self.lru_trie.node()
+        target_node = self.lru_trie.node()
 
         for prefix in prefixes:
             prefix = self.__encode(prefix)
@@ -647,8 +646,7 @@ class Traph(object):
         done_blocks = set()
         weids = set()
 
-        # TODO: we should probably get a node helper another way
-        target_node = LRUTrieNode(self.lru_trie_storage)
+        target_node = self.lru_trie.node()
 
         for prefix in prefixes:
             prefix = self.__encode(prefix)
@@ -690,8 +688,7 @@ class Traph(object):
         done_blocks = set()
         weids = set()
 
-        # TODO: we should probably get a node helper another way
-        source_node = LRUTrieNode(self.lru_trie_storage)
+        source_node = self.lru_trie.node()
 
         for prefix in prefixes:
             prefix = self.__encode(prefix)
@@ -740,9 +737,8 @@ class Traph(object):
 
         pagelinks = []
 
-        # TODO: we should probably get a node helper another way
-        source_node = LRUTrieNode(self.lru_trie_storage)
-        target_node = LRUTrieNode(self.lru_trie_storage)
+        source_node = self.lru_trie.node()
+        target_node = self.lru_trie.node()
 
         # Iterating over the page's outlinks
         if node.has_outlinks() and (include_outbound or include_internal):
