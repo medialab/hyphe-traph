@@ -8,7 +8,6 @@ import warnings
 from traph.helpers import lru_iter
 from traph.lru_trie.node import LRUTrieNode, LRU_TRIE_FIRST_DATA_BLOCK
 from traph.lru_trie.header import LRUTrieHeader
-from traph.lru_trie.iteration_state import LRUTrieDetailedDFSIterationState
 from traph.lru_trie.walk_history import LRUTrieWalkHistory
 
 
