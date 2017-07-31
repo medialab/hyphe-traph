@@ -181,7 +181,7 @@ class Traph(object):
             webentity_id = self.__generated_web_entity_id()
 
             for prefix, [node, history] in valid_prefixes_index.items():
-                node.read(node.block)  # node update necessary
+                node.refresh()  # node update necessary
                 node.set_webentity(webentity_id)
                 node.write()
 
@@ -247,13 +247,13 @@ class Traph(object):
 
         # In this case, the webentity already exists
         if longest_candidate_prefix and len(longest_candidate_prefix) <= history.webentity_position + 1:
-            node.read(node.block)  # update node
+            node.refresh()  # update node
             return node, report
 
         # Else we need to expand the prefix and create relevant web entities
         if longest_candidate_prefix:
             report += self.__create_webentity(longest_candidate_prefix, expand=True)
-            node.read(node.block)  # update node
+            node.refresh()  # update node
             return node, report
 
         # Nothing worked, we need to apply the default creation rule
@@ -268,7 +268,7 @@ class Traph(object):
         else:
             report += self.__create_webentity(longest_candidate_prefix, expand=True)
 
-        node.read(node.block)  # update node
+        node.refresh()  # update node
         return node, report
 
     # =========================================================================
@@ -956,7 +956,7 @@ class Traph(object):
             source_node = pages[source_page]
 
             # Refreshing node's data
-            source_node.read(source_node.block)
+            source_node.refresh()
             target_blocks = (pages[target_page].block for target_page in target_pages)
             store.add_outlinks(source_node, target_blocks)
 
@@ -964,7 +964,7 @@ class Traph(object):
             target_node = pages[target_page]
 
             # Refreshing node's data
-            target_node.read(target_node.block)
+            target_node.refresh()
             source_blocks = (pages[source_page].block for source_page in source_pages)
             store.add_inlinks(target_node, source_blocks)
 
@@ -991,7 +991,7 @@ class Traph(object):
                 source_node = pages[source_page]
 
                 if not source_node.is_crawled():
-                    source_node.read(source_node.block)
+                    source_node.refresh()
                     source_node.flag_as_crawled()
                     source_node.write()
 
@@ -1011,12 +1011,12 @@ class Traph(object):
                 # TODO: possible to store block as value rather
                 inlinks[target_page].append(source_page)
 
-            source_node.read(source_node.block)
+            source_node.refresh()
             store.add_outlinks(source_node, target_blocks)
 
         for target_page, source_pages in inlinks.items():
             target_node = pages[target_page]
-            target_node.read(target_node.block)
+            target_node.refresh()
             source_blocks = (pages[source_page].block for source_page in source_pages)
             store.add_inlinks(target_node, source_blocks)
 

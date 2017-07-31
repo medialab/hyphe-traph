@@ -166,6 +166,10 @@ class LRUTrieNode(object):
 
                 self.tail = ''.join(chunks)
 
+    # re-acquiring data from storage because it may have changed
+    def refresh(self):
+        self.read(self.block)
+
     # pack the node to binary form
     def pack(self):
         return struct.pack(LRU_TRIE_NODE_FORMAT, *self.data)
