@@ -99,6 +99,31 @@ class TestTraph(TraphTestCase):
                 ])
             )
 
+    def test_cluttered_root(self):
+        with self.open_traph() as traph:
+            traph.add_page('s:http|h:fr|h:sciences-po|')
+            traph.add_page('s:https|h:fr|h:sciences-po|')
+            traph.add_page('s:httpl|h:fr|h:sciences-po|')
+            traph.add_page('s:httpf|h:fr|h:sciences-po|')
+            traph.add_page('s:httpe|h:fr|h:sciences-po|')
+            traph.add_page('s:httpa|h:fr|h:sciences-po|')
+            traph.add_page('s:httpt|h:fr|h:sciences-po|')
+
+            pages_in_traph = [lru for _, lru in traph.pages_iter()]
+
+            self.assertEqual(
+                set(pages_in_traph),
+                set([
+                    's:http|h:fr|h:sciences-po|',
+                    's:https|h:fr|h:sciences-po|',
+                    's:httpl|h:fr|h:sciences-po|',
+                    's:httpf|h:fr|h:sciences-po|',
+                    's:httpe|h:fr|h:sciences-po|',
+                    's:httpa|h:fr|h:sciences-po|',
+                    's:httpt|h:fr|h:sciences-po|'
+                ])
+            )
+
     def test_clear(self):
         with self.open_traph() as traph:
             traph = self.get_traph()

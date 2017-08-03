@@ -119,8 +119,9 @@ class LRUTrie(object):
             top -= 1
             parent, parent_right = up[top]
 
-        # NOTE: since there is no actual root node in the trie, we need to
-        # skip this part if we are reaching the roots
+        # NOTE: since there is no actual root node in the trie, we cannot
+        # perform a rotation when we are at first level. This is why we
+        # test the existence of a parent before attempting the following.
         if parent.has_parent() and sibling.priority() < parent.priority():
             trie_parent = parent.parent_node()
 
