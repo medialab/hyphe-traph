@@ -119,7 +119,9 @@ class LRUTrie(object):
             top -= 1
             parent, parent_right = up[top]
 
-        if sibling.priority() < parent.priority():
+        # NOTE: since there is no actual root node in the trie, we need to
+        # skip this part if we are reaching the roots
+        if parent.has_parent() and sibling.priority() < parent.priority():
             trie_parent = parent.parent_node()
 
             if parent_right:
