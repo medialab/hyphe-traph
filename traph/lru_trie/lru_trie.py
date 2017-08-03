@@ -150,7 +150,6 @@ class LRUTrie(object):
         # Writing every needed block
         sibling.write()
 
-        # TODO: up to last top - 1
         for node, _ in up[top:]:
             node.write()
 
