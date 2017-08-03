@@ -4,6 +4,7 @@
 #
 # Class representing the Trie indexing the LRUs.
 #
+import random
 import warnings
 from traph.helpers import lru_iter
 from traph.lru_trie.node import LRUTrieNode, LRU_TRIE_FIRST_DATA_BLOCK, LRU_TRIE_STEM_SIZE
@@ -36,10 +37,14 @@ class LRUTrie(object):
         # If the node does not exist, we create it
         if not node.exists:
             node.set_stem(stem)
+            node.set_priority(random.random())
             node.write()
             return node
 
         # Else we follow the siblings until we find a relevant one
+        up = []
+        bst_root_block = node.block
+
         while True:
             current_stem = node.stem()
 
@@ -49,28 +54,102 @@ class LRUTrie(object):
             # Searching the BST
             if stem < current_stem:
                 if node.has_left():
-                    node.read_left()
+                    up.append((node, False))
+                    node = node.left_node()
                 else:
                     break
             else:
                 if node.has_right():
-                    node.read_right()
+                    up.append((node, True))
+                    node = node.right_node()
                 else:
                     break
 
-        # We did not find a relevant sibling, let's add it
+        # We did not find a relevant sibling, we need to add it
         sibling = self.node(stem=stem)
 
         # The new sibling's parent is the same, obviously
         sibling.set_parent(node.parent())
+        sibling.set_priority(random.random())
+
         sibling.write()
 
         if stem < node.stem():
             node.set_left(sibling.block)
+            up.append((node, False))
         else:
             node.set_right(sibling.block)
+            up.append((node, True))
 
-        node.write()
+        # Let's bubble up and rotate
+        top = len(up) - 1
+        parent, parent_right = up[top]
+
+        while top > 0 and sibling.priority() < parent.priority():
+            grandparent, grandparent_right = up[top - 1]
+
+            # Left rotation
+            if parent_right:
+                pointer = sibling.left()
+
+                if pointer:
+                    parent.set_right(pointer)
+                else:
+                    parent.clear_right()
+
+                sibling.set_left(parent.block)
+
+            # Right rotation
+            else:
+                pointer = sibling.right()
+
+                if pointer:
+                    parent.set_left(pointer)
+                else:
+                    parent.clear_left()
+
+                sibling.set_right(parent.block)
+
+            # Grandparent
+            if grandparent_right:
+                grandparent.set_right(sibling.block)
+            else:
+                grandparent.set_left(sibling.block)
+
+            top -= 1
+            parent, parent_right = up[top]
+
+        if sibling.priority() < parent.priority():
+            trie_parent = parent.parent_node()
+
+            if parent_right:
+                pointer = sibling.left()
+
+                if pointer:
+                    parent.set_right(pointer)
+                else:
+                    parent.clear_right()
+
+                sibling.set_left(parent.block)
+            else:
+                pointer = sibling.right()
+
+                if pointer:
+                    parent.set_left(pointer)
+                else:
+                    parent.clear_left()
+
+                sibling.set_right(parent.block)
+
+            trie_parent.set_child(sibling.block)
+            trie_parent.write()
+
+        # Writing every needed block
+        sibling.write()
+
+        # TODO: up to last top - 1
+        for node, _ in up:
+            node.write()
 
         return sibling
 
@@ -122,6 +201,7 @@ class LRUTrie(object):
 
             # Creating the child
             child = self.node(stem=stem)
+            child.set_priority(random.random())
             child.set_parent(node.block)
             child.write()
 

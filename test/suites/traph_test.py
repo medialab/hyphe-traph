@@ -38,6 +38,12 @@ class TestTraph(TraphTestCase):
             self.assertEqual(traph.count_pages(), 2)
             self.assertEqual(traph.count_links(), 1)
 
+            for node, lru in traph.lru_trie.dfs_iter():
+                print lru
+
+            for node in traph.lru_trie.nodes_iter():
+                print node
+
             # Re-adding pages should not have an effect
             report = traph.add_links([
                 (
@@ -50,63 +56,62 @@ class TestTraph(TraphTestCase):
             self.assertEqual(traph.count_pages(), 2)
             self.assertEqual(traph.count_links(), 1)
 
-    def test_index_batch_crawl(self):
-        with self.open_traph() as traph:
+    # def test_index_batch_crawl(self):
+    #     with self.open_traph() as traph:
 
-            report = traph.index_batch_crawl({
-                's:http|h:fr|h:sciences-po|h:medialab|': [
-                    's:https|h:com|h:twitter|p:paulanomalie|',
-                    's:http|h:com|h:twitter|p:pépé|yesterday|'
-                ]
-            })
+    #         report = traph.index_batch_crawl({
+    #             's:http|h:fr|h:sciences-po|h:medialab|': [
+    #                 's:https|h:com|h:twitter|p:paulanomalie|',
+    #                 's:http|h:com|h:twitter|p:pépé|yesterday|'
+    #             ]
+    #         })
 
-            self.assertEqual(report.nb_created_pages, 3)
-            self.assertEqual(traph.count_pages(), 3)
-            self.assertEqual(traph.count_links(), 2)
+    #         self.assertEqual(report.nb_created_pages, 3)
+    #         self.assertEqual(traph.count_pages(), 3)
+    #         self.assertEqual(traph.count_links(), 2)
 
-            # Re-adding pages should not have an effect
-            report = traph.index_batch_crawl({
-                's:http|h:fr|h:sciences-po|h:medialab|': [
-                    's:https|h:com|h:twitter|p:paulanomalie|',
-                    's:http|h:com|h:twitter|p:pépé|yesterday|'
-                ]
-            })
+    #         # Re-adding pages should not have an effect
+    #         report = traph.index_batch_crawl({
+    #             's:http|h:fr|h:sciences-po|h:medialab|': [
+    #                 's:https|h:com|h:twitter|p:paulanomalie|',
+    #                 's:http|h:com|h:twitter|p:pépé|yesterday|'
+    #             ]
+    #         })
 
-            self.assertEqual(report.nb_created_pages, 0)
-            self.assertEqual(traph.count_pages(), 3)
-            self.assertEqual(traph.count_links(), 2)
+    #         self.assertEqual(report.nb_created_pages, 0)
+    #         self.assertEqual(traph.count_pages(), 3)
+    #         self.assertEqual(traph.count_links(), 2)
 
-    def test_prefix_methods(self):
-        with self.open_traph() as traph:
+    # def test_prefix_methods(self):
+    #     with self.open_traph() as traph:
 
-            # Potential prefix
-            prefix = traph.get_potential_prefix('s:http|h:fr|h:sciences-po|h:medialab|')
-            self.assertEqual(prefix, 's:http|h:fr|h:sciences-po|')
+    #         # Potential prefix
+    #         prefix = traph.get_potential_prefix('s:http|h:fr|h:sciences-po|h:medialab|')
+    #         self.assertEqual(prefix, 's:http|h:fr|h:sciences-po|')
 
-    def test_long_stems(self):
-        with self.open_traph() as traph:
+    # def test_long_stems(self):
+    #     with self.open_traph() as traph:
 
-            traph.add_page('s:http|h:fr|h:sciences-po|p:thisisaveryveryveryverylooooooooooooooooongstem|p:thisalsoisquitethelongstemisntitnotsomuchtobehonest|')
-            traph.add_page('s:http|h:fr|h:sciences-po|p:sooooooofunnnnnnyyyyyyyyyyyyyyyyyyyyy|')
+    #         traph.add_page('s:http|h:fr|h:sciences-po|p:thisisaveryveryveryverylooooooooooooooooongstem|p:thisalsoisquitethelongstemisntitnotsomuchtobehonest|')
+    #         traph.add_page('s:http|h:fr|h:sciences-po|p:sooooooofunnnnnnyyyyyyyyyyyyyyyyyyyyy|')
 
-            pages_in_traph = [lru for _, lru in traph.pages_iter()]
-            for node in traph.lru_trie.nodes_iter():
-                pass
-            self.assertEqual(
-                set(pages_in_traph),
-                set([
-                    's:http|h:fr|h:sciences-po|p:thisisaveryveryveryverylooooooooooooooooongstem|p:thisalsoisquitethelongstemisntitnotsomuchtobehonest|',
-                    's:http|h:fr|h:sciences-po|p:sooooooofunnnnnnyyyyyyyyyyyyyyyyyyyyy|'
-                ])
-            )
+    #         pages_in_traph = [lru for _, lru in traph.pages_iter()]
 
-    def test_clear(self):
-        with self.open_traph() as traph:
-            traph = self.get_traph()
-            traph.add_page('s:http|h:fr|h:sciences-po|h:medialab|')
+    #         self.assertEqual(
+    #             set(pages_in_traph),
+    #             set([
+    #                 's:http|h:fr|h:sciences-po|p:thisisaveryveryveryverylooooooooooooooooongstem|p:thisalsoisquitethelongstemisntitnotsomuchtobehonest|',
+    #                 's:http|h:fr|h:sciences-po|p:sooooooofunnnnnnyyyyyyyyyyyyyyyyyyyyy|'
+    #             ])
+    #         )
 
-            self.assertEqual(traph.count_pages(), 1)
+    # def test_clear(self):
+    #     with self.open_traph() as traph:
+    #         traph = self.get_traph()
+    #         traph.add_page('s:http|h:fr|h:sciences-po|h:medialab|')
 
-            traph.clear()
+    #         self.assertEqual(traph.count_pages(), 1)
 
-            self.assertEqual(traph.count_pages(), 0)
+    #         traph.clear()
+
+    #         self.assertEqual(traph.count_pages(), 0)
