@@ -151,7 +151,7 @@ class LRUTrie(object):
         sibling.write()
 
         # TODO: up to last top - 1
-        for node, _ in up:
+        for node, _ in up[top:]:
             node.write()
 
         return sibling
