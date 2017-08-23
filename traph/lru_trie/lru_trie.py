@@ -361,11 +361,12 @@ class LRUTrie(object):
 
             yield node, current_lru
 
-            if node.has_right():
-                stack.append((node.right(), lru))
+            if block != starting_block:
+                if node.has_right():
+                    stack.append((node.right(), lru))
 
-            if node.has_left():
-                stack.append((node.left(), lru))
+                if node.has_left():
+                    stack.append((node.left(), lru))
 
             if node.has_child():
                 stack.append((node.child(), current_lru))
