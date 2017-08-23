@@ -299,6 +299,8 @@ class LRUTrie(object):
             yield parent
 
     def dfs_iter(self, starting_node=None, starting_lru=''):
+        starting_from_root = not starting_node
+
         if starting_node:
             starting_block = starting_node.block
             starting_lru = ''.join(list(lru_iter(starting_lru))[:-1])
@@ -321,11 +323,12 @@ class LRUTrie(object):
 
             yield node, current_lru
 
-            if node.has_right():
-                stack.append((node.right(), lru))
+            if starting_from_root or block != starting_block:
+                if node.has_right():
+                    stack.append((node.right(), lru))
 
-            if node.has_left():
-                stack.append((node.left(), lru))
+                if node.has_left():
+                    stack.append((node.left(), lru))
 
             if node.has_child():
                 stack.append((node.child(), current_lru))
