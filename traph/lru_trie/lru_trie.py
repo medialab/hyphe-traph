@@ -148,6 +148,11 @@ class LRUTrie(object):
             node.write()
             history.page_was_created = True
 
+        elif crawled and not node.is_crawled():
+            node.flag_as_crawled()
+
+            node.write()
+
         return node, history
 
     # =========================================================================

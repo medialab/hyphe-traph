@@ -76,6 +76,38 @@ class TestTraph(TraphTestCase):
             self.assertEqual(traph.count_pages(), 3)
             self.assertEqual(traph.count_links(), 2)
 
+    def test_index_batch_crawl_crawled_pages(self):
+        with self.open_traph() as traph:
+            traph.create_webentity(['s:http|h:fr|h:sciences-po|h:medialab|'])
+
+            traph.index_batch_crawl({
+                's:http|h:fr|h:sciences-po|h:medialab|': [
+                    's:http|h:fr|h:sciences-po|h:medialab|p:publications|',
+                    's:http|h:fr|h:sciences-po|h:medialab|p:people|'
+                ]
+            })
+
+            pages = traph.get_webentity_crawled_pages(1, ['s:http|h:fr|h:sciences-po|h:medialab|'])
+            self.assertEqual([item['lru'] for item in pages], ['s:http|h:fr|h:sciences-po|h:medialab|'])
+
+            traph.index_batch_crawl({
+                's:http|h:fr|h:sciences-po|h:medialab|p:publications|': [
+                    's:http|h:fr|h:sciences-po|h:medialab|',
+                    's:http|h:fr|h:sciences-po|h:medialab|p:people|'
+                ],
+                's:http|h:fr|h:sciences-po|h:medialab|p:people|': [
+                    's:http|h:fr|h:sciences-po|h:medialab|p:publications|',
+                    's:http|h:fr|h:sciences-po|h:medialab|'
+                ]
+            })
+
+            pages = traph.get_webentity_crawled_pages(1, ['s:http|h:fr|h:sciences-po|h:medialab|'])
+            self.assertEqual(set([item['lru'] for item in pages]), set([
+                's:http|h:fr|h:sciences-po|h:medialab|p:people|',
+                's:http|h:fr|h:sciences-po|h:medialab|p:publications|',
+                's:http|h:fr|h:sciences-po|h:medialab|'
+            ]))
+
     def test_prefix_methods(self):
         with self.open_traph() as traph:
 
