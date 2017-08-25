@@ -246,7 +246,7 @@ class Traph(object):
                 longest_candidate_prefix = candidate_prefix
 
         # In this case, the webentity already exists
-        if longest_candidate_prefix and len(longest_candidate_prefix) <= history.webentity_position + 1:
+        if len(longest_candidate_prefix) <= history.webentity_position:
             node.refresh()  # update node
             return node, report
 
@@ -437,7 +437,7 @@ class Traph(object):
                 longest_candidate_prefix = candidate_prefix
 
         # If the longest rules prefix is shorter than the webentity prefix, or there is no rules prefix
-        if longest_candidate_prefix and len(longest_candidate_prefix) <= history.webentity_position + 1:
+        if len(longest_candidate_prefix) <= history.webentity_position:
             return history.webentity_prefix
 
         # If there is a rules prefix and it is longer than the webentity prefix

@@ -79,9 +79,23 @@ class TestTraph(TraphTestCase):
     def test_prefix_methods(self):
         with self.open_traph() as traph:
 
-            # Potential prefix
+            # 1) Potential prefix when the traph is empty
             prefix = traph.get_potential_prefix('s:http|h:fr|h:sciences-po|h:medialab|')
             self.assertEqual(prefix, 's:http|h:fr|h:sciences-po|')
+
+            # 2) Test with existing webentity on path
+            traph.create_webentity(['s:http|h:fr|h:sciences-po|h:medialab|'])
+            prefix = traph.get_potential_prefix('s:http|h:fr|h:sciences-po|h:medialab|p:www|p:publications|')
+            self.assertEqual(prefix, 's:http|h:fr|h:sciences-po|h:medialab|')
+
+            # 3) With an upper webentity
+            traph.create_webentity(['s:http|h:fr|h:sciences-po|'])
+            prefix = traph.get_potential_prefix('s:http|h:fr|h:sciences-po|h:medialab|p:www|p:publications|')
+            self.assertEqual(prefix, 's:http|h:fr|h:sciences-po|h:medialab|')
+
+            # 4) Identity case
+            prefix = traph.get_potential_prefix('s:http|h:fr|h:sciences-po|h:medialab|')
+            self.assertEqual(prefix, 's:http|h:fr|h:sciences-po|h:medialab|')
 
     def test_long_stems(self):
         with self.open_traph() as traph:
