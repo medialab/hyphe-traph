@@ -794,7 +794,7 @@ class Traph(object):
         '''
         # TODO: optimize
 
-        return self.get_webentity_indegree(weid, prefixes) + self.get_webentity_indegree(weid, prefixes)
+        return self.get_webentity_indegree(weid, prefixes) + self.get_webentity_outdegree(weid, prefixes)
 
     def get_page_links(self, lru, include_inbound=True, include_internal=True, include_outbound=True):
         lru = self.__encode(lru)
