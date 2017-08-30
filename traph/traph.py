@@ -630,6 +630,8 @@ class Traph(object):
         Note: the prefixes are supposed to match the webentity id. We do not check.
         '''
 
+        # TODO: Can be optimized caching windups
+
         state = TraphIteratorState()
         pagelinks = []
 
@@ -730,6 +732,8 @@ class Traph(object):
         Convenience method relying on get_webentity_outlinks (thus NOT more efficient)
         Note: the prefixes are supposed to match the webentity id. We do not check.
         '''
+        # TODO: optimize
+
         return len(self.get_webentity_outlinks(weid, prefixes))
 
     def get_webentity_inlinks_iter(self, weid, prefixes):
@@ -779,6 +783,8 @@ class Traph(object):
         Convenience method relying on get_webentity_inlinks (thus NOT more efficient)
         Note: the prefixes are supposed to match the webentity id. We do not check.
         '''
+        # TODO: optimize
+
         return len(self.get_webentity_inlinks(weid, prefixes))
 
     def get_webentity_degree(self, weid, prefixes):
@@ -786,6 +792,8 @@ class Traph(object):
         Note: relies on get_webentity_inlinks() and get_webentity_outlinks(),
         thus not more efficient than calling these.
         '''
+        # TODO: optimize
+
         return self.get_webentity_indegree(weid, prefixes) + self.get_webentity_indegree(weid, prefixes)
 
     def get_page_links(self, lru, include_inbound=True, include_internal=True, include_outbound=True):
