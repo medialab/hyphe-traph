@@ -11,6 +11,7 @@ import re
 import warnings
 from collections import defaultdict, Counter
 from traph_write_report import TraphWriteReport
+from traph_iterator_state import TraphIteratorState, run_iterator
 from storage import FileStorage, MemoryStorage
 from lru_trie import LRUTrie, LRU_TRIE_NODE_BLOCK_SIZE
 from link_store import LinkStore, LINK_STORE_NODE_BLOCK_SIZE
@@ -842,7 +843,7 @@ class Traph(object):
 
         return graph
 
-    def get_webentities_links(self, out=True, include_auto=False):
+    def get_webentities_links_iter(self, out=True, include_auto=False):
         '''
         This method should be faster than the slow version because it avoids
         unnecessary upward traversal.
@@ -853,6 +854,7 @@ class Traph(object):
         graph = defaultdict(Counter)
         page_to_webentity = dict()
         link_pointers = []
+        state = TraphIteratorState()
 
         # Solving the page => webentity relation
         for node, source_webentity in self.lru_trie.dfs_with_webentity_iter():
@@ -866,6 +868,9 @@ class Traph(object):
 
             if node.has_links(out=out):
                 link_pointers.append((node.block, node.links(out=out)))
+
+            if state.should_yield():
+                yield state
 
         # Computing the links
         for source_block, links_block in link_pointers:
@@ -884,7 +889,19 @@ class Traph(object):
                 # Adding to the graph
                 graph[source_webentity][target_webentity] += link_node.weight()
 
-        return graph
+            if state.should_yield():
+                yield state
+
+        yield state.finalize(graph)
+
+    def get_webentities_inlinks_iter(self, include_auto=False):
+        return self.get_webentities_links_iter(out=False, include_auto=include_auto)
+
+    def get_webentities_outlinks_iter(self, include_auto=False):
+        return self.get_webentities_links_iter(out=True, include_auto=include_auto)
+
+    def get_webentities_links(self, out=True, include_auto=False):
+        return run_iterator(self.get_webentities_links_iter(out=out, include_auto=include_auto))
 
     def get_webentities_inlinks(self, include_auto=False):
         return self.get_webentities_links(out=False, include_auto=include_auto)
