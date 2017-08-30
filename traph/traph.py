@@ -275,7 +275,7 @@ class Traph(object):
     # =========================================================================
     # Public interface
     # =========================================================================
-    def add_webentity_creation_rule(self, rule_prefix, pattern, write_in_trie=True):
+    def add_webentity_creation_rule_iter(self, rule_prefix, pattern, write_in_trie=True):
         '''
         Note: write_in_trie has 2 effects: store the rule in the trie, and apply it to existing entities.
         write_in_trie=False is essentially for init on an existing traph.
@@ -291,6 +291,7 @@ class Traph(object):
         )
 
         report = TraphWriteReport()
+        state = TraphIteratorState()
 
         if write_in_trie:
             node, history = self.lru_trie.add_lru(rule_prefix)
@@ -305,7 +306,13 @@ class Traph(object):
                     _, add_report = self.__add_page(lru)
                     report += add_report
 
-        return report
+                if state.should_yield():
+                    yield state
+
+        yield state.finalize(report)
+
+    def add_webentity_creation_rule(self, rule_prefix, pattern, write_in_trie=True):
+        return run_iterator(self.add_webentity_creation_rule_iter(rule_prefix, pattern, write_in_trie=write_in_trie))
 
     def remove_webentity_creation_rule(self, rule_prefix):
         rule_prefix = self.__encode(rule_prefix)
@@ -484,10 +491,11 @@ class Traph(object):
             raise TraphException('LRU %s is not a webentity prefix' % (prefix))
         return node.webentity()
 
-    def get_webentity_pages(self, weid, prefixes):
+    def get_webentity_pages_iter(self, weid, prefixes):
         '''
         Note: the prefixes are supposed to match the webentity id. We do not check.
         '''
+        state = TraphIteratorState()
         pages = []
         for node, lru in self.webentity_page_nodes_iter(weid, prefixes):
             pages.append({
@@ -495,12 +503,19 @@ class Traph(object):
                 'crawled': node.is_crawled()
             })
 
-        return pages
+            if state.should_yield(1000):
+                yield state
 
-    def get_webentity_crawled_pages(self, weid, prefixes):
+        yield state.finalize(pages)
+
+    def get_webentity_pages(self, weid, prefixes):
+        return run_iterator(self.get_webentity_pages_iter(weid, prefixes))
+
+    def get_webentity_crawled_pages_iter(self, weid, prefixes):
         '''
         Note: the prefixes are supposed to match the webentity id. We do not check.
         '''
+        state = TraphIteratorState()
         pages = []
         for node, lru in self.webentity_page_nodes_iter(weid, prefixes):
             if node.is_crawled():
@@ -509,13 +524,20 @@ class Traph(object):
                     'crawled': True
                 })
 
-        return pages
+            if state.should_yield(1000):
+                yield state
 
-    def get_webentity_most_linked_pages(self, weid, prefixes, pages_count=10):
+        yield state.finalize(pages)
+
+    def get_webentity_crawled_pages(self, weid, prefixes):
+        return run_iterator(self.get_webentity_crawled_pages_iter(weid, prefixes))
+
+    def get_webentity_most_linked_pages_iter(self, weid, prefixes, pages_count=10):
         '''
         Returns a list of objects {lru:, indegree:}
         Note: the prefixes are supposed to match the webentity id. We do not check.
         '''
+        state = TraphIteratorState()
         pages = []
         c = 0
         for prefix in prefixes:
@@ -540,6 +562,9 @@ class Traph(object):
                     if len(pages) > pages_count:
                         heapq.heappop(pages)
 
+                if state.should_yield(1000):
+                    yield state
+
         sorted_pages = range(len(pages))
         i = len(pages) - 1
 
@@ -548,7 +573,10 @@ class Traph(object):
             sorted_pages[i] = {'lru': page[2], 'indegree': page[0]}
             i -= 1
 
-        return sorted_pages
+        yield state.finalize(sorted_pages)
+
+    def get_webentity_most_linked_pages(self, weid, prefixes, pages_count=10):
+        return run_iterator(self.get_webentity_most_linked_pages_iter(weid, prefixes, pages_count=pages_count))
 
     def get_webentity_parent_webentities(self, weid, prefixes):
         '''
@@ -569,10 +597,11 @@ class Traph(object):
 
         return list(weids)
 
-    def get_webentity_child_webentities(self, weid, prefixes):
+    def get_webentity_child_webentities_iter(self, weid, prefixes):
         '''
         Note: the prefixes are supposed to match the webentity id. We do not check.
         '''
+        state = TraphIteratorState()
         weids = set()
         for prefix in prefixes:
             prefix = self.__encode(prefix)
@@ -586,15 +615,22 @@ class Traph(object):
                 if weid2 and weid2 > 0 and weid2 != weid:
                     weids.add(weid2)
 
-        return list(weids)
+                if state.should_yield():
+                    yield state
 
-    def get_webentity_pagelinks(self, weid, prefixes, include_inbound=False, include_internal=True, include_outbound=False):
+        yield state.finalize(list(weids))
+
+    def get_webentity_child_webentities(self, weid, prefixes):
+        return run_iterator(self.get_webentity_child_webentities_iter(weid, prefixes))
+
+    def get_webentity_pagelinks_iter(self, weid, prefixes, include_inbound=False, include_internal=True, include_outbound=False):
         '''
         Returns all or part of: pagelinks to the entity, internal pagelinks, pagelinks out of the entity.
         Default is only internal pagelinks.
         Note: the prefixes are supposed to match the webentity id. We do not check.
         '''
 
+        state = TraphIteratorState()
         pagelinks = []
 
         source_node = self.lru_trie.node()
@@ -624,6 +660,9 @@ class Traph(object):
                         if (include_outbound and target_webentity != weid) or (include_internal and target_webentity == weid):
                             pagelinks.append([lru, target_lru, link_node.weight()])
 
+                        if state.should_yield(5000):
+                            yield state
+
                 # Iterating over the page's inlinks
                 if node.has_inlinks() and include_inbound:
                     links_block = node.inlinks()
@@ -636,14 +675,21 @@ class Traph(object):
                         if source_webentity != weid:
                             pagelinks.append([source_lru, lru, link_node.weight()])
 
-        return pagelinks
+                        if state.should_yield(5000):
+                            yield state
 
-    def get_webentity_outlinks(self, weid, prefixes):
+        yield state.finalize(pagelinks)
+
+    def get_webentity_pagelinks(self, weid, prefixes, include_inbound=False, include_internal=True, include_outbound=False):
+        return run_iterator(self.get_webentity_pagelinks_iter(weid, prefixes, include_inbound=include_inbound, include_internal=include_internal, include_outbound=include_outbound))
+
+    def get_webentity_outlinks_iter(self, weid, prefixes):
         '''
         Returns the list of cited web entities
         Note: the prefixes are supposed to match the webentity id. We do not check.
         '''
 
+        state = TraphIteratorState()
         done_blocks = set()
         weids = set()
 
@@ -671,7 +717,13 @@ class Traph(object):
                             done_blocks.add(target_node.block)
                             weids.add(target_webentity)
 
-        return weids
+                        if state.should_yield(5000):
+                            yield state
+
+        yield state.finalize(weids)
+
+    def get_webentity_outlinks(self, weid, prefixes):
+        return run_iterator(self.get_webentity_outlinks_iter(weid, prefixes))
 
     def get_webentity_outdegree(self, weid, prefixes):
         '''
@@ -680,12 +732,13 @@ class Traph(object):
         '''
         return len(self.get_webentity_outlinks(weid, prefixes))
 
-    def get_webentity_inlinks(self, weid, prefixes):
+    def get_webentity_inlinks_iter(self, weid, prefixes):
         '''
         Returns the list of citing web entities
         Note: the prefixes are supposed to match the webentity id. We do not check.
         '''
 
+        state = TraphIteratorState()
         done_blocks = set()
         weids = set()
 
@@ -713,7 +766,13 @@ class Traph(object):
                             done_blocks.add(source_node.block)
                             weids.add(source_webentity)
 
-        return weids
+                        if state.should_yield(5000):
+                            yield state
+
+        yield state.finalize(weids)
+
+    def get_webentity_inlinks(self, weid, prefixes):
+        return run_iterator(self.get_webentity_inlinks_iter(weid, prefixes))
 
     def get_webentity_indegree(self, weid, prefixes):
         '''
@@ -983,11 +1042,12 @@ class Traph(object):
 
         return report
 
-    def index_batch_crawl(self, data):
+    def index_batch_crawl_iter(self, data):
         '''
         data is must be a multimap 'source_lru' => 'target_lrus'
         '''
         store = self.link_store
+        state = TraphIteratorState()
         report = TraphWriteReport()
         pages = dict()
         inlinks = defaultdict(list)
@@ -1024,6 +1084,9 @@ class Traph(object):
                 # TODO: possible to store block as value rather
                 inlinks[target_page].append(source_page)
 
+                if state.should_yield(1000):
+                    yield state
+
             source_node.refresh()
             store.add_outlinks(source_node, target_blocks)
 
@@ -1033,7 +1096,13 @@ class Traph(object):
             source_blocks = (pages[source_page].block for source_page in source_pages)
             store.add_inlinks(target_node, source_blocks)
 
-        return report
+            if state.should_yield(1000):
+                yield state
+
+        yield state.finalize(report)
+
+    def index_batch_crawl(self, data):
+        return run_iterator(self.index_batch_crawl_iter(data))
 
     def close(self):
 
