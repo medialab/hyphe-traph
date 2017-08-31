@@ -503,7 +503,7 @@ class Traph(object):
                 'crawled': node.is_crawled()
             })
 
-            if state.should_yield(1000):
+            if state.should_yield():
                 yield state
 
         yield state.finalize(pages)
@@ -524,7 +524,7 @@ class Traph(object):
                     'crawled': True
                 })
 
-            if state.should_yield(1000):
+            if state.should_yield():
                 yield state
 
         yield state.finalize(pages)
@@ -562,7 +562,7 @@ class Traph(object):
                     if len(pages) > pages_count:
                         heapq.heappop(pages)
 
-                if state.should_yield(1000):
+                if state.should_yield():
                     yield state
 
         sorted_pages = range(len(pages))
@@ -1092,7 +1092,7 @@ class Traph(object):
                 # TODO: possible to store block as value rather
                 inlinks[target_page].append(source_page)
 
-                if state.should_yield(500):
+                if state.should_yield(250):
                     yield state
 
             source_node.refresh()
@@ -1104,7 +1104,7 @@ class Traph(object):
             source_blocks = (pages[source_page].block for source_page in source_pages)
             store.add_inlinks(target_node, source_blocks)
 
-            if state.should_yield(1000):
+            if state.should_yield(250):
                 yield state
 
         yield state.finalize(report)

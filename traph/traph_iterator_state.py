@@ -12,7 +12,7 @@ class TraphIteratorState(object):
         self.result = None
         self.n_iterations = 0
 
-    def should_yield(self, yield_frequency=5000):
+    def should_yield(self, yield_frequency=1000):
         self.n_iterations += 1
         return not self.n_iterations % yield_frequency
 
