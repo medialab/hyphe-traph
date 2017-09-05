@@ -956,8 +956,8 @@ class Traph(object):
                 # Adding to the graph
                 graph[source_webentity][target_webentity] += link_node.weight()
 
-            if state.should_yield():
-                yield state
+                if state.should_yield():
+                    yield state
 
         yield state.finalize(graph)
 
@@ -1086,14 +1086,15 @@ class Traph(object):
                     report += target_page_report
                     pages[target_page] = target_node
                     target_blocks.append(target_node.block)
+
+                    if state.should_yield(250):
+                        yield state
+
                 else:
                     target_blocks.append(pages[target_page].block)
 
                 # TODO: possible to store block as value rather
                 inlinks[target_page].append(source_page)
-
-                if state.should_yield(250):
-                    yield state
 
             source_node.refresh()
             store.add_outlinks(source_node, target_blocks)
