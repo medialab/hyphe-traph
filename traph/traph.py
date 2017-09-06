@@ -934,14 +934,13 @@ class Traph(object):
             page_to_webentity[node.block] = source_webentity
 
             if node.has_links(out=out):
-                link_pointers.append((node.block, node.links(out=out)))
+                link_pointers.append((source_webentity, node.links(out=out)))
 
             if state.should_yield():
                 yield state
 
         # Computing the links
-        for source_block, links_block in link_pointers:
-            source_webentity = page_to_webentity[source_block]
+        for source_webentity, links_block in link_pointers:
 
             for link_node in self.link_store.link_nodes_iter(links_block):
                 target_webentity = page_to_webentity.get(link_node.target())
