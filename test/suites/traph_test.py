@@ -6,6 +6,7 @@
 # Testing the Traph class itself.
 #
 from test.test_cases import TraphTestCase
+from traph.traph import TraphException
 
 
 class TestTraph(TraphTestCase):
@@ -107,6 +108,48 @@ class TestTraph(TraphTestCase):
                 's:http|h:fr|h:sciences-po|h:medialab|p:publications|',
                 's:http|h:fr|h:sciences-po|h:medialab|'
             ]))
+
+    def test_index_and_retrieve_pages(self):
+        with self.open_traph() as traph:
+            report = traph.create_webentity(['s:https|h:org|h:wikipedia|h:www|', 's:http|h:org|h:wikipedia|', 's:http|h:org|h:wikipedia|h:www|', 's:https|h:org|h:wikipedia|'])
+
+            self.assertEqual(report.nb_created_pages, 0)
+            self.assertEqual(len(report.created_webentities), 1)
+
+            report = traph.index_batch_crawl({
+                's:https|h:org|h:wikipedia|h:www|': [
+                    's:https|h:org|h:wikipedia|h:fr|',
+                    's:https|h:org|h:wikipedia|h:en|'
+                ]
+            })
+
+            self.assertEqual(report.nb_created_pages, 3)
+            self.assertEqual(len(report.created_webentities), 0)
+            self.assertEqual(traph.count_pages(), 3)
+            self.assertEqual(traph.count_links(), 2)
+
+            for lru, prefix, isPrefix in [
+                ('s:https|h:org|h:wikipedia|', 's:https|h:org|h:wikipedia|', True),
+                ('s:https|h:org|h:wikipedia|h:en|', 's:https|h:org|h:wikipedia|', False),
+                ('s:https|h:org|h:wikipedia|h:en|p:wiki|p:Crawl|', 's:https|h:org|h:wikipedia|', False),
+                ('s:https|h:org|h:wikipedia|h:www|', 's:https|h:org|h:wikipedia|h:www|', True),
+                ('s:https|h:org|h:wikipedia|h:www|p:wiki|p:Crawl|', 's:https|h:org|h:wikipedia|h:www|', False)
+            ]:
+                self.assertEqual(traph.retrieve_prefix(lru), prefix)
+                self.assertEqual(traph.retrieve_webentity(lru), 1)
+                try:
+                    self.assertTrue(traph.get_webentity_by_prefix(lru) == 1 and isPrefix)
+                except TraphException:
+                    self.assertFalse(isPrefix)
+
+            crawled_pages = traph.get_webentity_crawled_pages(1, ['s:https|h:org|h:wikipedia|h:www|', 's:http|h:org|h:wikipedia|', 's:http|h:org|h:wikipedia|h:www|', 's:https|h:org|h:wikipedia|'])
+
+            self.assertEqual(len(crawled_pages), 1)
+
+            pages = traph.get_webentity_pages(1, ['s:https|h:org|h:wikipedia|h:www|', 's:http|h:org|h:wikipedia|', 's:http|h:org|h:wikipedia|h:www|', 's:https|h:org|h:wikipedia|'])
+
+            self.assertEqual(len(pages), 3)
+
 
     def test_prefix_methods(self):
         with self.open_traph() as traph:
