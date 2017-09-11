@@ -359,13 +359,13 @@ class LRUTrie(object):
             block, lru = stack.pop()
             node.read(block)
 
-            if block != starting_block and node.has_webentity():
-                continue
-
+            relevant_node = block == starting_block or not node.has_webentity()
             current_lru = lru + node.stem()
 
-            yield node, current_lru
+            if relevant_node:
+                yield node, current_lru
 
+            # Following siblings
             if block != starting_block:
                 if node.has_right():
                     stack.append((node.right(), lru))
@@ -373,7 +373,8 @@ class LRUTrie(object):
                 if node.has_left():
                     stack.append((node.left(), lru))
 
-            if node.has_child():
+            # Following child
+            if relevant_node and node.has_child():
                 stack.append((node.child(), current_lru))
 
     def dfs_with_webentity_iter(self):
