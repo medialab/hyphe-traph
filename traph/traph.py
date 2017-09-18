@@ -503,7 +503,7 @@ class Traph(object):
                 'crawled': node.is_crawled()
             })
 
-            if state.should_yield():
+            if state.should_yield(2000):
                 yield state
 
         yield state.finalize(pages)
@@ -524,7 +524,7 @@ class Traph(object):
                     'crawled': True
                 })
 
-            if state.should_yield():
+            if state.should_yield(2000):
                 yield state
 
         yield state.finalize(pages)
@@ -562,7 +562,7 @@ class Traph(object):
                     if len(pages) > pages_count:
                         heapq.heappop(pages)
 
-                if state.should_yield():
+                if state.should_yield(2000):
                     yield state
 
         sorted_pages = range(len(pages))
@@ -615,7 +615,7 @@ class Traph(object):
                 if weid2 and weid2 > 0 and weid2 != weid:
                     weids.add(weid2)
 
-                if state.should_yield():
+                if state.should_yield(5000):
                     yield state
 
         yield state.finalize(list(weids))
@@ -662,7 +662,7 @@ class Traph(object):
                         if (include_outbound and target_webentity != weid) or (include_internal and target_webentity == weid):
                             pagelinks.append([lru, target_lru, link_node.weight()])
 
-                        if state.should_yield():
+                        if state.should_yield(5000):
                             yield state
 
                 # Iterating over the page's inlinks
@@ -677,7 +677,7 @@ class Traph(object):
                         if source_webentity != weid:
                             pagelinks.append([source_lru, lru, link_node.weight()])
 
-                        if state.should_yield():
+                        if state.should_yield(5000):
                             yield state
 
         yield state.finalize(pagelinks)
@@ -719,7 +719,7 @@ class Traph(object):
                             done_blocks.add(target_node.block)
                             weids.add(target_webentity)
 
-                        if state.should_yield():
+                        if state.should_yield(5000):
                             yield state
 
         yield state.finalize(weids)
@@ -770,7 +770,7 @@ class Traph(object):
                             done_blocks.add(source_node.block)
                             weids.add(source_webentity)
 
-                        if state.should_yield():
+                        if state.should_yield(5000):
                             yield state
 
         yield state.finalize(weids)
@@ -955,7 +955,7 @@ class Traph(object):
                 # Adding to the graph
                 graph[source_webentity][target_webentity] += link_node.weight()
 
-                if state.should_yield():
+                if state.should_yield(25000):
                     yield state
 
         yield state.finalize(graph)
@@ -1086,7 +1086,7 @@ class Traph(object):
                     pages[target_page] = target_node
                     target_blocks.append(target_node.block)
 
-                    if state.should_yield(250):
+                    if state.should_yield():
                         yield state
 
                 else:
@@ -1104,7 +1104,7 @@ class Traph(object):
             source_blocks = (pages[source_page].block for source_page in source_pages)
             store.add_inlinks(target_node, source_blocks)
 
-            if state.should_yield(250):
+            if state.should_yield():
                 yield state
 
         yield state.finalize(report)
