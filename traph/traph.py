@@ -955,7 +955,7 @@ class Traph(object):
                 # Adding to the graph
                 graph[source_webentity][target_webentity] += link_node.weight()
 
-                if state.should_yield(25000):
+                if state.should_yield(5000):
                     yield state
 
         yield state.finalize(graph)
@@ -1086,7 +1086,7 @@ class Traph(object):
                     pages[target_page] = target_node
                     target_blocks.append(target_node.block)
 
-                    if state.should_yield():
+                    if state.should_yield(200):
                         yield state
 
                 else:
