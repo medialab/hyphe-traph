@@ -23,7 +23,11 @@ from traph.helpers import detailed_chunks_iter
 LRU_TRIE_NODE_FORMAT = '75pBI6Q'
 LRU_TRIE_NODE_BLOCK_SIZE = struct.calcsize(LRU_TRIE_NODE_FORMAT)
 LRU_TRIE_FIRST_DATA_BLOCK = LRU_TRIE_HEADER_BLOCKS * LRU_TRIE_NODE_BLOCK_SIZE
-LRU_TRIE_STEM_SIZE = 75
+
+# NOTE: this MUST be 1 less than the number above because varchars or
+# pascal strings (hence the "p") need one byte of information to encode
+# the stored string's length
+LRU_TRIE_STEM_SIZE = 74
 
 # Node Positions
 LRU_TRIE_NODE_STEM = 0
