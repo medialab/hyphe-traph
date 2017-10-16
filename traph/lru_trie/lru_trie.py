@@ -450,10 +450,12 @@ class LRUTrie(object):
             'nb_fragmented_nodes': 0,
             'nb_stems': 0,
             'avg_stem_filling': 0,
-            'max_tail': 0
+            'max_tail': 0,
+            'avg_tail': 0
         }
 
         current_tail_size = 0
+        last_tail_size = 0
 
         for node in self.nodes_iter():
             stats['nb_nodes'] += 1
@@ -470,6 +472,8 @@ class LRUTrie(object):
 
                 if current_tail_size > stats['max_tail']:
                     stats['max_tail'] = current_tail_size
+
+                last_tail_size = current_tail_size
             else:
                 current_tail_size = 0
                 filling = len(node.stem()) / float(LRU_TRIE_STEM_SIZE)
@@ -482,6 +486,16 @@ class LRUTrie(object):
                         float(stats['nb_stems'])
                     )
                 )
+
+                if last_tail_size:
+                    stats['avg_tail'] = (
+                        stats['avg_tail'] + (
+                            (last_tail_size - stats['avg_tail']) /
+                            float(stats['nb_fragmented_nodes'])
+                        )
+                    )
+
+                    last_tail_size = 0
 
             if node.has_tail():
                 stats['nb_fragmented_nodes'] += 1
