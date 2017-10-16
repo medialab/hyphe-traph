@@ -27,6 +27,9 @@ LRU_TRIE_FIRST_DATA_BLOCK = LRU_TRIE_HEADER_BLOCKS * LRU_TRIE_NODE_BLOCK_SIZE
 # NOTE: this MUST be 1 less than the number above because varchars or
 # pascal strings (hence the "p") need one byte of information to encode
 # the stored string's length
+# NOTE: varchars are limited to 255 characters. If we want heavier blocks
+# we'll need to split the string into two varchars (but I would strongly
+# advise against block fattening since we are currently in the sweet spot).
 LRU_TRIE_STEM_SIZE = 74
 
 # Node Positions
