@@ -161,7 +161,7 @@ class LRUTrieNode(object):
 
                 while True:
                     data = struct.unpack(LRU_TRIE_NODE_FORMAT, self.storage.read())
-                    chars = data[0]
+                    chars = data[LRU_TRIE_NODE_STEM]
 
                     chunks.append(chars)
 
