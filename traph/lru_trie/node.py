@@ -151,7 +151,7 @@ class LRUTrieNode(object):
             # TODO: it's possible not to read the tail in some cases
             if self.has_tail():
                 chunks = []
-                current_block = block + self.storage.block_size
+                current_block = block + LRU_TRIE_NODE_BLOCK_SIZE
 
                 while True:
                     data = struct.unpack(LRU_TRIE_NODE_FORMAT, self.storage.read(current_block))
@@ -162,7 +162,7 @@ class LRUTrieNode(object):
                     if not test(data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_HAS_TAIL):
                         break
 
-                    current_block += self.storage.block_size
+                    current_block += LRU_TRIE_NODE_BLOCK_SIZE
 
                 self.tail = ''.join(chunks)
 
