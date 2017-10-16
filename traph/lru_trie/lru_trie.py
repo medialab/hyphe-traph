@@ -466,6 +466,9 @@ class LRUTrie(object):
                 if node.is_crawled():
                     stats['nb_crawled_pages'] += 1
 
+            if node.has_tail():
+                stats['nb_fragmented_nodes'] += 1
+
             if node.is_tail():
                 stats['nb_tail_nodes'] += 1
                 current_tail_size += 1
@@ -496,9 +499,6 @@ class LRUTrie(object):
                     )
 
                     last_tail_size = 0
-
-            if node.has_tail():
-                stats['nb_fragmented_nodes'] += 1
 
         stats['prop_fragmented_stems'] = (
             stats['nb_fragmented_nodes'] / float(stats['nb_stems'])
