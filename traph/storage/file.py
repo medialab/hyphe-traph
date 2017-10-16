@@ -35,8 +35,10 @@ class FileStorage(object):
         return False
 
     # Method reading a block in the file and returning the contained node
-    def read(self, block):
-        self.file.seek(block)
+    def read(self, block=None):
+
+        if block is not None:
+            self.file.seek(block)
 
         data = self.file.read(self.block_size)
 
