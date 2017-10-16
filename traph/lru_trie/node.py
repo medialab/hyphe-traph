@@ -156,6 +156,8 @@ class LRUTrieNode(object):
 
             # Reading the tail recursively
             # TODO: it's possible not to read the tail in some cases
+            # TODO: it might be possible to "stream" the tail when performing
+            # BST comparison (probably overkill)
             if self.has_tail():
                 chunks = []
 
@@ -184,8 +186,7 @@ class LRUTrieNode(object):
         self.block = block
 
         # Writing the tail recursively
-        # TODO: it's possible not to write the tail in some cases
-        # TODO: does not work on subsequent updates
+        # NOTE: does not work on subsequent updates
         if self.tail and not self.exists:
             for is_last, chunk in detailed_chunks_iter(LRU_TRIE_STEM_SIZE, self.tail):
                 data = [chunk] + [0] * LRU_TRIE_NODE_REGISTERS
