@@ -10,4 +10,4 @@ If the index' data is corrupted and needs to be recomputed one should first re-a
 
 ## MemMap
 
-Using an in-memory map of the file using the `MemMapStorage` leveraging python's  `mmap` module yields very fast network queries but consume a lot of RAM (basically it reads the file into RAM...).
+Using an in-memory map of the file using the `MemMapStorage` leveraging python's  `mmap` module yields very fast network queries but consume a lot of RAM (basically it reads the whole file into RAM...).
