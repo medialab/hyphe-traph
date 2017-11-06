@@ -13,7 +13,7 @@ The idea was therefore to switch to a trie of stems (logical parts composing the
 
 To keep fixed-size binary blocks (which are handy, harder to corrupt etc.), we designed a system of tail blocks to store stem characters that would not fit in the arbitrary number of characters we chose for the blocks.
 
-But soon, tests prove our new implementation to be inefficient. Its observed complexity was quadratic, while our old implementation had a linear one. In fact, we stumbled upon a Schlemiel syndrom whose reason was that our siblings' linked list were not bound to a precise limit anymore.
+But soon, tests prove our new implementation to be inefficient. Its observed complexity was quadratic, while our old implementation had a linear one. In fact, we stumbled upon a Schlemiel syndrom whose reason was that our siblings' linked lists were not bound to a precise limit anymore.
 
 Indeed, at character level, it's impossible for the siblings' linked list to be larger than 255 elements (empirically, it's even improbable that it would be larger than 30 elements). While, at stem level, a linked list could grow to become very large (the tld stem nodes, for instance, could have thousands of siblings very easily), hence the quadratic complexity.
 
