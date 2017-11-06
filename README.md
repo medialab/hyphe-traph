@@ -11,6 +11,9 @@ Under the hood, the `Traph` is the combination of a [ternary search tree](https:
 `hyphe-traph` was written to work with the `2.7` version of Python.
 
 ```
+# Install dev dependencies (preferably in a virtual env)
+pip install -r requirements.txt
+
 # Run the tests
 make test
 
