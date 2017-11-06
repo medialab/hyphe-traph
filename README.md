@@ -2,6 +2,19 @@
 
 # hyphe-traph
 
-A Trie/Graph hybrid memory structure used by the Hyphe crawler to index pages & webentities.
+The `Traph` is an on-file index structure designed to store [hyphe](https://github.com/medialab/hyphe)'s network of pages & webentities.
 
-WIP...
+Under the hood, the `Traph` is the combination of a [ternary search tree](https://en.wikipedia.org/wiki/Ternary_search_tree) of URL stems and [linked lists](https://en.wikipedia.org/wiki/Linked_list) of pages' hyperlinks (hence the portmanteau name).
+
+## Development
+
+`hyphe-traph` was written to work with the `2.7` version of Python.
+
+```
+# Run the tests
+make test
+
+# Run the linter
+make lint
+```
+
