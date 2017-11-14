@@ -17,7 +17,7 @@ We aim at providing the graph community with some feedback about the design of a
 
 ## Links
 
-* [Hyphe](http://hyphe.medialab.sciences-po.fr
+* [Hyphe](http://hyphe.medialab.sciences-po.fr)
 * [Hyphe Demo](http://hyphe.medialab.sciences-po.fr/demo/)
 * [The Traph sources](https://github.com/medialab/hyphe-traph)
 * [Hyphe's paper at the 10th International AAAI Conference on Web and Social Media (ICWSM-16)](https://www.aaai.org/ocs/index.php/ICWSM/ICWSM16/paper/download/13051/12797)
