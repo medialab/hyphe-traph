@@ -4,14 +4,14 @@
 
 *Designing an on-file multi-level graph index for the Hyphe web crawler*
 
-Hyphe, a social sciences-oriented web crawler developed by SciencesPo's médialab, introduced the novel concept of web entities to represent the very subjective nature of web pages' aggregation into meaningful groupings. This, however, does not come without technical challenges since indexing the dynamic graph of web entities lying above the web pages' one is not as straightforward as it may naively seems.
+Hyphe, a social sciences-oriented web crawler developed by the SciencesPo médialab, introduced the novel concept of web entities to provide a flexible way of grouping web pages in situations where the notion of website is not relevant enough (Twitter accounts, newspaper articles...). This comes with technical challenges since indexing a graph of web entities as a dynamic layer based on a large number of URLs is not as straightforward as it may seem.
 
-Our intent is therefore to present the graph community with our feedback about the design of an on-file index - part Graph, part Trie - named the "Traph", to solve this peculiar use-case. What's more, we propose to walk you through the path we followed from an old Lucene index, to our experiments with Neo4j and lastly our conclusions that we needed to develop our own data structure to be able to scale correctly.
+We aim at providing the graph community with some feedback about the design of an on-file index - part Graph, part Trie - named the "Traph", to solve this peculiar use-case. Additionally we propose to retrace the path we followed, from an old Lucene index, to our experiments with Neo4j, and lastly to our conclusion that we needed to develop our own data structure in order to be able to scale up.
 
 ## Speakers
 
 * Paul Girard
-* Matthieu Jacomy
+* Mathieu Jacomy
 * Benjamin Ooghe-Tabanou
 * Guillaume Plique
 
@@ -19,5 +19,6 @@ Our intent is therefore to present the graph community with our feedback about t
 
 * [Hyphe](http://hyphe.medialab.sciences-po.fr/)
 * [The Traph sources](https://github.com/medialab/hyphe-traph)
+* [Hyphe's paper at the 10th International AAAI Conference on Web and Social Media (ICWSM-16)](https://www.aaai.org/ocs/index.php/ICWSM/ICWSM16/paper/download/13051/12797)
 * [SciencesPo's médialab](http://www.medialab.sciences-po.fr/)
 
