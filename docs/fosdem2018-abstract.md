@@ -17,8 +17,11 @@ We aim at providing the graph community with some feedback about the design of a
 
 ## Links
 
-* [Hyphe](http://hyphe.medialab.sciences-po.fr/)
+* [Hyphe](http://hyphe.medialab.sciences-po.fr
+* [Hyphe Demo](http://hyphe.medialab.sciences-po.fr/demo/)
 * [The Traph sources](https://github.com/medialab/hyphe-traph)
 * [Hyphe's paper at the 10th International AAAI Conference on Web and Social Media (ICWSM-16)](https://www.aaai.org/ocs/index.php/ICWSM/ICWSM16/paper/download/13051/12797)
-* [SciencesPo's médialab](http://www.medialab.sciences-po.fr/)
+* [SciencesPo's médialab](http://www.medialab.sciences-po.fr/) and its other [data science tools](tools.medialab.sciences-po.fr)
+
+This work is supported by [DIME-WEB](http://dimeweb.dime-shs.sciences-po.fr/) part of [DIME-SHS](http://www.sciencespo.fr/dime-shs/) research equipment financed by the EQUIPEX program (ANR-10-EQPX-19-01).
 
