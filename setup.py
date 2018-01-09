@@ -5,6 +5,7 @@ setup(name='hyphe-traph',
       description='A Trie/Graph hybrid memory structure used by the Hyphe crawler to index pages & webentities.',
       url='http://github.com/medialab/hyphe-traph',
       license='MIT',
+      author='Guillaume Plique',
       packages=[
         'traph',
         'traph.link_store',
