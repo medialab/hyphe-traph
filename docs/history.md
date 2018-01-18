@@ -1,6 +1,6 @@
 # Design History of the Structure
 
-The Traph is the combination of two data structure:
+The Traph is the combination of two data structures:
 
 * The `lru_trie` is a ternary search tree (a specific implementation of a Trie) storing the URL hierarchy as well as the webentity position in this hierarchy.
 * The `link_store` is a collection of linked lists representing hyperlinks as stubs (we only get the target of the link).
