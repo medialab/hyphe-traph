@@ -16,7 +16,8 @@
 * Check the history of the structure for insight.
 * `UNWIND` is your friend.
 * Neo4j stored procedures.
-* No need for deletion, no need for ACID, just an on-file index. This means that the index stores no "original" data and can be recomputed from data stored in a legitimate database (MongoDB) in our case. 
-* linked to previous: fear for "from scratch" data structure (legitimate concerns regarding crashes handling), tradeoff specific salty blast vs. generic sugary slower
+* linked to previous: fear for "from scratch" data structure (legitimate concerns regarding crashes handling), tradeoff specific salty blast vs. generic sugary slower.
+* But - and this is an answer to the concerns above - no need for deletion, no need for ACID, just an on-file index. This means that the index stores no "original" data and can be recomputed from data stored in a legitimate database (MongoDB) in our case. 
 * Humility => ask for insights on the structure so we can better it further.
-* humility => Lucene started with a bad subcontractor
+* Humility => Lucene started with a bad subcontractor.
+* Use jacomyma's slides describing the url/lru/we scheme.
