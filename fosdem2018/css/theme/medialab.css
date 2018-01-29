@@ -2,7 +2,7 @@
 /**
  * médialab theme for reveal.js.
  */
-@import url("https://fonts.googleapis.com/css?family=Anonymous+Pro|Assistant:300|Bree+Serif|Open+Sans+Condensed:300");
+@import url("https://fonts.googleapis.com/css?family=Anonymous+Pro|Assistant:300,400|Open+Sans+Condensed:300");
 section.has-light-background, section.has-light-background h1, section.has-light-background h2, section.has-light-background h3, section.has-light-background h4, section.has-light-background h5, section.has-light-background h6 {
   color: #222; }
 
@@ -13,6 +13,11 @@ h2 {
   text-align: left; }
 
 p {
+  font-weight: 300 !important;
+  text-align: left;
+  font-size: 0.8em !important; }
+
+small {
   font-weight: 300 !important; }
 
 a {
@@ -20,11 +25,13 @@ a {
   font-weight: 300 !important; }
 
 .red-title {
-  font-family: "Bree Serif", serif !important;
+  font-size: 1.0em !important;
+  font-family: "Assistant", Helvetica, sans-serif !important;
   color: #fc5c52; }
 
-.red {
-  color: #fc5c52; }
+.red-number {
+  color: #fc5c52;
+  font-weight: 600 !important; }
 
 /*********************************************
  * GLOBAL STYLES
@@ -65,8 +72,8 @@ body {
 .reveal h6 {
   margin: 0 0 20px 0;
   color: #fbf9f0;
-  font-family: "Bree Serif", serif;
-  font-weight: 300;
+  font-family: "Assistant", Helvetica, sans-serif;
+  font-weight: 400;
   line-height: 1.2;
   letter-spacing: normal;
   text-transform: none;

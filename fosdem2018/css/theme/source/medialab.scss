@@ -11,7 +11,7 @@
 // ---------------------------------------------
 
 // Include theme-specific fonts
-@import url('https://fonts.googleapis.com/css?family=Anonymous+Pro|Assistant:300|Bree+Serif|Open+Sans+Condensed:300');
+@import url('https://fonts.googleapis.com/css?family=Anonymous+Pro|Assistant:300,400|Open+Sans+Condensed:300');
 
 // Override theme settings (see ../template/settings.scss)
 $backgroundColor: #000;
@@ -21,14 +21,16 @@ $headingColor: #fbf9f0;
 $red: #fc5c52;
 
 $mainFontSize: 36px;
+
+// NOTE: mainFont can also be Bree-Serif
 $mainFont: 'Assistant', Helvetica, sans-serif;
-$headingFont: 'Bree Serif', serif;
+$headingFont: $mainFont;
 $codeFont: 'Anonymous Pro', monospace;
 $linkFont: 'Open Sans Condensed', sans-serif;
 $headingTextShadow: none;
 $headingLetterSpacing: normal;
 $headingTextTransform: none;
-$headingFontWeight: 300;
+$headingFontWeight: 400;
 $linkColor: $red;
 $linkColorHover: lighten( $linkColor, 15% );
 $selectionBackgroundColor: lighten( $linkColor, 25% );
@@ -54,6 +56,12 @@ h2 {
 
 p {
   font-weight: 300 !important;
+  text-align: left;
+  font-size: 0.8em !important;
+}
+
+small {
+  font-weight: 300 !important;
 }
 
 a {
@@ -62,12 +70,14 @@ a {
 }
 
 .red-title {
+  font-size: 1.0em !important;
   font-family: $headingFont !important;
   color: $red;
 }
 
-.red {
+.red-number {
   color: $red;
+  font-weight: 600 !important;
 }
 
 // Theme template ------------------------------
