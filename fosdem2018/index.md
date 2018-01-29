@@ -34,6 +34,8 @@ Does it look sleek? Does it seem correct? "Les français ont le droit de savoir!
 
 This is a [http://www.google.fr](google.fr) link.
 
+![logo](img/medialab-logo.svg)
+
 ===
 
 ```python
@@ -44,3 +46,7 @@ def main(arg):
 ```cypher
 MATCH (n:Book) WHERE n.title = 'Test' RETURN n LIMIT 10;
 ```
+
+===
+
+<!-- .slide: data-background="img/tal.jpg" -->

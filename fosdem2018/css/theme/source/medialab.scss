@@ -2,9 +2,6 @@
  * médialab theme for reveal.js.
  */
 
-// Logo SVG
-// Highlight
-
 // Default mixins and settings -----------------
 @import "../template/mixins";
 @import "../template/settings";
@@ -52,6 +49,7 @@ code {
 
 h2 {
   text-align: left;
+  margin-bottom: 40px !important;
 }
 
 p {
@@ -67,6 +65,15 @@ small {
 a {
   font-family: $linkFont !important;
   font-weight: 300 !important;
+}
+
+img {
+  border: none !important;
+  background: none !important;
+}
+
+.red {
+  color: $red;
 }
 
 .red-title {

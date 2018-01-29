@@ -10,7 +10,8 @@ code {
   font-family: "Anonymous Pro", monospace !important; }
 
 h2 {
-  text-align: left; }
+  text-align: left;
+  margin-bottom: 40px !important; }
 
 p {
   font-weight: 300 !important;
@@ -23,6 +24,13 @@ small {
 a {
   font-family: "Open Sans Condensed", sans-serif !important;
   font-weight: 300 !important; }
+
+img {
+  border: none !important;
+  background: none !important; }
+
+.red {
+  color: #fc5c52; }
 
 .red-title {
   font-family: "Assistant", Helvetica, sans-serif !important;
