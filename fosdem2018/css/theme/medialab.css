@@ -25,13 +25,13 @@ a {
   font-weight: 300 !important; }
 
 .red-title {
-  font-size: 1.0em !important;
   font-family: "Assistant", Helvetica, sans-serif !important;
   color: #fc5c52; }
 
 .red-number {
   color: #fc5c52;
-  font-weight: 600 !important; }
+  font-weight: 600 !important;
+  font-size: 1.2em !important; }
 
 /*********************************************
  * GLOBAL STYLES
@@ -81,7 +81,7 @@ body {
   word-wrap: break-word; }
 
 .reveal h1 {
-  font-size: 2em; }
+  font-size: 2.5em; }
 
 .reveal h2 {
   font-size: 1.6em; }

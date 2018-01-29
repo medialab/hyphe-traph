@@ -35,7 +35,7 @@ $linkColor: $red;
 $linkColorHover: lighten( $linkColor, 15% );
 $selectionBackgroundColor: lighten( $linkColor, 25% );
 
-$heading1Size: 2.0em;
+$heading1Size: 2.5em;
 $heading2Size: 1.6em;
 $heading3Size: 1.3em;
 $heading4Size: 1.0em;
@@ -70,7 +70,6 @@ a {
 }
 
 .red-title {
-  font-size: 1.0em !important;
   font-family: $headingFont !important;
   color: $red;
 }
@@ -78,6 +77,7 @@ a {
 .red-number {
   color: $red;
   font-weight: 600 !important;
+  font-size: 1.2em !important;
 }
 
 // Theme template ------------------------------

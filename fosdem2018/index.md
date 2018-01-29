@@ -6,6 +6,8 @@
   </span>
 </center>
 
+<br>
+
 <center>
   <small>
     Mathieu Jacomy • Paul Girard • Benjamin Ooghe-Tabanou • Guillaume Plique
