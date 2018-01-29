@@ -19,7 +19,7 @@ $mainColor: #fbf9f0;
 $headingColor: #fbf9f0;
 $red: #fc5c52;
 
-$mainFontSize: 42px;
+$mainFontSize: 36px;
 $mainFont: 'Open Sans', Helvetica, sans-serif;
 $headingFont: 'Bree Serif', serif;
 $headingTextShadow: none;
@@ -41,6 +41,18 @@ section.has-light-background {
     }
 }
 
+h2 {
+  text-align: left;
+}
+
+.red-title {
+  font-family: $headingFont !important;
+  color: $red;
+}
+
+.red {
+  color: $red;
+}
 
 // Theme template ------------------------------
 @import "../template/theme";
