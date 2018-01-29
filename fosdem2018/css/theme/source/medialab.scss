@@ -2,15 +2,16 @@
  * médialab theme for reveal.js.
  */
 
+// Logo SVG
+// Highlight
 
 // Default mixins and settings -----------------
 @import "../template/mixins";
 @import "../template/settings";
 // ---------------------------------------------
 
-
 // Include theme-specific fonts
-@import url('https://fonts.googleapis.com/css?family=Bree+Serif|Open+Sans:300');
+@import url('https://fonts.googleapis.com/css?family=Anonymous+Pro|Assistant:300|Bree+Serif|Open+Sans+Condensed:300');
 
 // Override theme settings (see ../template/settings.scss)
 $backgroundColor: #000;
@@ -20,12 +21,14 @@ $headingColor: #fbf9f0;
 $red: #fc5c52;
 
 $mainFontSize: 36px;
-$mainFont: 'Open Sans', Helvetica, sans-serif;
+$mainFont: 'Assistant', Helvetica, sans-serif;
 $headingFont: 'Bree Serif', serif;
+$codeFont: 'Anonymous Pro', monospace;
+$linkFont: 'Open Sans Condensed', sans-serif;
 $headingTextShadow: none;
 $headingLetterSpacing: normal;
 $headingTextTransform: none;
-$headingFontWeight: 400;
+$headingFontWeight: 300;
 $linkColor: $red;
 $linkColorHover: lighten( $linkColor, 15% );
 $selectionBackgroundColor: lighten( $linkColor, 25% );
@@ -41,8 +44,21 @@ section.has-light-background {
     }
 }
 
+code {
+  font-family: $codeFont !important;
+}
+
 h2 {
   text-align: left;
+}
+
+p {
+  font-weight: 300 !important;
+}
+
+a {
+  font-family: $linkFont !important;
+  font-weight: 300 !important;
 }
 
 .red-title {

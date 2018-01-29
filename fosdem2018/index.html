@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="css/theme/medialab.css">
 
     <!-- Theme used for syntax highlighting of code -->
-    <link rel="stylesheet" href="lib/css/zenburn.css">
+    <link rel="stylesheet" href="lib/css/tomorrow-night-bright.css">
 
     <!-- Printing and PDF exports -->
     <script>
@@ -35,6 +35,7 @@
 
     <script src="lib/js/head.min.js"></script>
     <script src="js/reveal.js"></script>
+    <script src="js/cypher-mode.js"></script>
 
     <script>
       // More info about config & dependencies:
@@ -45,7 +46,7 @@
           { src: 'plugin/markdown/marked.js' },
           { src: 'plugin/markdown/markdown.js' },
           { src: 'plugin/notes/notes.js', async: true },
-          { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+          { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.registerLanguage('cypher', CYPHER_MODE); hljs.initHighlightingOnLoad(); } }
         ]
       });
     </script>

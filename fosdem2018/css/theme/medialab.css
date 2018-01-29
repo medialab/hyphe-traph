@@ -2,12 +2,22 @@
 /**
  * médialab theme for reveal.js.
  */
-@import url("https://fonts.googleapis.com/css?family=Bree+Serif|Open+Sans:300");
+@import url("https://fonts.googleapis.com/css?family=Anonymous+Pro|Assistant:300|Bree+Serif|Open+Sans+Condensed:300");
 section.has-light-background, section.has-light-background h1, section.has-light-background h2, section.has-light-background h3, section.has-light-background h4, section.has-light-background h5, section.has-light-background h6 {
   color: #222; }
 
+code {
+  font-family: "Anonymous Pro", monospace !important; }
+
 h2 {
   text-align: left; }
+
+p {
+  font-weight: 300 !important; }
+
+a {
+  font-family: "Open Sans Condensed", sans-serif !important;
+  font-weight: 300 !important; }
 
 .red-title {
   font-family: "Bree Serif", serif !important;
@@ -24,7 +34,7 @@ body {
   background-color: #000; }
 
 .reveal {
-  font-family: "Open Sans", Helvetica, sans-serif;
+  font-family: "Assistant", Helvetica, sans-serif;
   font-size: 36px;
   font-weight: normal;
   color: #fbf9f0; }
@@ -56,7 +66,7 @@ body {
   margin: 0 0 20px 0;
   color: #fbf9f0;
   font-family: "Bree Serif", serif;
-  font-weight: 400;
+  font-weight: 300;
   line-height: 1.2;
   letter-spacing: normal;
   text-transform: none;
