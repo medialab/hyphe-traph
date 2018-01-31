@@ -89,6 +89,30 @@
 
 ===
 
+# So let's build this index!
+
+===
+
+# We'll call it the Traph!
+
+===
+
+# But, seriously, what is a Traph?
+
+===
+
+The traph is a "subtle" mix between a <u>Trie</u> and a <u>Graph</u>.
+
+<small>Hence the incredibly innovative name...</small>
+
+===
+
+## A Trie
+
+The **Trie** is a prefix tree.
+
+===
+
 <center>
   Thanks for your attention.
 </center>
