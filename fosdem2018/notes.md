@@ -8,8 +8,8 @@
 4. Our gambit to create a better index (Copenhagen)
 5. The neo4j experience
 6. Traph protoype wins (benchmarks)
-7. Designing the on-file index (check history of the structure) image with flags on nodes
-8. Concerns, consequences & the future
+7. Designing the on-file index (check history of the structure) image with flags on nodes. The are you crazy part? why? just because we can. no seriously
+8. Concerns, consequences & the future (ask for feedback)
 
 ## Miscellaneaous
 
@@ -21,3 +21,4 @@
 * Humility => ask for insights on the structure so we can better it further.
 * Humility => Lucene started with a bad subcontractor.
 * Use jacomyma's slides describing the url/lru/we scheme.
+* process / msgpack

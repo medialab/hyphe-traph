@@ -23,7 +23,7 @@
 ===
 
 <h2>
-  <span class="red-number">II.</span><br>Lucene
+  <span class="red-number">II.</span><br>A Lucene story
 </h2>
 
 ===
@@ -41,15 +41,54 @@
 ===
 
 <h2>
-  <span class="red-number">V.</span><br>The Traph?
+  <span class="red-number">V.</span><br>What on earth is a Traph?
 </h2>
+
+===
+
+<center>
+  ![its-a-traph](img/its-a-traph.png)
+</center>
+
+===
+
+# Designing our own on-file index
+
+<center class="red">
+  To store a somewhat complicated multi-level graph of URLs
+</center>
+
+===
+
+### Isn't that what crazy people do?
+
+* Building an on-file structure from scratch is not easy.
+* Why would you do that instead of relying on some already existing solution?
+* What if it crashes?
+* What if your server unexpectedly shuts down?
+* What if humanity ceases to exist?
+
+\[\[ Insert a lot of other perfectly reasonable concerns \]\]
+
+===
+
+### Not so crazy
+
+* You cannot get faster than a tailored data structure (that's a fact).
+* We don't need deletions (huge win!).
+* No need for an **ACID** database (totally overkill).
+
+===
+
+### We just need an index
+
+* An index does not store any "original" data because...
+* ...a MongoDB stores the data in a reliable way.
+* \[ insert joke about MongoDB being bad \]
+* This means the index can be completely recomputed and its utter destruction does not mean we can lose data.
 
 ===
 
 <center>
   Thanks for your attention.
 </center>
-
-<!-- .slide: data-background="img/tal.jpg" -->
-
-Note: remove this. It's just here as an example.

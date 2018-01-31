@@ -38,24 +38,38 @@ $heading3Size: 1.3em;
 $heading4Size: 1.0em;
 
 section.has-light-background {
-    &, h1, h2, h3, h4, h5, h6 {
-        color: #222;
-    }
+  &, h1, h2, h3, h4, h5, h6 {
+      color: #222;
+  }
+
+  text-align: left;
 }
 
 code {
   font-family: $codeFont !important;
 }
 
-h2 {
+h2, h3 {
   text-align: left;
   margin-bottom: 40px !important;
 }
 
-p {
+p, li {
   font-weight: 300 !important;
   text-align: left;
   font-size: 0.8em !important;
+}
+
+ul, ol {
+  width: 100%;
+}
+
+ul, ol, li {
+  text-align: left !important;
+}
+
+li {
+  margin-bottom: 5px !important;
 }
 
 small {
