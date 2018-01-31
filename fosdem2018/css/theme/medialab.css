@@ -38,7 +38,7 @@ a {
 
 img {
   border: none !important;
-  background: none !important; }
+  background: none; }
 
 .red {
   color: #fc5c52; }

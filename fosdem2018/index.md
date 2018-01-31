@@ -111,6 +111,40 @@ The traph is a "subtle" mix between a <u>Trie</u> and a <u>Graph</u>.
 
 The **Trie** is a prefix tree.
 
+<center>
+  <img src="img/trie-example.png" style="height: 400px; background-color: #fff;" />
+</center>
+
+===
+
+TODO: a trie of lrus - blocks - stems - issue - ternary search tree - balancing
+
+===
+
+## A Graph
+
+How do we make this a graph
+
+TODO: graph of pages. link store - linked lists of stubs
+
+===
+
+the multi-level graph
+
+TODO: flagging the trie for webentities - DFS and bubbling up
+
+===
+
+TODO: bonus takeout: varchars
+
+===
+
+some astonishing numbers
+
+===
+
+here we are now. surely some people can do better
+
 ===
 
 <center>
