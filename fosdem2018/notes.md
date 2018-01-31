@@ -5,11 +5,11 @@
 1. Hyphe & background (web entities, LRUs, stems, creation rules etc.)
 2. The Lucene memory structure: advantages & limits (precision limit etc.)
 3. The problem: "not" queries (child & parent webentities)
-4. Our gambit to create a better index
+4. Our gambit to create a better index (Copenhagen)
 5. The neo4j experience
 6. Traph protoype wins (benchmarks)
-7. Designing the on-file index (check history of the structure)
-8. Consequences & the future
+7. Designing the on-file index (check history of the structure) image with flags on nodes
+8. Concerns, consequences & the future
 
 ## Miscellaneaous
 

@@ -22,31 +22,34 @@
 
 ===
 
-## Title of the slide
-
-This is just some really boring text whose only goal is to check what it would mean to write some text here.
-
-In fact, my aim here is more to show you what a typical slide would look like.
-
-Does it look sleek? Does it seem correct? "Les français ont le droit de savoir!"
+<h2>
+  <span class="red-number">II.</span><br>Lucene
+</h2>
 
 ===
 
-This is a [http://www.google.fr](google.fr) link.
+<h2>
+  <span class="red-number">III.</span><br>A battle to the death
+</h2>
 
-![logo](img/medialab-logo.svg)
+===
+
+<h2>
+  <span class="red-number">IV.</span><br>A Neo4j prototype
+</h2>
 
 ===
 
-```python
-def main(arg):
-  print('Test')
-```
-
-```cypher
-MATCH (n:Book) WHERE n.title = 'Test' RETURN n LIMIT 10;
-```
+<h2>
+  <span class="red-number">V.</span><br>The Traph?
+</h2>
 
 ===
+
+<center>
+  Thanks for your attention.
+</center>
 
 <!-- .slide: data-background="img/tal.jpg" -->
+
+Note: remove this. It's just here as an example.
