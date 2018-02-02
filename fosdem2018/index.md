@@ -28,9 +28,27 @@
 
 ===
 
+TODO: demo hyphe, web entities, lrus
+
+===
+
 <h2>
-  <span class="red-number">II.</span><br>A Lucene story
+  <span class="red-number">II.</span><br>Before: Lucene
 </h2>
+
+===
+
+TODO: limits
+
+TODO: operations: pages by prefix, page's webentity, ability to dynamically change webentities. NOT queries + dynamic changes => recache index slow
+
+SCHEMA: for NOT queries => illustrate using Wikipedia
+
+TODO: plus various caveats
+
+TODO: mea culpa
+
+TODO: it works, but it's slow (indexation is slower than the web...)
 
 ===
 
@@ -38,16 +56,28 @@
   <span class="red-number">III.</span><br>A battle to the death
 </h2>
 
+TODO: vs. Lucene/Neo4J/Traph
+
 ===
 
 <h2>
-  <span class="red-number">IV.</span><br>A Neo4j prototype
+  <span class="red-number">IV.</span><br>Prototype A - Neo4j
 </h2>
 
 ===
 
+TODO: we have a graph, let's use Neo4j
+
+TODO: UNWIND big win
+
+TODO: mettre une grosse requete qui tache
+
+SCHEMA: benj schema neo4j des lrus
+
+===
+
 <h2>
-  <span class="red-number">V.</span><br>What on earth is a Traph?
+  <span class="red-number">V.</span><br>Prototype B - The Traph
 </h2>
 
 ===
@@ -67,6 +97,8 @@
 ===
 
 ### Isn't that what crazy people do?
+
+TODO: people told us not to do it!
 
 * Building an on-file structure from scratch is not easy.
 * Why would you do that instead of relying on some already existing solution?
@@ -123,7 +155,7 @@ The **Trie** is a prefix tree.
 
 ===
 
-TODO: a trie of lrus - blocks - stems - issue - ternary search tree - balancing
+TODO: a trie of lrus - blocks
 
 ===
 
@@ -141,15 +173,23 @@ TODO: flagging the trie for webentities - DFS and bubbling up
 
 ===
 
-TODO: bonus takeout: varchars
+Benchmark: some astonishing numbers
 
 ===
 
-some astonishing numbers
+Implémentation python
+
+TODO: stems - issue - ternary search tree - balancing
+
+===
+
+TODO: bonus takeaway: varchars
 
 ===
 
 here we are now. surely some people can do better
+
+TODO: we used lucene badly but still + stored procedures in Neo4j
 
 ===
 
