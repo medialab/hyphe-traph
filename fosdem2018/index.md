@@ -61,10 +61,6 @@
 
 ===
 
-TODO: demo hyphe, web entities, lrus
-
-===
-
 So we have a trie of LRU
 and a network of links
 
