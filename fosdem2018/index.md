@@ -26,9 +26,11 @@
 
 ===
 
-<h2>
-  <span class="red-number">I.</span><br>Hyphe
-</h2>
+# Hyphe?
+* A web corpus curation tool
+* A research-driven web crawler
+* Demo: http://hyphe.medialab.sciences-po.fr/demo/
+* v1.0 finally easily installable via Docker
 
 ===
 
@@ -55,8 +57,7 @@
 <img class="image-slide" src="img/Traphs-05.png" />
 
 ===
-## a tree of LRU + a network of links
-
+## A tree of URLs and a graph of links
 <img class="image-slide" src="img/Traphs-07.png" />
 ===
 # It's a tree
@@ -68,11 +69,38 @@
 ===
 
 <h2>
-  <span class="red-number">II.</span><br>  Lucene
+  <span class="red-number">I.</span><br>  Lucene
 </h2>
 
 ===
 
+# a tree ?
+# => filter by Prefix
+===
+# a graph ? 
+# => index of links of prefixes
+===
+## Remember Bernhard?
+<img class="image-slide" src="img/Traphs-06.png" />
+===
+## problem
+
+- we have to aggregate links by webEntities
+- which are list of prexises
+- with subprefix
+- NOT in list of (sub)prefixes
+
+===
+## performance issue
+
+* **indexation** • 1 h 55 m
+* **WElinks aggregation** • 45 m
+* **on disk** • 740 mB
+===
+## turnarounds
+* Lucene chaching
+* WElinks in memory caching
+===
 TODO: limits
 
 TODO: operations: pages by prefix, page's webentity, ability to dynamically change webentities. NOT queries + dynamic changes => recache index slow
