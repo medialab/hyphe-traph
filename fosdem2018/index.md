@@ -28,8 +28,12 @@
 ===
 
 <h2>
-  <span class="red-number">I.</span><br>Hyphe
+  <span class="red-number">I.</span><br>Hyphe?
 </h2>
+* A web corpus curation tool
+* A research-driven web crawler
+* Demo: http://hyphe.medialab.sciences-po.fr/demo/
+* v1.0 finally easily installable via Docker
 
 ===
 
