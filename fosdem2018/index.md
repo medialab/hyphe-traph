@@ -195,7 +195,17 @@ TODO: compare bench again (see my notes for size & speed)
 
 ===
 
-TODO: bonus takeaway: varchars
+## Takeaway bonus: varchars(255)
+
+Sacrificing one byte to have the string's length will always be faster than manually dropping null bytes.
+
+===
+
+<!-- .slide: data-background="img/varchars.png" -->
+
+===
+
+**Huge win!** - 2x boost in performance.
 
 ===
 
@@ -203,11 +213,31 @@ TODO: we used lucene badly but still + stored procedures in Neo4j
 
 ===
 
-So, here we are now.
+<center>
+  Here we are now.
+</center>
+
+<br>
+
+<center>
+  <img src="img/crawl-index.png" height="300px" />
+</center>
+
+<br>
+
+<center>
+  The web is the bottleneck again!
+</center>
+
+===
 
 Current version of [Hyphe](https://github.com/medialab/hyphe) runs this index.
 
-IMG: image of a crawling graph with smooth curve
+===
+
+# But...
+
+===
 
 We are confident we can further improve our structure and that people here can help us do so!
 
