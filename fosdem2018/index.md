@@ -21,8 +21,6 @@
 <center>
   <img alt="logo médialab" src="img/medialab-logo.svg" />
 </center>  
-  
-
 
 ===
 
@@ -59,12 +57,18 @@
 ===
 ## A tree of URLs and a graph of links
 <img class="image-slide" src="img/Traphs-07.png" />
+
 ===
+
 # It's a tree
+
 ===
+
 # It's a graph
+
 ===
-# How to implement that ?
+
+# How to implement that?
 
 ===
 
@@ -74,21 +78,21 @@
 
 ===
 
-## a tree ?
+## A tree?
 
 - index of pages
 - filter by prefix
 
 ===
 
-## a graph ? 
+## A graph?
 
 - index of pages couples
 - agregate links by couples of prefixes
 
 ===
 
-## problem
+## Problem
 
 - Links between WebEntities are agregates
 - WebEntities are dynamic
@@ -102,7 +106,7 @@
 
 ===
 
-## limits
+## Limits
 
 - Agregate links for list of prefixes
 - but NOT for sub-prefixes!
@@ -111,28 +115,22 @@
 
 ===
 
-## performance issue
+## Turnarounds
 
-* **indexation** • 1 h 55 m
-* **WElinks aggregation** • 45 m
-* **on disk** • 740 mB
-
-===
-
-## turnarounds
-
-* Lucene chaching
+* Lucene caching
 * WElinks in memory caching
 
 ===
 
+## Performance issue
 
-TODO: plus various caveats
+* **Indexation time** • 1 hour & 55 minutes
+* **Graph processing time** • 45 minutes
+* **Disk space** • 740 MB
 
-TODO: mea culpa
+===
 
-=== 
-To sum up: indexation is slower than the web...
+To sum up: indexation is slower than crawlers...
 
 ===
 
