@@ -95,10 +95,12 @@ To sum up: indexation is slower than the web...
   <span class="red-number">III.</span><br>Coding retreat
 </h2>
 ===
+
 One week
 Four brains
 TANT LAB @Copenhaguen
 2 prototypes
+
 ===
 
 
@@ -143,11 +145,11 @@ SCHEMA: benj schema neo4j des lrus
 
 ===
 
-# Designing our own on-file index
+## Designing our own on-file index
 
-<center class="red">
+<p class="red">
   To store a somewhat complicated multi-level graph of URLs
-</center>
+</p>
 
 ===
 
@@ -184,15 +186,7 @@ SCHEMA: benj schema neo4j des lrus
 
 ===
 
-# So let's build this index!
-
-===
-
-# We'll call it the Traph!
-
-===
-
-# But, seriously, what is a Traph?
+# So, what's a Traph?
 
 ===
 
@@ -272,9 +266,9 @@ We have a graph of pages!
 
 What we want is the graph of **webentities** sitting above the graph of pages.
 
-===
-
 We "just" need to flag our Trie's nodes for webentities' starting points.
+
+===
 
 SCHEMA: trie with webentities boundaries' & flag
 
@@ -299,13 +293,9 @@ This seems costly but:
 
 ===
 
-## But was it worth it?
+## Was it worth it?
 
-===
-
-## Our benchmark
-
-10% sample of a sizeable corpus about privacy.
+Benchmark on a 10% sample from a sizeable corpus about privacy.
 
 * Number of pages: **1 840 377**
 * Number of links: **5 395 253**
@@ -336,15 +326,7 @@ This seems costly but:
 * **Neo4j** • 1.5 gigabytes
 * **Traph** • 1 gigabytes
 
-===
-
-OK.
-
-Lucene seems to win the disk space battle.
-
-===
-
-Not for long.
+Note: it seems that Lucene wins. Not for long.
 
 ===
 
@@ -356,15 +338,15 @@ We made some new discoveries on the way.
 
 ===
 
-## Beyond characters
+## The issue with single characters
 
 Our initial implementation was using single LRU characters as nodes.
 
-This means we waste a lot of space due to the multiplication of needed nodes: more pointers, more flags etc.
+Wastes a lot of spaces: more nodes = more pointers, flags etc.
 
-More disk space also means that graph queries are longer because of the amount of data we need to read from the disk.
+More disk space = longer queries because we need to read more data from the disk.
 
-We could do better: nodes should store LRU **stems**!
+We can do better: nodes should store LRU **stems**!
 
 ===
 
@@ -378,11 +360,9 @@ SCHEMA: the stem level LRU Trie
 
 ## Fragmented nodes
 
-Problem: stems can have variable length.
+**Problem**: stems can have variable length.
 
-But we have fixed-size binary blocks.
-
-We need to somehow fragment them.
+Fixed-size binary blocks => we need to be able to fragment them.
 
 ===
 
@@ -397,41 +377,33 @@ SCHEMA: reuse block with additional pointer to the tail
 
 Stem level had far less blocks and was orders of magnitudes lighter.
 
-But strangely, it was way slower because we had to read a lot more.
+Strangely, it was way slower because we had to read a lot more.
 
 ===
 
 ## Linked lists hell
 
-A Trie node's children where so far stored as linked lists.
+Node's children stored as linked lists.
 
-This means access to a particular child is `O(n)`.
+This means accessing a particular child is `O(n)`.
 
-But, at character level, a list cannot be larger than `255` since we store a single ascii bytes.
+At character level, a list cannot be larger than `255` since we store a single ascii byte.
 
-At stem level, those same linked lists can actually store a lot more children.
-
-===
-
-We had to organize children differently.
-
-We therefore implemented a <u>Ternary Search Tree</u>
+At stem level, those same linked lists will store a lot more children.
 
 ===
 
 ## The Ternary Search Tree
 
-A Trie whose children are stored as binary search trees.
+We had to organize children differently.
 
-This means we can access the desired child in `O(log n)`.
+We therefore implemented a <u>Ternary Search Tree</u>.
+
+This is a Trie whose children are stored as binary search trees so we can access children in `O(log n)`.
 
 ===
 
 SCHEMA: ternary search tree
-
-===
-
-## And finally results were good
 
 ===
 
@@ -460,7 +432,7 @@ SCHEMA: ternary search tree
 
 Binary search trees can degrade to `O(n)` access - same as the linked list - if unbalanced.
 
-We tried several balanced BSTs implementations (treap, red-black).
+We tried several balanced BSTs implementations: treap & red-black.
 
 This slowed down writes and did nothing to reads.
 
@@ -515,8 +487,6 @@ The current version of [Hyphe](https://github.com/medialab/hyphe) uses this inde
 ===
 
 # But...
-
-===
 
 We are confident we can further improve the structure.
 
