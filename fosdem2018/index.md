@@ -187,7 +187,11 @@ Benchmark: some [astonishing numbers](https://github.com/medialab/hyphe-neo4j-po
 
 Implémentation python
 
+TODO: trie organized with children as linked lists
+
 TODO: stems - issue - ternary search tree - balancing
+
+TODO: compare bench again (see my notes for size & speed)
 
 ===
 
