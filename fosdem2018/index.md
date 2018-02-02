@@ -18,12 +18,11 @@
 </center>
 
 ===
-<center><small>Produced by</small></center>
 <center>
   <img alt="logo médialab" src="img/medialab-logo.svg" />
 </center>  
   
-  
+
 
 ===
 
