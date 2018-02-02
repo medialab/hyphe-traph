@@ -1,8 +1,11 @@
-# It's a Tree... It's a Graph... It's a Traph!
+# It's a Tree... It's a Graph...  
+# It's a Traph!!!!
 
 <center>
   <span class="red-title">
-    Designing an on-file multi-level graph index for the Hyphe web crawler
+    Designing an on-file    
+    multi-level graph index  
+    for the Hyphe web crawler
   </span>
 </center>
 
@@ -15,10 +18,12 @@
 </center>
 
 ===
-
+<center><small>Produced by</small></center>
 <center>
   <img alt="logo médialab" src="img/medialab-logo.svg" />
-</center>
+</center>  
+  
+  
 
 ===
 
