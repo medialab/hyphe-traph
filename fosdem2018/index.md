@@ -57,12 +57,20 @@ TODO: it works, but it's slow (indexation is slower than the web...)
 </h2>
 
 TODO: vs. Lucene/Neo4J/Traph
+* [Java Tree POC](https://github.com/medialab/hyphe-java-tree-poc)
+* [Neo4J POC](https://github.com/medialab/hyphe-neo4j-poc)
 
 ===
 
 <h2>
   <span class="red-number">IV.</span><br>Prototype A - Neo4j
 </h2>
+
+* example schema LRUS/Wes stockées dans neo4J
+* Complexité à écrire certaines requetes
+ + WECreationRules -> [complex but OK](https://github.com/medialab/hyphe-neo4j-poc/blob/master/queries/core.cypher#L66-L164)
+ + Query WELinks... [10 versions](https://github.com/medialab/hyphe-neo4j-poc/blob/master/queries/core.cypher#L183-L289), même Procédures stockées
+  => #fail
 
 ===
 
@@ -173,7 +181,7 @@ TODO: flagging the trie for webentities - DFS and bubbling up
 
 ===
 
-Benchmark: some astonishing numbers
+Benchmark: some [astonishing numbers](https://github.com/medialab/hyphe-neo4j-poc/blob/master/benchmark.md)
 
 ===
 
