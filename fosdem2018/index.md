@@ -155,35 +155,149 @@ The traph is a "subtle" mix between a <u>Trie</u> and a <u>Graph</u>.
 
 ===
 
-## A Trie
+## A Trie of LRUs
 
-The **Trie** is a prefix tree.
-
-<center>
-  <img src="img/trie-example.png" style="height: 400px; background-color: #fff;" />
-</center>
+SCHEMA: schema of character level lrus.
 
 ===
 
-TODO: a trie of lrus - blocks
+## Storing a Trie on file
+
+Using fixed-size blocks of binary data (ex: 10 bytes).
+
+We can read specific ones using pointers in a random access fashion.
 
 ===
 
-## A Graph
-
-How do we make this a graph
-
-TODO: graph of pages. link store - linked lists of stubs
+SCHEMA: schema of binary lru trie block.
 
 ===
 
-the multi-level graph
-
-TODO: flagging the trie for webentities - DFS and bubbling up
+SCHEMA: schema of the Trie with blocks.
 
 ===
 
-Benchmark: some [astonishing numbers](https://github.com/medialab/hyphe-neo4j-poc/blob/master/benchmark.md)
+We can now insert & query pages in `O(m)`.
+
+===
+
+## A Graph of pages
+
+The second part of the structure is a distinct file storing links between pages.
+
+We need to store both out links and in links.
+
+```cypher
+(A)->(B)
+
+(A)<-(B)
+```
+
+===
+
+## Storing links on file
+
+Once again: using fixed-sized blocks of binary data.
+
+We'll use those blocks to represent a bunch of linked list of stubs.
+
+===
+
+SCHEMA: schema of binary lru store block
+
+===
+
+### Linked lists of stubs
+
+```large
+{LRUTriePointer} => [targetA, weight] -> [targetB, weight] -> ø
+```
+
+===
+
+We can now store our links.
+
+We have a graph of pages!
+
+===
+
+## What about the multi-level graph?
+
+What we want is the graph of **webentities** sitting above the graph of pages.
+
+===
+
+We "just" need to flag our Trie's nodes for webentities' starting points.
+
+SCHEMA: trie with webentities boundaries' & flag
+
+===
+
+So now, finding the webentity to which belongs a page is obvious when traversing the Trie.
+
+What's more, we can bubble up in `O(m)`, if we need to, when following pages' links (this can also be easily cached).
+
+===
+
+REUSE EARLIER SCHEMA
+
+===
+
+What's more, if we want to compute the webentities' graph, one just needs to perform a DFS on the Trie.
+
+This seems costly but:
+
+* No other way since we need to scan the whole index at least once.
+* The datastructure is quite lean and you won't read so much.
+
+===
+
+## But was it worth it?
+
+===
+
+## Our benchmark
+
+10% sample of a sizeable corpus about privacy.
+
+* Number of pages: **1 840 377**
+* Number of links: **5 395 253**
+* Number of webentities: **20 003**
+* Number of webentities' links: **30 490**
+
+===
+
+## Results - Indexation time
+
+* **Lucene** • 1 hour & 55 minutes
+* **Neo4j** • 1 hour & 4 minutes
+* **Traph** • 16 minutes
+
+===
+
+## Results - Graph processing time
+
+* **Lucene** • 45 minutes
+* **Neo4j** • 6 minutes
+* **Traph** • 1 minute 35 seconds
+
+===
+
+## Results - Disk space
+
+* **Lucene** • 740 megabytes
+* **Neo4j** • 1.5 gigabytes
+* **Traph** • 1 gigabytes
+
+===
+
+OK.
+
+Neo4j seems to win the disk space battle.
+
+===
+
+Not for long.
 
 ===
 
@@ -191,7 +305,7 @@ Implémentation python
 
 TODO: trie organized with children as linked lists
 
-TODO: stems - issue - ternary search tree - balancing
+TODO: stems + losing lots of space due to pointers - issue - ternary search tree - balancing
 
 TODO: compare bench again (see my notes for size & speed)
 

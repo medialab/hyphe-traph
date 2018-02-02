@@ -49,6 +49,10 @@ code {
   font-family: $codeFont !important;
 }
 
+code.lang-large {
+  font-size: 1.2em;
+}
+
 h2, h3 {
   text-align: left;
   margin-bottom: 40px !important;
