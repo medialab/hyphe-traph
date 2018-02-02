@@ -505,7 +505,7 @@ The current version of [Hyphe](https://github.com/medialab/hyphe) uses this inde
 
 ===
 
-# But...
+## But...
 
 We are confident we can further improve the structure.
 
