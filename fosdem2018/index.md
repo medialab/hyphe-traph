@@ -460,7 +460,7 @@ Yes we probably used Lucene badly.
 
 Yes we probably used Neo4j badly.
 
-But. If you need to twist that much a system - by tweaking internals and/or using store procedures - aren't you in fact developing something else?
+But. If you need to twist that much a system - by tweaking internals and/or using stored procedures - aren't you in fact developing something else?
 
 ===
 
