@@ -195,9 +195,17 @@ TODO: bonus takeaway: varchars
 
 ===
 
-here we are now. surely some people can do better
-
 TODO: we used lucene badly but still + stored procedures in Neo4j
+
+===
+
+So, here we are now.
+
+Current version of [Hyphe](https://github.com/medialab/hyphe) runs this index.
+
+IMG: image of a crawling graph with smooth curve
+
+We are confident we can further improve our structure and that people here can help us do so!
 
 ===
 
