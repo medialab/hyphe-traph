@@ -74,38 +74,58 @@
 
 ===
 
-# a tree ?
-# => filter by Prefix
+## a tree ?
+
+- index of pages
+- filter by prefix
+
 ===
-# a graph ? 
-# => index of links of prefixes
+
+## a graph ? 
+
+- index of pages couples
+- agregate links by couples of prefixes
+
 ===
-## Remember Bernhard?
-<img class="image-slide" src="img/Traphs-06.png" />
-===
+
 ## problem
 
-- we have to aggregate links by webEntities
-- which are list of prexises
-- with subprefix
-- NOT in list of (sub)prefixes
+- Links between WebEntities are agregates
+- WebEntities are dynamic
+
+> WE links should be computed, not stored
 
 ===
+
+## Remember Bernhard?
+<img class="image-slide" src="img/Traphs-06.png" />
+
+===
+
+## limits
+
+- Agregate links for list of prefixes
+- but NOT for sub-prefixes!
+
+> complex slow queries
+
+===
+
 ## performance issue
 
 * **indexation** • 1 h 55 m
 * **WElinks aggregation** • 45 m
 * **on disk** • 740 mB
+
 ===
+
 ## turnarounds
+
 * Lucene chaching
 * WElinks in memory caching
+
 ===
-TODO: limits
 
-TODO: operations: pages by prefix, page's webentity, ability to dynamically change webentities. NOT queries + dynamic changes => recache index slow
-
-SCHEMA: for NOT queries => illustrate using Wikipedia
 
 TODO: plus various caveats
 
