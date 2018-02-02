@@ -22,3 +22,10 @@
 * Humility => Lucene started with a bad subcontractor.
 * Use jacomyma's slides describing the url/lru/we scheme.
 * process / msgpack
+
+## Schemas
+
+* Trie x3: arbitrary characters, lru character-level, lru stem-level
+* Linked List
+* Trie with webentity frontier and flags
+* Schematic blocks for binary structure
