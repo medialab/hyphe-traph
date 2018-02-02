@@ -28,6 +28,30 @@
 
 ===
 
+<img class="image-slide" src="img/Traphs-01.png" />
+
+===
+
+<img class="image-slide" src="img/Traphs-02.png" />
+
+===
+
+<img class="image-slide" src="img/Traphs-03.png" />
+
+===
+
+<img class="image-slide" src="img/Traphs-04.png" />
+
+===
+
+<img class="image-slide" src="img/Traphs-05.png" />
+
+===
+
+<img class="image-slide" src="img/Traphs-06.png" />
+
+===
+
 TODO: demo hyphe, web entities, lrus
 
 ===
