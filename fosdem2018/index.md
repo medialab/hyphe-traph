@@ -93,7 +93,7 @@
 - Links between WebEntities are agregates
 - WebEntities are dynamic
 
-> WE links should be computed, not stored
+-> WE links should be computed, not stored
 
 ===
 
@@ -107,7 +107,7 @@
 - Agregate links for list of prefixes
 - but NOT for sub-prefixes!
 
-> complex slow queries
+-> complex slow queries
 
 ===
 
