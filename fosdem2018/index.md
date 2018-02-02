@@ -509,7 +509,7 @@ The current version of [Hyphe](https://github.com/medialab/hyphe) uses this inde
 
 We are confident we can further improve the structure.
 
-And that people here can help us do so!
+And that people in this very room can help us do so!
 
 ===
 
