@@ -40,6 +40,9 @@ img {
   border: none !important;
   background: none; }
 
+img[src$=".svg"] {
+  background: none !important; }
+
 .red {
   color: #fc5c52; }
 

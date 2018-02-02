@@ -86,6 +86,10 @@ img {
   background: none;
 }
 
+img[src$=".svg"] {
+  background: none !important;
+}
+
 .red {
   color: $red;
 }

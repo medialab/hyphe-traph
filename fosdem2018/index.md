@@ -16,6 +16,12 @@
 
 ===
 
+<center>
+  <img alt="logo médialab" src="img/medialab-logo.svg" />
+</center>
+
+===
+
 <h2>
   <span class="red-number">I.</span><br>Hyphe
 </h2>
