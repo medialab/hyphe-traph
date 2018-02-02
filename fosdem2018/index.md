@@ -32,8 +32,17 @@ TODO: demo hyphe, web entities, lrus
 
 ===
 
+So we have a trie of LRU
+and a network of links
+
+===
+
+=> traph
+
+===
+
 <h2>
-  <span class="red-number">II.</span><br>Before: Lucene
+  <span class="red-number">II.</span><br>Before there was Lucene
 </h2>
 
 ===
@@ -48,14 +57,23 @@ TODO: plus various caveats
 
 TODO: mea culpa
 
-TODO: it works, but it's slow (indexation is slower than the web...)
+=== 
+To sum up: indexation is slower than the web...
 
 ===
 
 <h2>
-  <span class="red-number">III.</span><br>A battle to the death
+  <span class="red-number">III.</span><br>Coding retreat
 </h2>
+===
+One week
+Four brains
+TANT LAB @Copenhaguen
+2 prototypes
+===
 
+
+===
 TODO: vs. Lucene/Neo4J/Traph
 * [Java Tree POC](https://github.com/medialab/hyphe-java-tree-poc)
 * [Neo4J POC](https://github.com/medialab/hyphe-neo4j-poc)
