@@ -104,15 +104,17 @@ SCHEMA: benj schema neo4j des lrus
 
 ===
 
-### Isn't that what crazy people do?
+## People told us NOT to do it
 
-TODO: people told us not to do it!
+===
+
+### It certainly seems crazy...
 
 * Building an on-file structure from scratch is not easy.
 * Why would you do that instead of relying on some already existing solution?
 * What if it crashes?
 * What if your server unexpectedly shuts down?
-* What if humanity ceases to exist?
+* What if a thermonuclear war eradicates mankind?
 
 \[\[ Insert a lot of other perfectly reasonable concerns \]\]
 
@@ -129,9 +131,9 @@ TODO: people told us not to do it!
 ### We just need an index
 
 * An index does not store any "original" data because...
-* ...a MongoDB stores the data in a reliable way.
+* ...a MongoDB already stores the actual data in a reliable way.
 * \[ insert joke about MongoDB being bad \]
-* This means the index can be completely recomputed and its utter destruction does not mean we can lose data.
+* This means the index can be completely recomputed and its utter destruction does not mean we can lose information.
 
 ===
 
@@ -231,7 +233,7 @@ TODO: we used lucene badly but still + stored procedures in Neo4j
 
 ===
 
-Current version of [Hyphe](https://github.com/medialab/hyphe) runs this index.
+The current version of [Hyphe](https://github.com/medialab/hyphe) uses this index!
 
 ===
 
@@ -239,7 +241,9 @@ Current version of [Hyphe](https://github.com/medialab/hyphe) runs this index.
 
 ===
 
-We are confident we can further improve our structure and that people here can help us do so!
+We are confident we can further improve the structure.
+
+And that people here can help us do so!
 
 ===
 
