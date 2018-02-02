@@ -49,11 +49,11 @@
 
 ===
 
-<img class="image-slide" src="img/Traphs-05.png" />
+<img class="image-slide" src="img/Traphs-06.png" />
 
 ===
 
-<img class="image-slide" src="img/Traphs-06.png" />
+<img class="image-slide" src="img/Traphs-05.png" />
 
 ===
 
