@@ -267,23 +267,23 @@ This seems costly but:
 
 ===
 
-## Results - Indexation time
+## Indexation time
 
 * **Lucene** • 1 hour & 55 minutes
 * **Neo4j** • 1 hour & 4 minutes
-* **Traph** • 16 minutes
+* **Traph** • 20 minutes
 
 ===
 
-## Results - Graph processing time
+## Graph processing time
 
 * **Lucene** • 45 minutes
 * **Neo4j** • 6 minutes
-* **Traph** • 1 minute 35 seconds
+* **Traph** • 2 minutes 35 seconds
 
 ===
 
-## Results - Disk space
+## Disk space
 
 * **Lucene** • 740 megabytes
 * **Neo4j** • 1.5 gigabytes
@@ -293,7 +293,7 @@ This seems costly but:
 
 OK.
 
-Neo4j seems to win the disk space battle.
+Lucene seems to win the disk space battle.
 
 ===
 
@@ -301,13 +301,123 @@ Not for long.
 
 ===
 
-Implémentation python
+## After Copenhagen
 
-TODO: trie organized with children as linked lists
+We decided to redevelop the structure in **python** to limit the amount of different languages used by Hyphe's core.
 
-TODO: stems + losing lots of space due to pointers - issue - ternary search tree - balancing
+We made some new discoveries on the way.
 
-TODO: compare bench again (see my notes for size & speed)
+===
+
+## Beyond characters
+
+Our initial implementation was using single LRU characters as nodes.
+
+This means we waste a lot of space due to the multiplication of needed nodes: more pointers, more flags etc.
+
+More disk space also means that graph queries are longer because of the amount of data we need to read from the disk.
+
+We could do better: nodes should store LRU **stems**!
+
+===
+
+SCHEMA: the character level LRU Trie once again
+
+===
+
+SCHEMA: the stem level LRU Trie
+
+===
+
+## Fragmented nodes
+
+Problem: stems can have variable length.
+
+But we have fixed-size binary blocks.
+
+We need to somehow fragment them.
+
+===
+
+SCHEMA: reuse block with additional pointer to the tail
+
+===
+
+## Results were disappointing...
+
+* **Character level** • 5 400 000 reads / 1 001 000 total blocks
+* **Stem level** • 12 750 000 reads / 56 730 total blocks
+
+Stem level had far less blocks and was orders of magnitudes lighter.
+
+But strangely, it was way slower because we had to read a lot more.
+
+===
+
+## Linked lists hell
+
+A Trie node's children where so far stored as linked lists.
+
+This means access to a particular child is `O(n)`.
+
+But, at character level, a list cannot be larger than `255` since we store a single ascii bytes.
+
+At stem level, those same linked lists can actually store a lot more children.
+
+===
+
+We had to organize children differently.
+
+We therefore implemented a <u>Ternary Search Tree</u>
+
+===
+
+## The Ternary Search Tree
+
+A Trie whose children are stored as binary search trees.
+
+This means we can access the desired child in `O(log n)`.
+
+===
+
+SCHEMA: ternary search tree
+
+===
+
+## And finally results were good
+
+===
+
+## Indexation time
+
+* **Python character level traph** • 20 minutes
+* **Python stem level traph** • 8 minutes
+
+===
+
+## Graph processing time
+
+* **Python character level traph** • 2 minutes 43 seconds
+* **Python stem level traph** • 27 seconds
+
+===
+
+## Disk space
+
+* **Python character level traph** • 827 megabytes
+* **Python stem level traph** • 270 megabytes
+
+===
+
+## About balancing
+
+Binary search trees can degrade to `O(n)` access - same as the linked list - if unbalanced.
+
+We tried several balanced BSTs implementations (treap, red-black).
+
+This slowed down writes and did nothing to reads.
+
+It seems that the order in which the crawled pages are fed to the structure generate sufficient entropy.
 
 ===
 
@@ -325,7 +435,13 @@ Sacrificing one byte to have the string's length will always be faster than manu
 
 ===
 
-TODO: we used lucene badly but still + stored procedures in Neo4j
+## A final mea culpa
+
+Yes we probably used Lucene badly.
+
+Yes we probably used Neo4j badly.
+
+But. If you need to twist that much a system - by tweaking internals and/or using store procedures - aren't you in fact developing something else?
 
 ===
 
