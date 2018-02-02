@@ -55,22 +55,20 @@
 <img class="image-slide" src="img/Traphs-05.png" />
 
 ===
+## a tree of LRU + a network of links
 
-TODO: demo hyphe, web entities, lrus
-
+<img class="image-slide" src="img/Traphs-07.png" />
 ===
-
-So we have a trie of LRU
-and a network of links
-
+# It's a tree
 ===
-
-=> traph
+# It's a graph
+===
+# How to implement that ?
 
 ===
 
 <h2>
-  <span class="red-number">II.</span><br>Before there was Lucene
+  <span class="red-number">II.</span><br>  Lucene
 </h2>
 
 ===
@@ -135,12 +133,6 @@ SCHEMA: benj schema neo4j des lrus
 <h2>
   <span class="red-number">V.</span><br>Prototype B - The Traph
 </h2>
-
-===
-
-<center>
-  ![its-a-traph](img/its-a-traph.png)
-</center>
 
 ===
 
