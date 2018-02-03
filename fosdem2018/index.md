@@ -125,6 +125,7 @@
 ===
 
 ## Remember Bernhard?
+
 <img class="image-slide" src="img/Traphs-06.png" />
 
 ===
