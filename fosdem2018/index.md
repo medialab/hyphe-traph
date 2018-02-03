@@ -39,7 +39,7 @@
 * A web corpus curation tool
 * A research-driven web crawler
 * Demo: http://hyphe.medialab.sciences-po.fr/demo/
-* v1.0 finally easily installable via Docker
+* [v1.0](https://github.com/medialab/hyphe) finally easily installable via Docker
 
 ===
 
@@ -483,6 +483,8 @@ Note: it seems that Lucene wins. Not for long.
 We decided to redevelop the structure in **python** to limit the amount of different languages used by Hyphe's core.
 
 We made some new discoveries on the way.
+
+[https://github.com/medialab/hyphe-traph](https://github.com/medialab/hyphe-traph)
 
 ===
 
