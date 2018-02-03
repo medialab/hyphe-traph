@@ -3,8 +3,8 @@
 
 <center>
   <span class="red-title">
-    Designing an on-file    
-    multi-level graph index  
+    Designing an on-file<br>
+    multi-level graph index<br>
     for the Hyphe web crawler
   </span>
 </center>
