@@ -191,7 +191,7 @@ To sum up: indexation is slower than crawling...
 
 [Indexing pages](https://github.com/medialab/hyphe-neo4j-poc/blob/master/queries/core.cypher#L66-L164)
 
-<pre style="font-size: 0.4em; margin-left: -15%">
+```cypher
 UNWIND $lrus AS stems
 WITH [{lru: ""}] + stems AS stems
 WITH stems[size(stems)-1].lru as lru, extract(n IN range(1, size(stems) - 1) | {first: stems[n - 1], second: stems[n]}) AS tuples
@@ -227,15 +227,13 @@ FOREACH (_ IN CASE WHEN coalesce(tuple.second.page, false) THEN [1] ELSE [] END 
       b:Page
   MERGE (a)<-[:PARENT]-(b)
 );
-</pre>
+```
 
 ===
 
 Links agregation [V1 (out of 10)](https://github.com/medialab/hyphe-neo4j-poc/blob/master/queries/core.cypher#L183-L289)
 
-**TODO Guillaume: check which is the best version to display**
-
-<pre style=" margin-left: -15%">
+```cypher
 MATCH p=(weSource:WebEntity)<-[:PREFIX]-(:Stem)<-[:PARENT*0..]-(sourcePage:Page)
 WITH sourcePage, reduce(we = null , path in collect({length:length(p), we:weSource}) |
   CASE WHEN we IS NULL OR we.length>=path.length THEN path ELSE we END).we as weSource
@@ -245,7 +243,7 @@ MATCH p=(targetPage)-[:PARENT*0..]->(:Stem)-[:PREFIX]->(we:WebEntity)
 WITH weSource,targetPage,reduce(we = null , path in collect({length:length(p), we:we}) |
   CASE WHEN we IS NULL OR we.length>=path.length THEN path ELSE we END).we as weTarget, weight
 RETURN weSource.name as Source,weTarget.name as Target, sum(weight) as Weight
-</pre>
+```
 
 ===
 
@@ -322,7 +320,7 @@ The traph is a "subtle" mix between a <u>Trie</u> and a <u>Graph</u>.
 
 ## A Trie of LRUs
 
-SCHEMA: schema of character level lrus.
+<img src="img/Traphs-09.png" />
 
 ===
 
@@ -332,17 +330,13 @@ Using fixed-size blocks of binary data (ex: 10 bytes).
 
 We can read specific ones using pointers in a random access fashion.
 
-===
+Accessing a specific's page node is done in `O(m)`.
 
-SCHEMA: schema of binary lru trie block.
+---
 
-===
-
-SCHEMA: schema of the Trie with blocks.
-
-===
-
-We can now insert & query pages in `O(m)`.
+```very-large
+[char|flags|next|child|parent|outlinks|inlinks]
+```
 
 ===
 
@@ -366,9 +360,11 @@ Once again: using fixed-sized blocks of binary data.
 
 We'll use those blocks to represent a bunch of linked list of stubs.
 
-===
+---
 
-SCHEMA: schema of binary lru store block
+```very-large
+[target|weight|next]
+```
 
 ===
 
@@ -394,7 +390,7 @@ We "just" need to flag our Trie's nodes for webentities' starting points.
 
 ===
 
-SCHEMA: trie with webentities boundaries' & flag
+<img src="img/Traphs-10.png" />
 
 ===
 
@@ -404,7 +400,7 @@ What's more, we can bubble up in `O(m)`, if we need to, when following pages' li
 
 ===
 
-REUSE EARLIER SCHEMA
+<img src="img/Traphs-09.png" />
 
 ===
 
