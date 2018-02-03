@@ -146,12 +146,6 @@
 
 ===
 
-## User issue
-
-TODO: Screenshot network Hyphe
-
-===
-
 # indexation is slower than crawling...
 
 ===
@@ -164,7 +158,7 @@ TODO: Screenshot network Hyphe
 
 - One week
 - Four brains
-- TANT LAB @Copenhaguen
+- [TANT LAB @Copenhaguen](http://www.tantlab.aau.dk/)
 - 2 prototypes
   * [Java Tree POC](https://github.com/medialab/hyphe-java-tree-poc)
   * [Neo4J POC](https://github.com/medialab/hyphe-neo4j-poc)
@@ -209,13 +203,16 @@ TODO: Screenshot network Hyphe
 - `FOREACH`
 - `REDUCE`
 - `CASE`
+- `COALESCE`
 - stored procedures...
 
 ===
 
 [Indexing pages](https://github.com/medialab/hyphe-neo4j-poc/blob/master/queries/core.cypher#L66-L164)
 
-```cypher
+<img src='./img/indexLRUScypher.png' alt='index LRUS cypher query see hidden comments in source' style='margin:0px'>
+
+<!--
 UNWIND $lrus AS stems
 WITH [{lru: ""}] + stems AS stems
 WITH stems[size(stems)-1].lru as lru, extract(n IN range(1, size(stems) - 1) | {first: stems[n - 1], second: stems[n]}) AS tuples
@@ -250,24 +247,34 @@ FOREACH (_ IN CASE WHEN coalesce(tuple.second.page, false) THEN [1] ELSE [] END 
       b.linked = coalesce(tuple.second.linked, b.linked),
       b:Page
   MERGE (a)<-[:PARENT]-(b)
-);
-```
+);-->
 
 ===
 
-Links agregation [V1 (out of 10)](https://github.com/medialab/hyphe-neo4j-poc/blob/master/queries/core.cypher#L183-L289)
+Links agregation [V8 and 10 (out of 10)](https://github.com/medialab/hyphe-neo4j-poc/blob/master/queries/core.cypher#L183-L289)
 
-```cypher
-MATCH p=(weSource:WebEntity)<-[:PREFIX]-(:Stem)<-[:PARENT*0..]-(sourcePage:Page)
-WITH sourcePage, reduce(we = null , path in collect({length:length(p), we:weSource}) |
-  CASE WHEN we IS NULL OR we.length>=path.length THEN path ELSE we END).we as weSource
+<img src='img/aggregationLinksCypher.png' alt='Cypher queries to aggregate links at WE level'>
+
+<!--
+// name: get_webentity_links_v8
+MATCH path = (sourcePage:Page)-[:PARENT*0..]->(:Stem)-[:PREFIX]->(:WebEntity)
+WITH sourcePage, path
+ORDER BY length(path) ASC
+WITH sourcePage, head(collect(last(nodes(path)))) AS sourceWe
 MATCH (sourcePage)-[:LINK]->(targetPage:Page)
-WITH weSource,sourcePage,targetPage, count(*) as weight
-MATCH p=(targetPage)-[:PARENT*0..]->(:Stem)-[:PREFIX]->(we:WebEntity)
-WITH weSource,targetPage,reduce(we = null , path in collect({length:length(p), we:we}) |
-  CASE WHEN we IS NULL OR we.length>=path.length THEN path ELSE we END).we as weTarget, weight
-RETURN weSource.name as Source,weTarget.name as Target, sum(weight) as Weight
-```
+WITH sourcePage, targetPage, sourceWe, count(*) AS weight
+MATCH path = (targetPage)-[:PARENT*0..]->(:Stem)-[:PREFIX]->(:WebEntity)
+WITH sourcePage, targetPage, path, sourceWe, weight
+ORDER BY length(path) ASC
+WITH sourcePage, targetPage, sourceWe, head(collect(last(nodes(path)))) AS targetWe, weight
+RETURN sourceWe.name, targetWe.name, sum(weight) AS weight;
+
+// name: get_webentity_links_v10
+MATCH (source:Page)-[:LINK]->(target:Page)
+CALL hyphe.traverse(source) YIELD node AS sourceWe
+CALL hyphe.traverse(target) YIELD node AS targetWe
+RETURN sourceWe.name, targetWe.name;
+-->
 
 ===
 
@@ -434,6 +441,10 @@ Benchmark on a 10% sample from a sizeable corpus about privacy.
 * Number of links: **5 395 253**
 * Number of webentities: **20 003**
 * Number of webentities' links: **30 490**
+
+===
+
+<img src='img/codeRetreatResults.png' alt='Coding Retreat results at Tant Lab' style='margin:0px'>
 
 ===
 
