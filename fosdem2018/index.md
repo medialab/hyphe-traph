@@ -55,7 +55,9 @@
 <img class="image-slide" src="img/Traphs-05.png" />
 
 ===
+
 ## A tree of URLs and a graph of links
+
 <img class="image-slide" src="img/Traphs-07.png" />
 
 ===
@@ -129,9 +131,13 @@
 * **Disk space** • 740 MB
 
 ===
+
 ## User issue
+
 Screenshot network Hyphe
+
 ===
+
 # indexation is slower than crawling...
 
 ===
@@ -139,6 +145,7 @@ Screenshot network Hyphe
 <h2>
   <span class="red-number">II.</span><br>Coding retreat
 </h2>
+
 ===
 
 - One week
