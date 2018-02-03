@@ -473,11 +473,11 @@ We can do better: nodes should store LRU **stems**!
 
 ===
 
-SCHEMA: the character level LRU Trie once again
+<img src="img/Traphs-09.png" />
 
 ===
 
-SCHEMA: the stem level LRU Trie
+<img src="img/Traphs-08.png" />
 
 ===
 
@@ -487,9 +487,13 @@ SCHEMA: the stem level LRU Trie
 
 Fixed-size binary blocks => we need to be able to fragment them.
 
-===
+---
 
-SCHEMA: reuse block with additional pointer to the tail
+```large
+[stem|flags|next|parent|outlinks|inlinks] ... [tail?]
+        ^
+     has_tail?
+```
 
 ===
 
@@ -526,7 +530,9 @@ This is a Trie whose children are stored as binary search trees so we can access
 
 ===
 
-SCHEMA: ternary search tree
+<center>
+  <img src="img/ternary-search-tree.png" height="450px" />
+</center>
 
 ===
 
@@ -553,7 +559,7 @@ SCHEMA: ternary search tree
 
 ## About balancing
 
-Binary search trees can degrade to `O(n)` access - same as the linked list - if unbalanced.
+Binary search trees can degrade to linked lists if unbalanced.
 
 We tried several balanced BSTs implementations: treap & red-black.
 
@@ -605,7 +611,7 @@ But. If you need to twist that much a system - by tweaking internals and/or usin
 
 ===
 
-The current version of [Hyphe](https://github.com/medialab/hyphe) uses this index in prod!
+The current version of [Hyphe](https://github.com/medialab/hyphe) uses this index in production!
 
 ===
 
