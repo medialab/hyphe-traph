@@ -13,14 +13,14 @@
 
 <center>
   <small>
-    Paul Girard • Mathieu Jacomy • Benjamin Ooghe-Tabanou • Guillaume Plique
+    <a href="https://twitter.com/paulanomalie">Paul Girard</a> • <a href="https://twitter.com/jacomyma">Mathieu Jacomy</a> • <a href="https://twitter.com/boogheta">Benjamin Ooghe-Tabanou</a> • <a href="https://twitter.com/yomguithereal">Guillaume Plique</a>
   </small>
 </center>
 
 ===
 
 <center>
-  <img alt="logo médialab" src="img/medialab-logo.svg" />
+  <a href="http://www.medialab.sciences-po.fr"><img alt="logo médialab" src="img/medialab-logo.svg" /></a><br/>
 </center>
 
 <center>
@@ -164,8 +164,8 @@
 - Four brains
 - [TANT LAB @Copenhaguen](http://www.tantlab.aau.dk/)
 - 2 prototypes
-  * [Java Tree POC](https://github.com/medialab/hyphe-java-tree-poc)
   * [Neo4J POC](https://github.com/medialab/hyphe-neo4j-poc)
+  * [Java Tree POC](https://github.com/medialab/hyphe-java-tree-poc)
 
 ===
 
