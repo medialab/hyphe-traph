@@ -476,7 +476,7 @@ Benchmark on a 10% sample from a sizeable corpus about privacy.
 
 * **Lucene** • 740 megabytes
 * **Neo4j** • 1.5 gigabytes
-* **Traph** • 1 gigabytes
+* **Traph** • 1 gigabyte
 
 Note: it seems that Lucene wins. Not for long.
 
@@ -486,7 +486,7 @@ Note: it seems that Lucene wins. Not for long.
 
 We decided to redevelop the structure in **python** to limit the amount of different languages used by Hyphe's core.
 
-We made some new discoveries on the way.
+We made some new discoveries on the way and improved the performance of the Traph even more.
 
 [https://github.com/medialab/hyphe-traph](https://github.com/medialab/hyphe-traph)
 
