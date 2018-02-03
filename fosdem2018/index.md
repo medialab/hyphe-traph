@@ -141,8 +141,8 @@
 
 ## Turnarounds
 
-* Pages/WebEntities links caching in Lucene
-* WebEntitites links caching in RAM
+* Pages/Web entities links caching in Lucene
+* Web entities links caching in RAM
 
 ===
 
