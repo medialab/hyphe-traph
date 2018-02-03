@@ -282,6 +282,10 @@ RETURN sourceWe.name, targetWe.name;
 
 ===
 
+It's not as straightforward to traverse trees in Neo4j as it seems.
+
+===
+
 <h2>
   <span class="red-number">IV.</span><br>Prototype B - The Traph
 </h2>
