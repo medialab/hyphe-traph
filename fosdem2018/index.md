@@ -129,8 +129,10 @@
 * **Disk space** • 740 MB
 
 ===
-
-To sum up: indexation is slower than crawling...
+## User issue
+Screenshot network Hyphe
+===
+# indexation is slower than crawling...
 
 ===
 
@@ -185,6 +187,7 @@ To sum up: indexation is slower than crawling...
 - UNWIND
 - FOREACH
 - REDUCE
+- CASE
 - stored procedures...
 
 ===
@@ -606,7 +609,7 @@ But. If you need to twist that much a system - by tweaking internals and/or usin
 
 ===
 
-The current version of [Hyphe](https://github.com/medialab/hyphe) uses this index!
+The current version of [Hyphe](https://github.com/medialab/hyphe) uses this index in prod!
 
 ===
 
