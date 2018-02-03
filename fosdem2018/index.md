@@ -96,7 +96,7 @@
 ===
 
 <h2>
-  <span class="red-number">I.</span><br> Lucene
+  <span class="red-number">I.</span><br>Lucene
 </h2>
 
 ===
@@ -147,6 +147,10 @@
 ===
 
 # indexation is slower than crawling...
+
+<center>
+  <img src="img/slow-indexing.png" height="300px" />
+</center>
 
 ===
 
@@ -251,7 +255,11 @@ FOREACH (_ IN CASE WHEN coalesce(tuple.second.page, false) THEN [1] ELSE [] END 
 
 ===
 
+<<<<<<< HEAD
 Links agregation [V8 and 10 (out of 10)](https://github.com/medialab/hyphe-neo4j-poc/blob/master/queries/core.cypher#L183-L289)
+=======
+Links agregation [V9 (out of 10)](https://github.com/medialab/hyphe-neo4j-poc/blob/master/queries/core.cypher#L183-L289)
+>>>>>>> 30c3c84a28ea39d11415fa73cf55c5f214b457af
 
 <img src='img/aggregationLinksCypher.png' alt='Cypher queries to aggregate links at WE level'>
 
