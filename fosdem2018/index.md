@@ -471,6 +471,19 @@ We made some new discoveries on the way.
 
 ===
 
+## Bonus section
+
+* Single character trie is slow: stem level is better
+* We had to find a way to store variable length stems
+* Results were bad at beginning because of linked lists
+* We had to organize children as binary search trees: this is a ternary search tree
+* We tried to use auto-balancing BSTs but this was useless since crawl order generate enough entropy
+* Finally we switched to using varchars(255) rather than trimming null bytes to double performance.
+
+(Related slides are vertical)
+
+----
+
 ## The issue with single characters
 
 Our initial implementation was using single LRU characters as nodes.
@@ -481,15 +494,15 @@ More disk space = longer queries because we need to read more data from the disk
 
 We can do better: nodes should store LRU **stems**!
 
-===
+----
 
 <img src="img/Traphs-09.png" />
 
-===
+----
 
 <img src="img/Traphs-08.png" />
 
-===
+----
 
 ## Fragmented nodes
 
@@ -505,7 +518,7 @@ Fixed-size binary blocks => we need to be able to fragment them.
      has_tail?
 ```
 
-===
+----
 
 ## Results were disappointing...
 
@@ -516,7 +529,7 @@ Stem level had far less blocks and was orders of magnitudes lighter.
 
 Strangely, it was way slower because we had to read a lot more.
 
-===
+----
 
 ## Linked lists hell
 
@@ -528,7 +541,7 @@ At character level, a list cannot be larger than `255` since we store a single a
 
 At stem level, those same linked lists will store a lot more children.
 
-===
+----
 
 ## The Ternary Search Tree
 
@@ -538,34 +551,34 @@ We therefore implemented a <u>Ternary Search Tree</u>.
 
 This is a Trie whose children are stored as binary search trees so we can access children in `O(log n)`.
 
-===
+----
 
 <center>
   <img src="img/ternary-search-tree.png" height="450px" />
 </center>
 
-===
+----
 
 ## Indexation time
 
 * **Python character level traph** • 20 minutes
 * **Python stem level traph** • 8 minutes
 
-===
+----
 
 ## Graph processing time
 
 * **Python character level traph** • 2 minutes 43 seconds
 * **Python stem level traph** • 27 seconds
 
-===
+----
 
 ## Disk space
 
 * **Python character level traph** • 827 megabytes
 * **Python stem level traph** • 270 megabytes
 
-===
+----
 
 ## About balancing
 
@@ -577,21 +590,21 @@ This slowed down writes and did nothing to reads.
 
 It seems that the order in which the crawled pages are fed to the structure generate sufficient entropy.
 
-===
+----
 
 ## Takeaway bonus: varchars(255)
 
 Sacrificing one byte to have the string's length will always be faster than manually dropping null bytes.
 
-===
+----
 
 <!-- .slide: data-background="img/varchars.png" -->
 
-===
+----
 
 **Huge win!** - 2x boost in performance.
 
-===
+----
 
 ## A final mea culpa
 
