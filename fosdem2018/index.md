@@ -29,6 +29,10 @@
   </small>
 </center>
 
+<center>
+  <img alt="logo ANR" src="img/ANR.jpg" width="100px" />
+</center>
+
 ===
 
 # Hyphe?
