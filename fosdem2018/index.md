@@ -271,6 +271,10 @@ RETURN weSource.name as Source,weTarget.name as Target, sum(weight) as Weight
 
 ===
 
+We even tried stored procedure to traverse the tree easily.
+
+===
+
 <h2>
   <span class="red-number">IV.</span><br>Prototype B - The Traph
 </h2>
