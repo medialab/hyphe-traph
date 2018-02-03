@@ -96,7 +96,7 @@
 ===
 
 <h2>
-  <span class="red-number">I.</span><br> Lucene
+  <span class="red-number">I.</span><br>Lucene
 </h2>
 
 ===
@@ -152,7 +152,11 @@ TODO: Screenshot network Hyphe
 
 ===
 
-# indexation is slower than crawling...
+## indexation is slower than crawling...
+
+<center>
+  <img src="img/slow-indexing.png" height="300px" />
+</center>
 
 ===
 
