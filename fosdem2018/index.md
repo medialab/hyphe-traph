@@ -18,9 +18,16 @@
 </center>
 
 ===
+
 <center>
   <img alt="logo médialab" src="img/medialab-logo.svg" />
-</center>  
+</center>
+
+<center>
+  <small>
+    Equipex DIME-SHS ANR-10-EQPX-19-01
+  </small>
+</center>
 
 ===
 
