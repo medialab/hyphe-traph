@@ -13,7 +13,7 @@
 
 <center>
   <small>
-    Mathieu Jacomy • Paul Girard • Benjamin Ooghe-Tabanou • Guillaume Plique
+    Paul Girard • Mathieu Jacomy • Benjamin Ooghe-Tabanou • Guillaume Plique
   </small>
 </center>
 
