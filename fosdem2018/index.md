@@ -35,6 +35,18 @@
 
 ===
 
+<center>
+  <a href="https://medialab.github.io/hyphe-traph/fosdem2018">https://medialab.github.io/hyphe-traph/fosdem2018</a>
+</center>
+
+<center>-</center>
+
+<center>
+  <a href="http://bit.ly/2EcTeD2">http://bit.ly/2EcTeD2</a>
+</center>
+
+===
+
 # Hyphe?
 * A web corpus curation tool
 * A research-driven web crawler
