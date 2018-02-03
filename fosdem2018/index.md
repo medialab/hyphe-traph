@@ -631,6 +631,10 @@ Sacrificing one byte to have the string's length will always be faster than manu
   Here we are now.
 </center>
 
+<center>
+  We went from 45 minutes to 27 seconds!
+</center>
+
 <br>
 
 <center>
