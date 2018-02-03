@@ -356,7 +356,7 @@ The traph is a "subtle" mix between a <u>Trie</u> and a <u>Graph</u>.
 
 Using fixed-size blocks of binary data (ex: 10 bytes).
 
-We can read specific ones using pointers in a random access fashion.
+We can read specific blocks using pointers in a random access fashion.
 
 Accessing a specific's page node is done in `O(m)`.
 
