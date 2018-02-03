@@ -75,11 +75,11 @@
 
 ## Structure's requirements
 
-* Add tens of millions of LRUs.
-* Add hundreds of millions of links.
-* Edit webentities' boundaries without re-indexing.
-* Get all the pages of a webentity.
-* Get the webentities' graph sitting on top of the pages' one.
+* Add tens of millions of LRUs
+* Add hundreds of millions of links
+* Edit web entity boundaries (move the flags) without re-indexing
+* Get all the pages of a web entity
+* Get the web entity graph sitting on top of the pages' one
 
 ===
 
@@ -117,8 +117,8 @@
 
 ## Problem
 
-- Links between WebEntities are agregates
-- WebEntities are dynamic
+- Links between web entities are agregates
+- web entities are dynamic
 
 -> WE links should be computed, not stored
 
@@ -409,7 +409,7 @@ We "just" need to flag our Trie's nodes for webentities' starting points.
 
 ===
 
-So now, finding the webentity to which belongs a page is obvious when traversing the Trie.
+So now, finding the web entity to which belongs a page is obvious when traversing the Trie.
 
 What's more, we can bubble up in `O(m)`, if we need to, when following pages' links (this can also be easily cached).
 
