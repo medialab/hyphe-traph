@@ -259,7 +259,7 @@ FOREACH (_ IN CASE WHEN coalesce(tuple.second.page, false) THEN [1] ELSE [] END 
 
 ===
 
-Links agregation [V1 (out of 10)](https://github.com/medialab/hyphe-neo4j-poc/blob/master/queries/core.cypher#L183-L289)
+Links agregation [V9 (out of 10)](https://github.com/medialab/hyphe-neo4j-poc/blob/master/queries/core.cypher#L183-L289)
 
 ```cypher
 MATCH p=(weSource:WebEntity)<-[:PREFIX]-(:Stem)<-[:PARENT*0..]-(sourcePage:Page)
