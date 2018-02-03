@@ -124,17 +124,9 @@
 
 ===
 
-## Performance issue
-
-* **Indexation time** • 1 hour & 55 minutes
-* **Graph processing time** • 45 minutes
-* **Disk space** • 740 MB
-
-===
-
 ## User issue
 
-Screenshot network Hyphe
+TODO: Screenshot network Hyphe
 
 ===
 
@@ -191,10 +183,10 @@ Screenshot network Hyphe
 
 ## Challenge: complex querying
 
-- UNWIND
-- FOREACH
-- REDUCE
-- CASE
+- `UNWIND`
+- `FOREACH`
+- `REDUCE`
+- `CASE`
 - stored procedures...
 
 ===
@@ -254,14 +246,6 @@ WITH weSource,targetPage,reduce(we = null , path in collect({length:length(p), w
   CASE WHEN we IS NULL OR we.length>=path.length THEN path ELSE we END).we as weTarget, weight
 RETURN weSource.name as Source,weTarget.name as Target, sum(weight) as Weight
 ```
-
-===
-
-## Good performance
-
-* **Indexation time** • 1 hour & 4 minutes
-* **Graph processing time** • 6 minutes
-* **Disk space** • 1.5 gigabytes
 
 ===
 
