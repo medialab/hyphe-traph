@@ -558,7 +558,7 @@ Node's children stored as linked lists.
 
 This means accessing a particular child is `O(n)`.
 
-At character level, a list cannot be larger than `255` since we store a single ascii byte.
+At character level, a list cannot be larger than `256` since we store a single ascii byte.
 
 At stem level, those same linked lists will store a lot more children.
 
