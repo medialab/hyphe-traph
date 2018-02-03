@@ -73,6 +73,16 @@
 
 ===
 
+## Structure's requirements
+
+* Add tens of millions of LRUs.
+* Add hundreds of millions of links.
+* Edit webentities' boundaries without re-indexing.
+* Get all the pages of a webentity.
+* Get the webentities' graph sitting on top of the pages' one.
+
+===
+
 # It's a tree
 
 ===
