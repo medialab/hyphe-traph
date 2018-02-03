@@ -295,9 +295,6 @@ RETURN weSource.name as Source,weTarget.name as Target, sum(weight) as Weight
 * Why would you do that instead of relying on some already existing solution?
 * What if it crashes?
 * What if your server unexpectedly shuts down?
-* What if a thermonuclear war eradicates mankind?
-
-\[\[ Insert a lot of other perfectly reasonable concerns \]\]
 
 ===
 
