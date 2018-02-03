@@ -619,16 +619,6 @@ Sacrificing one byte to have the string's length will always be faster than manu
 
 **Huge win!** - 2x boost in performance.
 
-----
-
-## A final mea culpa
-
-Yes we probably used Lucene badly.
-
-Yes we probably used Neo4j badly.
-
-But. If you need to twist that much a system - by tweaking internals and/or using stored procedures - aren't you in fact developing something else?
-
 ===
 
 <center>
@@ -650,6 +640,16 @@ But. If you need to twist that much a system - by tweaking internals and/or usin
 ===
 
 The current version of [Hyphe](https://github.com/medialab/hyphe) uses this index in production!
+
+===
+
+## A final mea culpa
+
+Yes we probably used Lucene badly.
+
+Yes we probably used Neo4j badly.
+
+But. If you need to twist that much a system - by tweaking internals and/or using stored procedures - aren't you in fact developing something else?
 
 ===
 
