@@ -73,7 +73,7 @@
 ===
 
 <h2>
-  <span class="red-number">I.</span><br>  Lucene
+  <span class="red-number">I.</span><br> Lucene
 </h2>
 
 ===
@@ -130,54 +130,135 @@
 
 ===
 
-To sum up: indexation is slower than crawlers...
+To sum up: indexation is slower than crawling...
 
 ===
 
 <h2>
-  <span class="red-number">III.</span><br>Coding retreat
+  <span class="red-number">II.</span><br>Coding retreat
 </h2>
 ===
 
-One week
-Four brains
-TANT LAB @Copenhaguen
-2 prototypes
+- One week
+- Four brains
+- TANT LAB @Copenhaguen
+- 2 prototypes
+  * [Java Tree POC](https://github.com/medialab/hyphe-java-tree-poc)
+  * [Neo4J POC](https://github.com/medialab/hyphe-neo4j-poc)
 
 ===
 
+<center>
+  <img alt="logo médialab" src="img/variousCopenhague/C8vaoK1XgAIWpHA.jpg" />
+</center>  
 
 ===
-TODO: vs. Lucene/Neo4J/Traph
-* [Java Tree POC](https://github.com/medialab/hyphe-java-tree-poc)
-* [Neo4J POC](https://github.com/medialab/hyphe-neo4j-poc)
+
+<center>
+  <img alt="logo médialab" src="img/Punch Cards Merged.png" />
+</center>  
+
+===
+
+<center>
+  <img alt="logo médialab" src="img/mikkeller.jpg" />
+</center>  
 
 ===
 
 <h2>
-  <span class="red-number">IV.</span><br>Prototype A - Neo4j
+  <span class="red-number">III.</span><br>Prototype A - Neo4J
 </h2>
 
-* example schema LRUS/Wes stockées dans neo4J
-* Complexité à écrire certaines requetes
- + WECreationRules -> [complex but OK](https://github.com/medialab/hyphe-neo4j-poc/blob/master/queries/core.cypher#L66-L164)
- + Query WELinks... [10 versions](https://github.com/medialab/hyphe-neo4j-poc/blob/master/queries/core.cypher#L183-L289), même Procédures stockées
-  => #fail
+===
+
+## A tree? A graph?
+
+<center>
+  <img alt="logo médialab" src="img/WEtree.png" />
+</center>  
 
 ===
 
-TODO: we have a graph, let's use Neo4j
+## Challenge: complex querying
 
-TODO: UNWIND big win
+- UNWIND
+- FOREACH
+- REDUCE
+- stored procedures...
 
-TODO: mettre une grosse requete qui tache
+===
 
-SCHEMA: benj schema neo4j des lrus
+[Indexing pages](https://github.com/medialab/hyphe-neo4j-poc/blob/master/queries/core.cypher#L66-L164)
+
+<pre style="font-size: 0.4em; margin-left: -15%">
+UNWIND $lrus AS stems
+WITH [{lru: ""}] + stems AS stems
+WITH stems[size(stems)-1].lru as lru, extract(n IN range(1, size(stems) - 1) | {first: stems[n - 1], second: stems[n]}) AS tuples
+UNWIND tuples AS tuple
+
+FOREACH (_ IN CASE WHEN NOT coalesce(tuple.second.page, false) THEN [1] ELSE [] END |
+  MERGE (a:Stem {lru: tuple.first.lru})
+  MERGE (b:Stem {lru: tuple.second.lru})
+    ON CREATE SET
+      b.type = tuple.second.type,
+      b.stem = tuple.second.stem,
+      b.createdTimestamp = timestamp()
+  MERGE (a)<-[:PARENT]-(b)
+)
+
+FOREACH (_ IN CASE WHEN coalesce(tuple.second.page, false) THEN [1] ELSE [] END |
+  MERGE (a:Stem {lru: tuple.first.lru})
+  MERGE (b:Stem {lru: tuple.second.lru})
+    ON CREATE SET
+      b.type = tuple.second.type,
+      b.stem = tuple.second.stem,
+      b.crawlDepth = tuple.second.crawlDepth,
+      b.linked = coalesce(tuple.second.linked, false),
+      b:Page
+    ON MATCH SET
+      b.crawlDepth =
+        CASE
+          WHEN tuple.second.crawlDepth < b.crawlDepth
+          THEN tuple.second.crawlDepth
+          ELSE b.crawlDepth
+          END,
+      b.linked = coalesce(tuple.second.linked, b.linked),
+      b:Page
+  MERGE (a)<-[:PARENT]-(b)
+);
+</pre>
+
+===
+
+Links agregation [V1 (out of 10)](https://github.com/medialab/hyphe-neo4j-poc/blob/master/queries/core.cypher#L183-L289)
+
+**TODO Guillaume: check which is the best version to display**
+
+<pre style=" margin-left: -15%">
+MATCH p=(weSource:WebEntity)<-[:PREFIX]-(:Stem)<-[:PARENT*0..]-(sourcePage:Page)
+WITH sourcePage, reduce(we = null , path in collect({length:length(p), we:weSource}) |
+  CASE WHEN we IS NULL OR we.length>=path.length THEN path ELSE we END).we as weSource
+MATCH (sourcePage)-[:LINK]->(targetPage:Page)
+WITH weSource,sourcePage,targetPage, count(*) as weight
+MATCH p=(targetPage)-[:PARENT*0..]->(:Stem)-[:PREFIX]->(we:WebEntity)
+WITH weSource,targetPage,reduce(we = null , path in collect({length:length(p), we:we}) |
+  CASE WHEN we IS NULL OR we.length>=path.length THEN path ELSE we END).we as weTarget, weight
+RETURN weSource.name as Source,weTarget.name as Target, sum(weight) as Weight
+</pre>
+
+===
+
+## Good performance
+
+* **Indexation time** • 1 hour & 4 minutes
+* **Graph processing time** • 6 minutes
+* **Disk space** • 1.5 gigabytes
 
 ===
 
 <h2>
-  <span class="red-number">V.</span><br>Prototype B - The Traph
+  <span class="red-number">IV.</span><br>Prototype B - The Traph
 </h2>
 
 ===
@@ -224,6 +305,12 @@ SCHEMA: benj schema neo4j des lrus
 ===
 
 # So, what's a Traph?
+
+===
+
+<center>
+  <img alt="logo médialab" src="img/its-a-traph.png" />
+</center>  
 
 ===
 
