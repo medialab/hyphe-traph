@@ -42,7 +42,7 @@
 <center>-</center>
 
 <center>
-  <a href="http://bit.ly/2EcTeD2">http://bit.ly/2EcTeD2</a>
+  <a href="http://bit.ly/fosdem-traph">http://bit.ly/fosdem-traph</a>
 </center>
 
 ===
