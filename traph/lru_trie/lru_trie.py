@@ -5,6 +5,7 @@
 # Class representing the Trie indexing the LRUs.
 #
 import warnings
+from collections import Counter
 from traph.helpers import lru_iter
 from traph.lru_trie.node import LRUTrieNode, LRU_TRIE_FIRST_DATA_BLOCK, LRU_TRIE_STEM_SIZE
 from traph.lru_trie.header import LRUTrieHeader
@@ -505,3 +506,16 @@ class LRUTrie(object):
         )
 
         return stats
+
+    def bst_stats(self):
+        stems_index = {}
+        bst_index = Counter()
+
+        for node in self.nodes_iter():
+            parent_block = node.parent()
+            parent_stem = stems_index.get(parent_block, '')
+
+            stems_index[node.block] = parent_stem + node.stem()
+            bst_index[parent_block] += 1
+
+        return stems_index, bst_index
