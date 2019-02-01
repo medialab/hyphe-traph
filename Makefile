@@ -8,7 +8,7 @@ test: test-unittest
 
 lint:
 	@echo Linting source code using pep8...
-	pep8 --ignore E501 $(SOURCE) test
+	pycodestyle --ignore E501,E722,E741,W504 $(SOURCE) test
 	@echo
 
 hint:

@@ -1,5 +1,5 @@
 # Dev Dependencies
 networkx
-pep8
+pycodestyle
 pylint
 pymongo
