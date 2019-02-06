@@ -532,7 +532,7 @@ class Traph(object):
     def get_webentity_crawled_pages(self, weid, prefixes):
         return run_iterator(self.get_webentity_crawled_pages_iter(weid, prefixes))
 
-    def get_webentity_most_linked_pages_iter(self, weid, prefixes, pages_count=10):
+    def get_webentity_most_linked_pages_iter(self, weid, prefixes, pages_count=10, max_depth=None):
         '''
         Returns a list of objects {lru:, indegree:}
         Note: the prefixes are supposed to match the webentity id. We do not check.
@@ -547,7 +547,7 @@ class Traph(object):
             if not starting_node:
                 raise TraphException('LRU %s not in the traph' % (prefix))
 
-            for node, lru in self.lru_trie.webentity_dfs_iter(starting_node, prefix):
+            for node, lru in self.lru_trie.webentity_dfs_iter(starting_node, prefix, max_depth):
                 if node.is_page():
 
                     # Iterate over link nodes
@@ -575,8 +575,8 @@ class Traph(object):
 
         yield state.finalize(sorted_pages)
 
-    def get_webentity_most_linked_pages(self, weid, prefixes, pages_count=10):
-        return run_iterator(self.get_webentity_most_linked_pages_iter(weid, prefixes, pages_count=pages_count))
+    def get_webentity_most_linked_pages(self, weid, prefixes, pages_count=10, max_depth=None):
+        return run_iterator(self.get_webentity_most_linked_pages_iter(weid, prefixes, pages_count=pages_count, max_depth=max_depth))
 
     def get_webentity_parent_webentities(self, weid, prefixes):
         '''

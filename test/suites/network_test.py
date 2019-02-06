@@ -152,6 +152,19 @@ class TestNetwork(TraphTestCase):
                 ])
             )
 
+            most_linked_pages = traph.get_webentity_most_linked_pages(
+                4,
+                ['s:http|h:com|h:world|p:africa|'],
+                max_depth=0
+            )
+
+            self.assertEqual(
+                set((page['lru'], page['indegree']) for page in most_linked_pages),
+                set([
+                    ('s:http|h:com|h:world|p:africa|', 1)
+                ])
+            )
+
     def test_network_with_multiple_root_stems(self):
         creation_rules = {
             's:http|h:com|h:world|': WEBENTITY_CREATION_RULES_REGEXES['path1']

@@ -376,7 +376,7 @@ class LRUTrie(object):
 
             # Following child
             if relevant_node and node.has_child():
-                if max_depth is not None and level > max_depth:
+                if max_depth is not None and level >= max_depth:
                     continue
 
                 stack.append((node.child(), current_lru, level + 1))
