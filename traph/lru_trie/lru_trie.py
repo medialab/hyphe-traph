@@ -339,7 +339,7 @@ class LRUTrie(object):
             if node.has_child():
                 stack.append((node.child(), current_lru))
 
-    def webentity_dfs_iter(self, starting_node, starting_lru):
+    def webentity_dfs_iter(self, starting_node, starting_lru, max_depth=None):
         '''
         Note that this algorithm will peruse the webentity nodes only for the
         given prefix. We would need a refined algorithm for the cases when
@@ -353,11 +353,11 @@ class LRUTrie(object):
         if not starting_node.exists:
             return
 
-        stack = [(starting_block, starting_lru)]
+        stack = [(starting_block, starting_lru, 0)]
         node = self.node()
 
         while len(stack):
-            block, lru = stack.pop()
+            block, lru, level = stack.pop()
             node.read(block)
 
             relevant_node = block == starting_block or not node.has_webentity()
@@ -369,14 +369,17 @@ class LRUTrie(object):
             # Following siblings
             if block != starting_block:
                 if node.has_right():
-                    stack.append((node.right(), lru))
+                    stack.append((node.right(), lru, level))
 
                 if node.has_left():
-                    stack.append((node.left(), lru))
+                    stack.append((node.left(), lru, level))
 
             # Following child
             if relevant_node and node.has_child():
-                stack.append((node.child(), current_lru))
+                if max_depth is not None and level > max_depth:
+                    continue
+
+                stack.append((node.child(), current_lru, level + 1))
 
     def dfs_with_webentity_iter(self):
         starting_node = self.root()
