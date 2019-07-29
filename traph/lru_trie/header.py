@@ -7,12 +7,14 @@
 #
 import struct
 
+from traph.version import __version__ as TRAPH_VERSION
+
 # Binary format
 # -
 # NOTE: Since python mimics C struct, the block size should be respecting
-# some rules (namely have even addresses or addresses divisble by 4 on some
+# some rules (namely have even addresses or addresses divisible by 4 on some
 # architecture).
-LRU_TRIE_HEADER_FORMAT = 'I124x'
+LRU_TRIE_HEADER_FORMAT = 'I12p112x'
 LRU_TRIE_HEADER_BLOCK_SIZE = struct.calcsize(LRU_TRIE_HEADER_FORMAT)
 
 # Header blocks
@@ -23,6 +25,7 @@ LRU_TRIE_HEADER_BLOCKS = 1
 
 # Positions
 LRU_TRIE_HEADER_LAST_WEBENTITY_ID = 0
+LRU_TRIE_HEADER_TRAPH_VERSION = 1
 
 
 # Main class
@@ -36,7 +39,8 @@ class LRUTrieHeader(object):
         # Properties
         self.storage = storage
         self.data = [
-            0  # Last webentity id
+            0,              # Last webentity id
+            TRAPH_VERSION   # Traph version
         ]
 
         self.__ensure()
@@ -47,16 +51,18 @@ class LRUTrieHeader(object):
 
         return (
             '<%(class_name)s'
+            ' version=%(version)s'
             ' last_webentity_id=%(last_webentity_id)s>'
         ) % {
             'class_name': class_name,
-            'last_webentity_id': self.last_webentity_id()
+            'version': self.get_version(),
+            'last_webentity_id': self.last_webentity_id(),
         }
 
     def __ensure(self):
         block = 0
 
-        empty_data = struct.pack(LRU_TRIE_HEADER_FORMAT, 0)
+        empty_data = struct.pack(LRU_TRIE_HEADER_FORMAT, *self.data)
 
         while block < LRU_TRIE_HEADER_BLOCKS:
             data = self.storage.read(block)
@@ -100,3 +106,6 @@ class LRUTrieHeader(object):
 
     def increment_last_webentity_id(self):
         self.data[LRU_TRIE_HEADER_LAST_WEBENTITY_ID] += 1
+
+    def get_version(self):
+        return self.data[LRU_TRIE_HEADER_TRAPH_VERSION]

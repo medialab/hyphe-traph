@@ -7,12 +7,15 @@
 #
 import struct
 
+from traph.version import __version__ as TRAPH_VERSION
+
 # Binary format
 # -
 # NOTE: Since python mimics C struct, the block size should be respecting
-# some rules (namely have even addresses or addresses divisble by 4 on some
+# some rules (namely have even addresses or addresses divisible by 4 on some
 # architecture).
-LINK_STORE_HEADER_FORMAT = 'QQH'
+LINK_STORE_HEADER_FORMAT = '12p6x'
+LINK_STORE_HEADER_BLOCK_SIZE = struct.calcsize(LINK_STORE_HEADER_FORMAT)
 
 # Header blocks
 # -
@@ -21,6 +24,7 @@ LINK_STORE_HEADER_FORMAT = 'QQH'
 LINK_STORE_HEADER_BLOCKS = 1
 
 # Positions
+LINK_STORE_HEADER_TRAPH_VERSION = 0
 
 
 # Main class
@@ -34,9 +38,7 @@ class LinkStoreHeader(object):
         # Properties
         self.storage = storage
         self.data = [
-            0,
-            0,
-            0
+            TRAPH_VERSION  # Traph version
         ] * LINK_STORE_HEADER_BLOCKS
 
         self.__ensure()
@@ -46,15 +48,17 @@ class LinkStoreHeader(object):
         class_name = self.__class__.__name__
 
         return (
-            '<%(class_name)s>'
+            '<%(class_name)s'
+            ' version=%(version)s>'
         ) % {
-            'class_name': class_name
+            'class_name': class_name,
+            'version': self.get_version()
         }
 
     def __ensure(self):
         block = 0
 
-        empty_data = struct.pack(LINK_STORE_HEADER_FORMAT, *([0] * 3))
+        empty_data = struct.pack(LINK_STORE_HEADER_FORMAT, *self.data)
 
         while block < LINK_STORE_HEADER_BLOCKS:
             data = self.storage.read(block)
@@ -87,3 +91,5 @@ class LinkStoreHeader(object):
     # =========================================================================
     # Getters/Setters
     # =========================================================================
+    def get_version(self):
+        return self.data[LINK_STORE_HEADER_TRAPH_VERSION]
