@@ -75,3 +75,9 @@ def detailed_chunks_iter(chunk_size, string):
 def chunks_iter(chunk_size, string):
     for _, chunk in detailed_chunks_iter(chunk_size, string):
         yield chunk
+
+
+def parse_pagination_token(token):
+    prefix_index, starting_block = token.split('&')
+
+    return int(prefix_index), int(starting_block)
