@@ -1166,8 +1166,10 @@ class Traph(object):
             prefix = self.__encode(prefix)
 
             starting_node = self.lru_trie.lru_node(prefix)
+
             if not starting_node:
                 raise TraphException('LRU %s not in the traph' % (prefix))
+
             for node, lru in self.lru_trie.webentity_dfs_iter(starting_node, prefix):
                 if node.is_page():
                     yield node, lru
