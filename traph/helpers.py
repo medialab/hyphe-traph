@@ -81,3 +81,7 @@ def parse_pagination_token(token):
     prefix_index, starting_block = token.split('&')
 
     return int(prefix_index), int(starting_block)
+
+
+def build_pagination_token(prefix_index, block):
+    return '%i&%i' % (prefix_index, block)
