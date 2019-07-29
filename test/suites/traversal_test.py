@@ -84,3 +84,37 @@ class TestTraversal(TraphTestCase):
                 'p:france|',
                 'p:romania|'
             ])
+
+    def test_webentity_dfs_iter(self):
+
+        with self.open_traph(default_webentity_creation_rule=WEBENTITY_CREATION_RULES_REGEXES['domain']) as traph:
+            trie = traph.lru_trie
+
+            traph.add_page('s:http|h:com|h:world|p:europe|')
+            traph.add_page('s:http|h:com|h:world|p:asia|')
+            traph.add_page('s:http|h:com|h:world|p:africa|')
+            traph.add_page('s:http|h:com|h:world|p:oceania|')
+
+            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|')
+            traph.add_page('s:http|h:com|h:world|p:europe|p:france|')
+            traph.add_page('s:http|h:com|h:world|p:europe|p:romania|')
+
+            prefix = 's:http|h:com|h:world|'
+
+            prefix_node = trie.lru_node(prefix)
+
+            webentity_dfs = [
+                's:http|h:com|h:world|',
+                's:http|h:com|h:world|p:europe|',
+                's:http|h:com|h:world|p:europe|p:spain|',
+                's:http|h:com|h:world|p:europe|p:france|',
+                's:http|h:com|h:world|p:europe|p:romania|',
+                's:http|h:com|h:world|p:asia|',
+                's:http|h:com|h:world|p:africa|',
+                's:http|h:com|h:world|p:oceania|'
+            ]
+
+            self.assertEqual(
+                [lru for node, lru in trie.webentity_dfs_iter(prefix_node, prefix)],
+                webentity_dfs
+            )
