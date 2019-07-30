@@ -58,6 +58,10 @@ def lru_iter(lru):
             last = i + 1
 
 
+def lru_dirname(lru):
+    return ''.join(list(lru_iter(lru))[:-1])
+
+
 def detailed_chunks_iter(chunk_size, string):
     '''
     Returning an iterator over a string's chunks of the given size.

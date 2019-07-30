@@ -148,10 +148,6 @@ class TestTraversal(TraphTestCase):
         with self.open_traph(default_webentity_creation_rule=WEBENTITY_CREATION_RULES_REGEXES['domain']) as traph:
             trie = traph.lru_trie
 
-            # TODO: test with sub webentity
-            # TODO: test with starting node in the middle of a siblings list
-            # TODO: test same things above
-
             traph.add_page('s:http|h:com|h:world|p:europe|')
             traph.add_page('s:http|h:com|h:world|p:asia|')
             traph.add_page('s:http|h:com|h:world|p:africa|')
@@ -203,3 +199,31 @@ class TestTraversal(TraphTestCase):
                 [lru for node, lru in trie.webentity_inorder_iter(prefix_node, prefix)],
                 webentity_inorder
             )
+
+    # def test_paginated_webentity_inorder_iter(self):
+
+    #     with self.open_traph(default_webentity_creation_rule=WEBENTITY_CREATION_RULES_REGEXES['domain']) as traph:
+    #         trie = traph.lru_trie
+
+    #         traph.add_page('s:http|h:com|h:world|p:europe|')
+    #         traph.add_page('s:http|h:com|h:world|p:asia|')
+    #         traph.add_page('s:http|h:com|h:world|p:africa|')
+    #         traph.add_page('s:http|h:com|h:world|p:oceania|')
+
+    #         traph.add_page('s:http|h:com|h:world|p:europe|p:spain|')
+    #         traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:madrid|')
+    #         traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:toledo|')
+    #         traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:barcelona|')
+    #         traph.add_page('s:http|h:com|h:world|p:europe|p:france|')
+    #         traph.add_page('s:http|h:com|h:world|p:europe|p:romania|')
+
+    #         prefix = 's:http|h:com|h:world|'
+
+    #         prefix_node = trie.lru_node(prefix)
+
+    #         pagination_node = trie.lru_node('s:http|h:com|h:world|p:europe|p:spain|p:barcelona|')
+
+    #         for node, lru in trie.webentity_inorder_iter(
+    #             prefix_node, prefix, pagination_node, 'cccl'
+    #         ):
+    #             print lru, node

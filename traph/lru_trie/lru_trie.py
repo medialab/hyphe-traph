@@ -6,7 +6,7 @@
 #
 import warnings
 from collections import Counter
-from traph.helpers import lru_iter
+from traph.helpers import lru_iter, lru_dirname
 from traph.lru_trie.node import LRUTrieNode, LRU_TRIE_FIRST_DATA_BLOCK, LRU_TRIE_STEM_SIZE
 from traph.lru_trie.header import LRUTrieHeader
 from traph.lru_trie.walk_history import LRUTrieWalkHistory
@@ -309,7 +309,7 @@ class LRUTrie(object):
 
         if starting_node:
             starting_block = starting_node.block
-            starting_lru = ''.join(list(lru_iter(starting_lru))[:-1])
+            starting_lru = lru_dirname(starting_lru)
         else:
             starting_node = self.root()
             starting_block = self.root().block
@@ -347,7 +347,7 @@ class LRUTrie(object):
         whole realm.
         '''
         starting_block = starting_node.block
-        starting_lru = ''.join(list(lru_iter(starting_lru))[:-1])
+        starting_lru = lru_dirname(starting_lru)
 
         # If there is no starting node, there is no point in doing a DFS
         if not starting_node.exists:
@@ -381,32 +381,71 @@ class LRUTrie(object):
 
                 stack.append((node.child(), current_lru, level + 1))
 
-    def webentity_inorder_iter(self, starting_node, starting_lru):
-        starting_lru = ''.join(list(lru_iter(starting_lru))[:-1])
+    def webentity_inorder_iter(self, starting_node, starting_lru,
+                               pagination_node=None, pagination_path=None):
 
-        def inorder_traversal(node, lru):
+        starting_lru = lru_dirname(starting_lru)
+        pagination_stack = []
+
+        if pagination_node is not None:
+            assert pagination_path is not None
+
+            # Here we need to build back a stack of ids and lrus
+            node = starting_node
+
+            for op in pagination_path:
+                if op == 'l':
+                    node = node.left_node()
+                elif op == 'r':
+                    node = node.right_node()
+                else:
+                    node = node.child_node()
+
+                # TODO: can do better than windup here...
+                pagination_stack.append((node, lru_dirname(self.windup_lru(node.block)), op))
+
+        def inorder_traversal(node, lru, path='', last_op=None):
 
             if node.block != starting_node.block:
-                if node.has_left():
-                    for item in inorder_traversal(node.left_node(), lru):
+                if last_op != 'l' and node.has_left():
+                    for item in inorder_traversal(node.left_node(), lru, path + 'l'):
                         yield item
 
             current_lru = lru + node.stem()
             relevant_node = node.block == starting_node.block or not node.has_webentity()
 
             if relevant_node:
-                yield node, current_lru
+                if pagination_node is None or node.block != pagination_node.block:
+                    yield node, current_lru
 
-                if node.has_child():
-                    for item in inorder_traversal(node.child_node(), current_lru):
+                if last_op != 'c' and node.has_child():
+                    for item in inorder_traversal(node.child_node(), current_lru, path + 'c'):
                         yield item
 
             if node.block != starting_node.block:
-                if node.has_right():
-                    for item in inorder_traversal(node.right_node(), lru):
+                if last_op is None and node.has_right():
+                    for item in inorder_traversal(node.right_node(), lru, path + 'r'):
                         yield item
 
-        for item in inorder_traversal(starting_node, starting_lru):
+            if len(pagination_stack) != 0:
+                last_node, last_lru, last_op = pagination_stack.pop()
+
+                for item in inorder_traversal(last_node, last_lru, path[:-1], last_op):
+                    yield item
+
+        if pagination_node is not None:
+            generator = inorder_traversal(
+                pagination_node,
+                pagination_stack[-1][1],
+                pagination_path
+            )
+        else:
+            generator = inorder_traversal(
+                starting_node,
+                starting_lru
+            )
+
+        for item in generator:
             yield item
 
     def dfs_with_webentity_iter(self):
