@@ -126,6 +126,23 @@ class TestTraversal(TraphTestCase):
                 webentity_dfs
             )
 
+            traph.create_webentity(['s:http|h:com|h:world|p:europe|p:spain|'])
+
+            webentity_dfs = [
+                's:http|h:com|h:world|',
+                's:http|h:com|h:world|p:europe|',
+                's:http|h:com|h:world|p:europe|p:france|',
+                's:http|h:com|h:world|p:europe|p:romania|',
+                's:http|h:com|h:world|p:asia|',
+                's:http|h:com|h:world|p:africa|',
+                's:http|h:com|h:world|p:oceania|'
+            ]
+
+            self.assertEqual(
+                [lru for node, lru in trie.webentity_dfs_iter(prefix_node, prefix)],
+                webentity_dfs
+            )
+
     # def test_webentity_inorder_iter(self):
 
     #     with self.open_traph(default_webentity_creation_rule=WEBENTITY_CREATION_RULES_REGEXES['domain']) as traph:
