@@ -389,42 +389,6 @@ class LRUTrie(object):
         if not starting_node.exists:
             return
 
-        stack = []
-        node = self.node()
-        current_block = starting_block
-        current_lru = starting_lru
-
-        while True:
-
-            while current_block is not None:
-                stack.append((current_block, current_lru))
-                node.read(current_block)
-                current_block = node.left()
-
-            if current_block is None and len(stack) != 0:
-                current_block, current_lru = stack.pop()
-                node.read(current_block)
-
-                relevant_node = current_block == starting_block or not node.has_webentity()
-
-                if relevant_node:
-                    yield node, current_lru + node.stem()
-
-                    # TODO: the child relation should also recurse...
-                    if node.has_child():
-                        current_block = node.child()
-                        current_lru += node.stem()
-                        continue
-
-                if node.has_right():
-                    current_block = node.right()
-                    continue
-
-                current_block = None
-                continue
-
-            break
-
     def dfs_with_webentity_iter(self):
         starting_node = self.root()
         starting_block = self.root().block
