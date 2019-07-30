@@ -393,9 +393,9 @@ class LRUTrie(object):
             pagination_lru = self.windup_lru(pagination_node.block)
 
         ENUM = {
-            'l': 0,
-            'c': 1,
-            'r': 2
+            'l': 'a',
+            'c': 'b',
+            'r': 'c'
         }
 
         def count_starting_c(p):
@@ -410,20 +410,34 @@ class LRUTrie(object):
             return i
 
         def compare(current_path, p):
-            if len(current_path) > len(p):
+            # if len(current_path) > len(p):
+            #     return True
+
+            # TODO: this is shady
+            # if count_starting_c(current_path) > count_starting_c(p):
+            #     return True
+
+            # for i in xrange(len(current_path)):
+            #     op1 = ENUM[current_path[i]]
+            #     op2 = ENUM[p[i]]
+
+            #     if op1 < op2:
+            #         return False
+
+            # return True
+
+            string1 = ''.join(ENUM[v] for v in current_path)
+
+            if not string1:
                 return True
 
-            if count_starting_c(current_path) > count_starting_c(p):
-                return True
+            string2 = ''.join(ENUM[v] for v in p)
 
-            for i in xrange(len(current_path)):
-                op1 = ENUM[current_path[i]]
-                op2 = ENUM[p[i]]
+            string2 = string2[:len(string1)]
 
-                if op1 < op2:
-                    return False
+            # print string1, '->', string2
 
-            return True
+            return string1 >= string2
 
         def inorder_traversal(node, lru, path=''):
 

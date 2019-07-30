@@ -200,34 +200,54 @@ class TestTraversal(TraphTestCase):
                 webentity_inorder
             )
 
-    # def test_paginated_webentity_inorder_iter(self):
+    def test_paginated_webentity_inorder_iter(self):
 
-    #     with self.open_traph(default_webentity_creation_rule=WEBENTITY_CREATION_RULES_REGEXES['domain']) as traph:
-    #         trie = traph.lru_trie
+        with self.open_traph(default_webentity_creation_rule=WEBENTITY_CREATION_RULES_REGEXES['domain']) as traph:
+            trie = traph.lru_trie
 
-    #         traph.add_page('s:http|h:com|h:world|p:europe|')
-    #         traph.add_page('s:http|h:com|h:world|p:asia|')
-    #         traph.add_page('s:http|h:com|h:world|p:africa|')
-    #         traph.add_page('s:http|h:com|h:world|p:oceania|')
+            traph.add_page('s:http|h:com|h:world|p:europe|')
+            traph.add_page('s:http|h:com|h:world|p:asia|')
+            traph.add_page('s:http|h:com|h:world|p:africa|')
+            traph.add_page('s:http|h:com|h:world|p:oceania|')
 
-    #         traph.add_page('s:http|h:com|h:world|p:europe|p:spain|')
-    #         traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:madrid|')
-    #         traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:toledo|')
-    #         traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:barcelona|')
-    #         traph.add_page('s:http|h:com|h:world|p:europe|p:france|')
-    #         traph.add_page('s:http|h:com|h:world|p:europe|p:romania|')
+            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|')
+            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:madrid|')
+            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:toledo|')
+            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:barcelona|')
+            traph.add_page('s:http|h:com|h:world|p:europe|p:france|')
+            traph.add_page('s:http|h:com|h:world|p:europe|p:romania|')
 
-    #         prefix = 's:http|h:com|h:world|'
+            prefix = 's:http|h:com|h:world|'
 
-    #         prefix_node = trie.lru_node(prefix)
+            prefix_node = trie.lru_node(prefix)
 
-    #         pagination_node = trie.lru_node('s:http|h:com|h:world|p:europe|p:romania|')
+            webentity_inorder = [
+                ('s:http|h:com|h:world|', ''),
+                ('s:http|h:com|h:world|p:africa|', 'clrl'),
+                ('s:http|h:com|h:world|p:asia|', 'clr'),
+                ('s:http|h:com|h:world|p:europe|', 'c'),
+                ('s:http|h:com|h:world|p:europe|p:france|', 'ccl'),
+                ('s:http|h:com|h:world|p:europe|p:romania|', 'cclr'),
+                ('s:http|h:com|h:world|p:europe|p:spain|', 'cc'),
+                ('s:http|h:com|h:world|p:europe|p:spain|p:barcelona|', 'cccl'),
+                ('s:http|h:com|h:world|p:europe|p:spain|p:madrid|', 'ccc'),
+                ('s:http|h:com|h:world|p:europe|p:spain|p:toledo|', 'cccr'),
+                ('s:http|h:com|h:world|p:oceania|', 'cr')
+            ]
 
-    #         print
-    #         print
-    #         for node, lru in trie.webentity_inorder_iter(
-    #             prefix_node, prefix, pagination_node, 'cclr'
-    #         ):
-    #             print lru, node
-    #         print
-    #         print
+            for i, (pagination_lru, pagination_path) in enumerate(webentity_inorder):
+                pagination_node = trie.lru_node(pagination_lru)
+
+                self.assertEqual(
+                    [lru for node, lru in trie.webentity_inorder_iter(prefix_node, prefix, pagination_node, pagination_path)],
+                    [lru for lru, _ in webentity_inorder[i + 1:]]
+                )
+
+            # print
+            # print
+            # for node, lru in trie.webentity_inorder_iter(
+            #     prefix_node, prefix, trie.lru_node('s:http|h:com|h:world|p:africa|'), 'clrl'
+            # ):
+            #     print lru, node
+            # print
+            # print
