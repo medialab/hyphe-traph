@@ -426,6 +426,8 @@ class LRUTrie(object):
             return True
 
         def inorder_traversal(node, lru, path=''):
+
+            # NOTE: could be done before this call to avoid reading too much from file
             if pagination_path is not None and not compare(path, pagination_path):
                 return
 
