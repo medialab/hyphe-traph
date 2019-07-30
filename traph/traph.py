@@ -868,12 +868,18 @@ class Traph(object):
         else:
             return len(self.get_page_links(lru, include_inbound=True, include_internal=True, include_outbound=True))
 
-    def get_webentities_links_slow(self, out=True, include_auto=False):
+    def get_webentities_links_slow_iter(self, out=True, include_auto=False):
+        '''
+        This method should be slower than the regular version but lighter in
+        memory as it does not retain a full map of pages association to
+        webentities but only the least recently used ones.
+        '''
         graph = defaultdict(Counter)
         page_to_webentity = dict()
-
+        state = TraphIteratorState()
         target_node = self.lru_trie.node()
 
+        # Iterating over all pages
         for node, source_webentity in self.lru_trie.dfs_with_webentity_iter():
 
             if not node.is_page() or not node.has_links(out=out):
@@ -908,7 +914,10 @@ class Traph(object):
                 # Adding to the graph
                 graph[source_webentity][target_webentity] += link_node.weight()
 
-        return graph
+                if state.should_yield(5000):
+                    yield state
+
+        yield state.finalize(graph)
 
     def get_webentities_links_iter(self, out=True, include_auto=False):
         '''
@@ -968,6 +977,9 @@ class Traph(object):
 
     def get_webentities_links(self, out=True, include_auto=False):
         return run_iterator(self.get_webentities_links_iter(out=out, include_auto=include_auto))
+
+    def get_webentities_links_slow(self, out=True, include_auto=False):
+        return run_iterator(self.get_webentities_links_slow_iter(out=out, include_auto=include_auto))
 
     def get_webentities_inlinks(self, include_auto=False):
         return self.get_webentities_links(out=False, include_auto=include_auto)
