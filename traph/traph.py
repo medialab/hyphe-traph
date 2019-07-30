@@ -997,24 +997,24 @@ class Traph(object):
 
         return lru_variations(prefix)
 
-    def add_page(self, lru):
+    def add_page(self, lru, crawled=False):
         '''
         Returns a webentity creation report as {created_webentities: {weid:[prefixes], ...}}
         '''
         lru = self.__encode(lru)
 
-        node, report = self.__add_page(lru, crawled=True)
+        node, report = self.__add_page(lru, crawled=crawled)
 
         return report
 
-    def add_pages(self, lrus):
+    def add_pages(self, lrus, crawled=False):
 
         report = TraphWriteReport()
 
         for lru in lrus:
             lru = self.__encode(lru)
 
-            node, page_report = self.__add_page(lru)
+            node, page_report = self.__add_page(lru, crawled=crawled)
             report += page_report
 
             node.flag_as_crawled()
