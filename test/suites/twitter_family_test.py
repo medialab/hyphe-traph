@@ -7,7 +7,7 @@
 #
 from collections import defaultdict
 from test.test_cases import TraphTestCase
-from test.helpers import webentity_label_from_prefixes
+from test.helpers import webentity_label_from_prefixes, legible_network
 
 # TODO: reinstate unit tests with significantother full length!
 
@@ -69,7 +69,8 @@ class TestTwitterFamily(TraphTestCase):
         # Inserting pages
         for page in PAGES:
             report = traph.add_page(page)
-            webentities.update(report.created_webentities)
+            for weid, prefixes in report.created_webentities.items():
+                webentities[weid] = webentity_label_from_prefixes(prefixes)
 
         self.assertEqual(len(webentities), 16)
 
@@ -88,18 +89,17 @@ class TestTwitterFamily(TraphTestCase):
 
         # Network
         network = traph.get_webentities_links()
+        legible = legible_network(webentities, network)
 
-        self.assertEqual(sum(len(targets) for targets in network.values()), 21)
-        self.assertEqual(len(network), len(NETWORK))
+        self.assertEqual(sum(len(targets) for targets in legible.values()), 21)
+        self.assertEqual(len(legible), len(NETWORK))
+
+        for source, targets in legible.items():
+            self.assertTrue(source in NETWORK)
+            self.assertEqual(set(targets), set(NETWORK[source]))
 
         for source, targets in network.items():
-            source = webentity_label_from_prefixes(webentities[source])
-            self.assertTrue(source in NETWORK)
-
             for weight in targets.values():
                 self.assertEqual(weight, 1)
-
-            targets = [webentity_label_from_prefixes(webentities[target]) for target in targets]
-            self.assertEqual(set(targets), set(NETWORK[source]))
 
         traph.close()
