@@ -382,12 +382,32 @@ class LRUTrie(object):
                 stack.append((node.child(), current_lru, level + 1))
 
     def webentity_inorder_iter(self, starting_node, starting_lru):
-        starting_block = starting_node.block
         starting_lru = ''.join(list(lru_iter(starting_lru))[:-1])
 
-        # If there is no starting node, there is no point in doing a DFS
-        if not starting_node.exists:
-            return
+        def inorder_traversal(node, lru):
+
+            if node.block != starting_node.block:
+                if node.has_left():
+                    for item in inorder_traversal(node.left_node(), lru):
+                        yield item
+
+            current_lru = lru + node.stem()
+            relevant_node = node.block == starting_node.block or not node.has_webentity()
+
+            if relevant_node:
+                yield node, current_lru
+
+                if node.has_child():
+                    for item in inorder_traversal(node.child_node(), current_lru):
+                        yield item
+
+            if node.block != starting_node.block:
+                if node.has_right():
+                    for item in inorder_traversal(node.right_node(), lru):
+                        yield item
+
+        for item in inorder_traversal(starting_node, starting_lru):
+            yield item
 
     def dfs_with_webentity_iter(self):
         starting_node = self.root()

@@ -143,51 +143,63 @@ class TestTraversal(TraphTestCase):
                 webentity_dfs
             )
 
-    # def test_webentity_inorder_iter(self):
+    def test_webentity_inorder_iter(self):
 
-    #     with self.open_traph(default_webentity_creation_rule=WEBENTITY_CREATION_RULES_REGEXES['domain']) as traph:
-    #         trie = traph.lru_trie
+        with self.open_traph(default_webentity_creation_rule=WEBENTITY_CREATION_RULES_REGEXES['domain']) as traph:
+            trie = traph.lru_trie
 
-    #         # TODO: test with sub webentity
-    #         # TODO: test with starting node in the middle of a siblings list
-    #         # TODO: test same things above
+            # TODO: test with sub webentity
+            # TODO: test with starting node in the middle of a siblings list
+            # TODO: test same things above
 
-    #         traph.add_page('s:http|h:com|h:world|p:europe|')
-    #         traph.add_page('s:http|h:com|h:world|p:asia|')
-    #         traph.add_page('s:http|h:com|h:world|p:africa|')
-    #         traph.add_page('s:http|h:com|h:world|p:oceania|')
+            traph.add_page('s:http|h:com|h:world|p:europe|')
+            traph.add_page('s:http|h:com|h:world|p:asia|')
+            traph.add_page('s:http|h:com|h:world|p:africa|')
+            traph.add_page('s:http|h:com|h:world|p:oceania|')
 
-    #         traph.add_page('s:http|h:com|h:world|p:europe|p:spain|')
-    #         traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:madrid|')
-    #         traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:toledo|')
-    #         traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:barcelona|')
-    #         traph.add_page('s:http|h:com|h:world|p:europe|p:france|')
-    #         traph.add_page('s:http|h:com|h:world|p:europe|p:romania|')
+            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|')
+            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:madrid|')
+            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:toledo|')
+            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:barcelona|')
+            traph.add_page('s:http|h:com|h:world|p:europe|p:france|')
+            traph.add_page('s:http|h:com|h:world|p:europe|p:romania|')
 
-    #         prefix = 's:http|h:com|h:world|'
+            prefix = 's:http|h:com|h:world|'
 
-    #         prefix_node = trie.lru_node(prefix)
+            prefix_node = trie.lru_node(prefix)
 
-    #         print
-    #         print
-    #         for node, lru in trie.webentity_inorder_iter(prefix_node, prefix):
-    #             print lru, node
+            webentity_inorder = [
+                's:http|h:com|h:world|',
+                's:http|h:com|h:world|p:africa|',
+                's:http|h:com|h:world|p:asia|',
+                's:http|h:com|h:world|p:europe|',
+                's:http|h:com|h:world|p:europe|p:france|',
+                's:http|h:com|h:world|p:europe|p:romania|',
+                's:http|h:com|h:world|p:europe|p:spain|',
+                's:http|h:com|h:world|p:europe|p:spain|p:barcelona|',
+                's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
+                's:http|h:com|h:world|p:europe|p:spain|p:toledo|',
+                's:http|h:com|h:world|p:oceania|'
+            ]
 
-    #         print
-    #         print
+            self.assertEqual(
+                [lru for node, lru in trie.webentity_inorder_iter(prefix_node, prefix)],
+                webentity_inorder
+            )
 
-    #         # webentity_dfs = [
-    #         #     's:http|h:com|h:world|',
-    #         #     's:http|h:com|h:world|p:europe|',
-    #         #     's:http|h:com|h:world|p:europe|p:spain|',
-    #         #     's:http|h:com|h:world|p:europe|p:france|',
-    #         #     's:http|h:com|h:world|p:europe|p:romania|',
-    #         #     's:http|h:com|h:world|p:asia|',
-    #         #     's:http|h:com|h:world|p:africa|',
-    #         #     's:http|h:com|h:world|p:oceania|'
-    #         # ]
+            traph.create_webentity(['s:http|h:com|h:world|p:europe|p:spain|'])
 
-    #         # self.assertEqual(
-    #         #     [lru for node, lru in trie.webentity_dfs_iter(prefix_node, prefix)],
-    #         #     webentity_dfs
-    #         # )
+            webentity_inorder = [
+                's:http|h:com|h:world|',
+                's:http|h:com|h:world|p:africa|',
+                's:http|h:com|h:world|p:asia|',
+                's:http|h:com|h:world|p:europe|',
+                's:http|h:com|h:world|p:europe|p:france|',
+                's:http|h:com|h:world|p:europe|p:romania|',
+                's:http|h:com|h:world|p:oceania|'
+            ]
+
+            self.assertEqual(
+                [lru for node, lru in trie.webentity_inorder_iter(prefix_node, prefix)],
+                webentity_inorder
+            )
