@@ -404,10 +404,10 @@ class LRUTrie(object):
                 # TODO: can do better than windup here...
                 pagination_stack.append((node, lru_dirname(self.windup_lru(node.block)), op))
 
-        def inorder_traversal(node, lru, path='', last_op=None):
+        def inorder_traversal(node, lru, path=''):
 
             if node.block != starting_node.block:
-                if last_op != 'l' and node.has_left():
+                if node.has_left():
                     for item in inorder_traversal(node.left_node(), lru, path + 'l'):
                         yield item
 
@@ -418,25 +418,25 @@ class LRUTrie(object):
                 if pagination_node is None or node.block != pagination_node.block:
                     yield node, current_lru
 
-                if last_op != 'c' and node.has_child():
+                if node.has_child():
                     for item in inorder_traversal(node.child_node(), current_lru, path + 'c'):
                         yield item
 
             if node.block != starting_node.block:
-                if last_op is None and node.has_right():
+                if node.has_right():
                     for item in inorder_traversal(node.right_node(), lru, path + 'r'):
                         yield item
 
-            if len(pagination_stack) != 0:
-                last_node, last_lru, last_op = pagination_stack.pop()
+            # if len(pagination_stack) != 0:
+            #     last_node, last_lru, last_op = pagination_stack.pop()
 
-                for item in inorder_traversal(last_node, last_lru, path[:-1], last_op):
-                    yield item
+            #     for item in inorder_traversal(last_node, last_lru, path[:-1], last_op):
+            #         yield item
 
         if pagination_node is not None:
             generator = inorder_traversal(
                 pagination_node,
-                pagination_stack[-1][1],
+                pagination_stack.pop()[1],
                 pagination_path
             )
         else:
