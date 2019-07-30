@@ -385,26 +385,49 @@ class LRUTrie(object):
                                pagination_node=None, pagination_path=None):
 
         starting_lru = lru_dirname(starting_lru)
-        pagination_stack = []
+        pagination_lru = None
 
         if pagination_node is not None:
             assert pagination_path is not None
 
-            # Here we need to build back a stack of ids and lrus
-            node = starting_node
+            pagination_lru = self.windup_lru(pagination_node.block)
 
-            for op in pagination_path:
-                if op == 'l':
-                    node = node.left_node()
-                elif op == 'r':
-                    node = node.right_node()
+        ENUM = {
+            'l': 0,
+            'c': 1,
+            'r': 2
+        }
+
+        def count_starting_c(p):
+            i = 0
+
+            for op in p:
+                if op == 'c':
+                    i += 1
                 else:
-                    node = node.child_node()
+                    return i
 
-                # TODO: can do better than windup here...
-                pagination_stack.append((node, lru_dirname(self.windup_lru(node.block)), op))
+            return i
+
+        def compare(current_path, p):
+            if len(current_path) > len(p):
+                return True
+
+            if count_starting_c(current_path) > count_starting_c(p):
+                return True
+
+            for i in xrange(len(current_path)):
+                op1 = ENUM[current_path[i]]
+                op2 = ENUM[p[i]]
+
+                if op1 < op2:
+                    return False
+
+            return True
 
         def inorder_traversal(node, lru, path=''):
+            if pagination_path is not None and not compare(path, pagination_path):
+                return
 
             if node.block != starting_node.block:
                 if node.has_left():
@@ -415,7 +438,7 @@ class LRUTrie(object):
             relevant_node = node.block == starting_node.block or not node.has_webentity()
 
             if relevant_node:
-                if pagination_node is None or node.block != pagination_node.block:
+                if pagination_node is None or current_lru > pagination_lru:
                     yield node, current_lru
 
                 if node.has_child():
@@ -427,25 +450,7 @@ class LRUTrie(object):
                     for item in inorder_traversal(node.right_node(), lru, path + 'r'):
                         yield item
 
-            # if len(pagination_stack) != 0:
-            #     last_node, last_lru, last_op = pagination_stack.pop()
-
-            #     for item in inorder_traversal(last_node, last_lru, path[:-1], last_op):
-            #         yield item
-
-        if pagination_node is not None:
-            generator = inorder_traversal(
-                pagination_node,
-                pagination_stack.pop()[1],
-                pagination_path
-            )
-        else:
-            generator = inorder_traversal(
-                starting_node,
-                starting_lru
-            )
-
-        for item in generator:
+        for item in inorder_traversal(starting_node, starting_lru):
             yield item
 
     def dfs_with_webentity_iter(self):

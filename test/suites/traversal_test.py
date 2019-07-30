@@ -221,12 +221,12 @@ class TestTraversal(TraphTestCase):
 
     #         prefix_node = trie.lru_node(prefix)
 
-    #         pagination_node = trie.lru_node('s:http|h:com|h:world|p:europe|p:spain|p:barcelona|')
+    #         pagination_node = trie.lru_node('s:http|h:com|h:world|p:europe|')
 
     #         print
     #         print
     #         for node, lru in trie.webentity_inorder_iter(
-    #             prefix_node, prefix, pagination_node, 'cccl'
+    #             prefix_node, prefix, pagination_node, 'c'
     #         ):
     #             print lru, node
     #         print
