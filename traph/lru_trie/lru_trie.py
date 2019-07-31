@@ -4,6 +4,7 @@
 #
 # Class representing the Trie indexing the LRUs.
 #
+import math
 import warnings
 from collections import Counter
 from traph.helpers import lru_iter, lru_dirname
@@ -598,15 +599,83 @@ class LRUTrie(object):
 
         return stats
 
-    def bst_stats(self):
-        stems_index = {}
-        bst_index = Counter()
+    def bst_metrics(self):
+
+        def is_bst_root(node):
+            if not node.has_parent():
+                return True
+
+            if node.parent_node().child() == node.block:
+                return True
+
+            return False
+
+        def max_balanced_bst_height(n):
+            if n < 2:
+                return 0
+
+            return int(math.ceil(math.log(n + 1, 2) - 1))
+
+        def bst_dfs_iter(node):
+            stack = [(node.block, 0)]
+
+            n = self.node()
+            while len(stack) != 0:
+                b, l = stack.pop()
+
+                n.read(b)
+
+                yield l
+
+                if n.has_right():
+                    stack.append((n.right(), l + 1))
+
+                if n.has_left():
+                    stack.append((n.left(), l + 1))
+
+        nb_bst = 0
+        sum_bst_height = 0
+        max_bst_height = 0
+        sum_bst_size = 0
+        max_bst_size = 0
+        sum_bst_ratio = 0.0
+        max_bst_ratio = 0.0
 
         for node in self.nodes_iter():
-            parent_block = node.parent()
-            parent_stem = stems_index.get(parent_block, '')
+            if not is_bst_root(node):
+                continue
 
-            stems_index[node.block] = parent_stem + node.stem()
-            bst_index[parent_block] += 1
+            nb_bst += 1
 
-        return stems_index, bst_index
+            dfs_result = list(bst_dfs_iter(node))
+            height = max(dfs_result) + 1
+            size = len(dfs_result)
+
+            assert size != 0
+            assert height > 0
+
+            expected_height = max_balanced_bst_height(size) + 1
+            ratio = height / float(expected_height)
+
+            if height > max_bst_height:
+                max_bst_height = height
+
+            if size > max_bst_size:
+                max_bst_size = size
+
+            if ratio > max_bst_ratio:
+                max_bst_ratio = ratio
+
+            sum_bst_height += height
+            sum_bst_size += size
+            sum_bst_ratio += ratio
+
+        return {
+            'nb_bst': nb_bst,
+            'max_bst_height': max_bst_height,
+            'avg_bst_height': sum_bst_height / float(nb_bst),
+            'max_bst_size': max_bst_size,
+            'avg_bst_size': sum_bst_size / float(nb_bst),
+            'max_bst_ratio': max_bst_ratio,
+            'avg_bst_ratio': sum_bst_ratio / float(nb_bst)
+        }

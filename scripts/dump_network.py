@@ -26,8 +26,12 @@ traph = Traph(folder='./scripts/data/',
               default_webentity_creation_rule=default_webentity_creation_rule,
               webentity_creation_rules=webentity_creation_rules)
 
-webentities_network = traph.get_webentities_links()
+# webentities_network = traph.get_webentities_links()
+from pprint import pprint
+import numpy as np
+metrics = traph.lru_trie.bst_metrics()
 
+pprint(metrics)
 # g = nx.Graph()
 
 # for source, targets in webentities_network.items():
