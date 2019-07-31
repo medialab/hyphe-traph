@@ -7,10 +7,16 @@
 import math
 import warnings
 from collections import Counter
-from traph.helpers import lru_iter, lru_dirname
 from traph.lru_trie.node import LRUTrieNode, LRU_TRIE_FIRST_DATA_BLOCK, LRU_TRIE_STEM_SIZE
 from traph.lru_trie.header import LRUTrieHeader
 from traph.lru_trie.walk_history import LRUTrieWalkHistory
+
+from traph.helpers import (
+    lru_iter,
+    lru_dirname,
+    base4_append,
+    int_to_base4
+)
 
 
 # Main class
@@ -387,68 +393,34 @@ class LRUTrie(object):
 
         starting_lru = lru_dirname(starting_lru)
         pagination_lru = None
+        comparison_path = None
 
         if pagination_node is not None:
             assert pagination_path is not None
 
             pagination_lru = self.windup_lru(pagination_node.block)
 
-        ENUM = {
-            'l': 'a',
-            'c': 'b',
-            'r': 'c'
-        }
+            comparison_path = int_to_base4(pagination_path) if pagination_lru != '0' else ''
 
-        def count_starting_c(p):
-            i = 0
-
-            for op in p:
-                if op == 'c':
-                    i += 1
-                else:
-                    return i
-
-            return i
-
-        def compare(current_path, p):
-            # if len(current_path) > len(p):
-            #     return True
-
-            # TODO: this is shady
-            # if count_starting_c(current_path) > count_starting_c(p):
-            #     return True
-
-            # for i in xrange(len(current_path)):
-            #     op1 = ENUM[current_path[i]]
-            #     op2 = ENUM[p[i]]
-
-            #     if op1 < op2:
-            #         return False
-
-            # return True
-
-            string1 = ''.join(ENUM[v] for v in current_path)
-
-            if not string1:
+        def can_follow_path(current_path):
+            if current_path == 0:
                 return True
 
-            string2 = ''.join(ENUM[v] for v in p)
+            current_path = int_to_base4(current_path)
 
-            string2 = string2[:len(string1)]
+            p = comparison_path[:len(current_path)]
 
-            # print string1, '->', string2
+            return current_path >= p
 
-            return string1 >= string2
-
-        def inorder_traversal(node, lru, path=''):
+        def inorder_traversal(node, lru, path=0):
 
             # NOTE: could be done before this call to avoid reading too much from file
-            if pagination_path is not None and not compare(path, pagination_path):
+            if pagination_path is not None and not can_follow_path(path):
                 return
 
             if node.block != starting_node.block:
                 if node.has_left():
-                    for item in inorder_traversal(node.left_node(), lru, path + 'l'):
+                    for item in inorder_traversal(node.left_node(), lru, base4_append(path, 1)):
                         yield item
 
             current_lru = lru + node.stem()
@@ -459,12 +431,12 @@ class LRUTrie(object):
                     yield node, current_lru
 
                 if node.has_child():
-                    for item in inorder_traversal(node.child_node(), current_lru, path + 'c'):
+                    for item in inorder_traversal(node.child_node(), current_lru, base4_append(path, 2)):
                         yield item
 
             if node.block != starting_node.block:
                 if node.has_right():
-                    for item in inorder_traversal(node.right_node(), lru, path + 'r'):
+                    for item in inorder_traversal(node.right_node(), lru, base4_append(path, 3)):
                         yield item
 
         for item in inorder_traversal(starting_node, starting_lru):

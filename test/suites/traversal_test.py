@@ -8,6 +8,8 @@
 from test.test_cases import TraphTestCase
 from test.config import WEBENTITY_CREATION_RULES_REGEXES
 
+from traph.helpers import ops_to_base4
+
 WEBENTITY_CREATION_RULES = {
     's:http|h:com|h:world|': WEBENTITY_CREATION_RULES_REGEXES['path1'],
 }
@@ -223,20 +225,22 @@ class TestTraversal(TraphTestCase):
 
             webentity_inorder = [
                 ('s:http|h:com|h:world|', ''),
-                ('s:http|h:com|h:world|p:africa|', 'clrl'),
-                ('s:http|h:com|h:world|p:asia|', 'clr'),
-                ('s:http|h:com|h:world|p:europe|', 'c'),
-                ('s:http|h:com|h:world|p:europe|p:france|', 'ccl'),
-                ('s:http|h:com|h:world|p:europe|p:romania|', 'cclr'),
-                ('s:http|h:com|h:world|p:europe|p:spain|', 'cc'),
-                ('s:http|h:com|h:world|p:europe|p:spain|p:barcelona|', 'cccl'),
-                ('s:http|h:com|h:world|p:europe|p:spain|p:madrid|', 'ccc'),
-                ('s:http|h:com|h:world|p:europe|p:spain|p:toledo|', 'cccr'),
-                ('s:http|h:com|h:world|p:oceania|', 'cr')
+                ('s:http|h:com|h:world|p:africa|', 'CLRL'),
+                ('s:http|h:com|h:world|p:asia|', 'CLR'),
+                ('s:http|h:com|h:world|p:europe|', 'C'),
+                ('s:http|h:com|h:world|p:europe|p:france|', 'CCL'),
+                ('s:http|h:com|h:world|p:europe|p:romania|', 'CCLR'),
+                ('s:http|h:com|h:world|p:europe|p:spain|', 'CC'),
+                ('s:http|h:com|h:world|p:europe|p:spain|p:barcelona|', 'CCCL'),
+                ('s:http|h:com|h:world|p:europe|p:spain|p:madrid|', 'CCC'),
+                ('s:http|h:com|h:world|p:europe|p:spain|p:toledo|', 'CCCR'),
+                ('s:http|h:com|h:world|p:oceania|', 'CR')
             ]
 
             for i, (pagination_lru, pagination_path) in enumerate(webentity_inorder):
                 pagination_node = trie.lru_node(pagination_lru)
+
+                pagination_path = ops_to_base4(pagination_path)
 
                 self.assertEqual(
                     [lru for node, lru in trie.webentity_inorder_iter(prefix_node, prefix, pagination_node, pagination_path)],

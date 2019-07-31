@@ -156,8 +156,14 @@ def base64_to_int(s):
 
 
 def base4_to_ops(n):
+    if n == 0:
+        return ''
+
     return ''.join(BASE4_TO_OPS[i] for i in int_to_base4(n))
 
 
 def ops_to_base4(s):
+    if len(s) == 0:
+        return 0
+
     return base4_int(''.join(OPS_TO_BASE4[op] for op in s))
