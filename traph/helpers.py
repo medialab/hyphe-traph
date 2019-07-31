@@ -15,6 +15,18 @@ for i, c in enumerate(BASE64):
 
 assert len(BASE64) == 64
 
+BASE4_TO_OPS = {
+    '1': 'L',
+    '2': 'C',
+    '3': 'R'
+}
+
+OPS_TO_BASE4 = {
+    'L': '1',
+    'C': '2',
+    'R': '3'
+}
+
 
 def https_variation(lru):
     '''
@@ -141,3 +153,11 @@ def base64_to_int(s):
         p = p * 64
 
     return x
+
+
+def base4_to_ops(n):
+    return ''.join(BASE4_TO_OPS[i] for i in int_to_base4(n))
+
+
+def ops_to_base4(s):
+    return base4_int(''.join(OPS_TO_BASE4[op] for op in s))

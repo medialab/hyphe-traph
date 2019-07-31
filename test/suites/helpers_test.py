@@ -15,7 +15,9 @@ from traph.helpers import (
     base4_append,
     int_to_base64,
     base64_to_int,
-    int_to_base4
+    int_to_base4,
+    base4_to_ops,
+    ops_to_base4
 )
 
 
@@ -82,3 +84,20 @@ class TestHelpers(TestCase):
             self.assertEqual(b64, b)
             self.assertEqual(int_to_base4(n), s)
             self.assertEqual(base64_to_int(b64), n)
+
+    def test_ops_conversions(self):
+
+        tests = [
+            ('133231', 'LRRCRL'),
+            ('32111', 'RCLLL'),
+            ('32', 'RC')
+        ]
+
+        for s, ops in tests:
+            n = base4_int(s)
+
+            self.assertEqual(base4_to_ops(n), ops)
+            self.assertEqual(
+                ops_to_base4(base4_to_ops(n)),
+                n
+            )
