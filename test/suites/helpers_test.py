@@ -10,7 +10,12 @@ from traph.helpers import (
     lru_variations,
     lru_iter,
     chunks_iter,
-    lru_dirname
+    lru_dirname,
+    base4_int,
+    base4_append,
+    int_to_base64,
+    base64_to_int,
+    int_to_base4
 )
 
 
@@ -49,3 +54,31 @@ class TestHelpers(TestCase):
             list(chunks_iter(7, 's:http|h:fr|h:sciences-po|h:medialab|')),
             ['s:http|', 'h:fr|h:', 'science', 's-po|h:', 'mediala', 'b|']
         )
+
+    def test_base4_append(self):
+        n = base4_int('13213')
+
+        self.assertEqual(
+            n,
+            487
+        )
+
+        self.assertEqual(
+            base4_append(n, 2),
+            base4_int('132132')
+        )
+
+    def test_int_to_base64(self):
+        tests = [
+            ('1321313231221323312121332313133232311', '1VTJFXSp-TvKR'),
+            ('13213', '7D'),
+            ('12313313232132331323133132313', '6TTKuZXvuT')
+        ]
+
+        for s, b in tests:
+            n = base4_int(s)
+            b64 = int_to_base64(n)
+
+            self.assertEqual(b64, b)
+            self.assertEqual(int_to_base4(n), s)
+            self.assertEqual(base64_to_int(b64), n)

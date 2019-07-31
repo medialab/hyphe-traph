@@ -5,6 +5,15 @@
 # Miscellaneous helper functions used throughout the code.
 #
 import math
+import string
+
+BASE64 = string.digits + string.ascii_letters + '-_'
+BASE64_INDEX = {}
+
+for i, c in enumerate(BASE64):
+    BASE64_INDEX[c] = i
+
+assert len(BASE64) == 64
 
 
 def https_variation(lru):
@@ -81,11 +90,54 @@ def chunks_iter(chunk_size, string):
         yield chunk
 
 
-def parse_pagination_token(token):
-    prefix_index, starting_block = token.split('&')
-
-    return int(prefix_index), int(starting_block)
+def base4_append(p, n):
+    return p * 4 + n
 
 
-def build_pagination_token(prefix_index, block):
-    return '%i&%i' % (prefix_index, block)
+def base4_int(s):
+    return int(s, 4)
+
+
+def int_to_base4(x):
+    if x == 0:
+        return BASE64[0]
+
+    digits = []
+
+    while x:
+        digits.append(BASE64[x % 4])
+        x = x >> 2
+
+    digits.reverse()
+
+    return ''.join(digits)
+
+
+def int_to_base64(x):
+    if x == 0:
+        return BASE64[0]
+
+    digits = []
+
+    while x:
+        digits.append(BASE64[x % 64])
+        x = x >> 6
+
+    digits.reverse()
+
+    return ''.join(digits)
+
+
+def base64_to_int(s):
+    l = len(s)
+    p = 1
+    x = 0
+
+    for i in xrange(l - 1, -1, -1):
+        c = s[i]
+        v = BASE64_INDEX[c]
+
+        x += v * p
+        p = p * 64
+
+    return x
