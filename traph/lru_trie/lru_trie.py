@@ -400,7 +400,7 @@ class LRUTrie(object):
 
             pagination_lru = self.windup_lru(pagination_node.block)
 
-            comparison_path = int_to_base4(pagination_path) if pagination_lru != '0' else ''
+            comparison_path = int_to_base4(pagination_path) if pagination_path != 0 else ''
 
         def can_follow_path(current_path):
             if current_path == 0:
