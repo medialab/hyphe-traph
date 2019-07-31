@@ -868,12 +868,18 @@ class Traph(object):
         else:
             return len(self.get_page_links(lru, include_inbound=True, include_internal=True, include_outbound=True))
 
-    def get_webentities_links_slow(self, out=True, include_auto=False):
+    def get_webentities_links_slow_iter(self, out=True, include_auto=False):
+        '''
+        This method should be slower than the regular version but lighter in
+        memory as it does not retain a full map of pages association to
+        webentities but only the least recently used ones.
+        '''
         graph = defaultdict(Counter)
         page_to_webentity = dict()
-
+        state = TraphIteratorState()
         target_node = self.lru_trie.node()
 
+        # Iterating over all pages
         for node, source_webentity in self.lru_trie.dfs_with_webentity_iter():
 
             if not node.is_page() or not node.has_links(out=out):
@@ -908,7 +914,10 @@ class Traph(object):
                 # Adding to the graph
                 graph[source_webentity][target_webentity] += link_node.weight()
 
-        return graph
+                if state.should_yield(5000):
+                    yield state
+
+        yield state.finalize(graph)
 
     def get_webentities_links_iter(self, out=True, include_auto=False):
         '''
@@ -930,6 +939,11 @@ class Traph(object):
 
             if not source_webentity:
                 continue
+
+            if node.is_crawled():
+                graph[source_webentity]["pages_crawled"] += 1
+            else:
+                graph[source_webentity]["pages_uncrawled"] += 1
 
             page_to_webentity[node.block] = source_webentity
 
@@ -969,6 +983,9 @@ class Traph(object):
     def get_webentities_links(self, out=True, include_auto=False):
         return run_iterator(self.get_webentities_links_iter(out=out, include_auto=include_auto))
 
+    def get_webentities_links_slow(self, out=True, include_auto=False):
+        return run_iterator(self.get_webentities_links_slow_iter(out=out, include_auto=include_auto))
+
     def get_webentities_inlinks(self, include_auto=False):
         return self.get_webentities_links(out=False, include_auto=include_auto)
 
@@ -980,24 +997,24 @@ class Traph(object):
 
         return lru_variations(prefix)
 
-    def add_page(self, lru):
+    def add_page(self, lru, crawled=False):
         '''
         Returns a webentity creation report as {created_webentities: {weid:[prefixes], ...}}
         '''
         lru = self.__encode(lru)
 
-        node, report = self.__add_page(lru, crawled=True)
+        node, report = self.__add_page(lru, crawled=crawled)
 
         return report
 
-    def add_pages(self, lrus):
+    def add_pages(self, lrus, crawled=False):
 
         report = TraphWriteReport()
 
         for lru in lrus:
             lru = self.__encode(lru)
 
-            node, page_report = self.__add_page(lru)
+            node, page_report = self.__add_page(lru, crawled=crawled)
             report += page_report
 
             node.flag_as_crawled()
