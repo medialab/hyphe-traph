@@ -389,18 +389,30 @@ class LRUTrie(object):
                 stack.append((node.child(), current_lru, level + 1))
 
     def webentity_inorder_iter(self, starting_node, starting_lru,
-                               pagination_node=None, pagination_path=None):
+                               pagination_path=None):
 
         starting_lru = lru_dirname(starting_lru)
         pagination_lru = None
         comparison_path = None
 
-        if pagination_node is not None:
-            assert pagination_path is not None
+        def follow_path(p):
+            n = self.node(block=starting_node.block)
+            lru = starting_lru
 
-            pagination_lru = self.windup_lru(pagination_node.block)
+            for op in p:
+                if op == '1':
+                    n.read_left()
+                elif op == '2':
+                    lru += n.stem()
+                    n.read_child()
+                else:
+                    n.read_right()
 
+            return lru + n.stem()
+
+        if pagination_path is not None:
             comparison_path = int_to_base4(pagination_path) if pagination_path != 0 else ''
+            pagination_lru = follow_path(comparison_path)
 
         def can_follow_path(current_path):
             if current_path == 0:
@@ -427,7 +439,7 @@ class LRUTrie(object):
             relevant_node = node.block == starting_node.block or not node.has_webentity()
 
             if relevant_node:
-                if pagination_node is None or current_lru > pagination_lru:
+                if pagination_path is None or current_lru > pagination_lru:
                     yield node, current_lru
 
                 if node.has_child():
