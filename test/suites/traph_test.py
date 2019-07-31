@@ -17,12 +17,14 @@ class TestTraph(TraphTestCase):
 
             self.assertEqual(report.nb_created_pages, 1)
             self.assertEqual(traph.count_pages(), 1)
+            self.assertEqual(traph.count_crawled_pages(), 0)
 
-            # Re-adding pages should not have an effect
-            report = traph.add_page('s:http|h:fr|h:sciences-po|h:medialab|')
+            # Re-adding pages should not have an effect, except on crawled flag
+            report = traph.add_page('s:http|h:fr|h:sciences-po|h:medialab|', crawled=True)
 
             self.assertEqual(report.nb_created_pages, 0)
             self.assertEqual(traph.count_pages(), 1)
+            self.assertEqual(traph.count_crawled_pages(), 1)
             self.assertEqual(traph.count_links(), 0)
 
     def test_add_links(self):

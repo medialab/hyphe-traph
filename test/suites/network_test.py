@@ -35,9 +35,18 @@ class TestNetwork(TraphTestCase):
                 webentities[weid] = webentity_label_from_prefixes(prefixes)
 
             # Normal network
-            network = legible_network(webentities, traph.get_webentities_links())
+            network = traph.get_webentities_links()
 
-            self.assertIdenticalMultimaps(network, {
+            self.assertEqual(network[1]['pages_crawled'], 1)     # europe/spain
+            self.assertEqual(network[1]['pages_uncrawled'], 1)   # europe/spain/madrid
+            self.assertEqual(network[2]['pages_crawled'], 1)     # america
+            self.assertEqual(network[2]['pages_uncrawled'], 0)   #
+            self.assertEqual(network[3]['pages_crawled'], 0)     #
+            self.assertEqual(network[3]['pages_uncrawled'], 1)   # asia
+
+            legible = legible_network(webentities, network)
+
+            self.assertIdenticalMultimaps(legible, {
                 's:http|h:com|h:world|p:europe|': [
                     's:http|h:com|h:world|p:america|'
                 ],
