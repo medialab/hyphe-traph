@@ -940,10 +940,8 @@ class Traph(object):
             if not source_webentity:
                 continue
 
-            if node.is_crawled():
-                graph[source_webentity]["pages_crawled"] += 1
-            else:
-                graph[source_webentity]["pages_uncrawled"] += 1
+            crawled_status = 'crawled' if node.is_crawled() else 'uncrawled'
+            graph[source_webentity]['pages_' + crawled_status] += 1
 
             page_to_webentity[node.block] = source_webentity
 
