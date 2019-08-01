@@ -253,3 +253,53 @@ class TestTraversal(TraphTestCase):
             #     print lru, node
             # print
             # print
+
+    def test_paginate_webentity_pages(self):
+
+        with self.open_traph(default_webentity_creation_rule=WEBENTITY_CREATION_RULES_REGEXES['domain']) as traph:
+            trie = traph.lru_trie
+
+            traph.add_page('s:http|h:com|h:world|p:europe|')
+            traph.add_page('s:http|h:com|h:world|p:asia|')
+            traph.add_page('s:http|h:com|h:world|p:africa|')
+            traph.add_page('s:http|h:com|h:world|p:oceania|')
+
+            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|')
+            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:madrid|')
+            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:toledo|')
+            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:barcelona|')
+            traph.add_page('s:http|h:com|h:world|p:europe|p:france|')
+            traph.add_page('s:http|h:com|h:world|p:europe|p:romania|')
+
+            prefixes = ['s:http|h:com|h:world|']
+
+            webentity_inorder = [
+                ('s:http|h:com|h:world|p:africa|', 'CLRL'),
+                ('s:http|h:com|h:world|p:asia|', 'CLR'),
+                ('s:http|h:com|h:world|p:europe|', 'C'),
+                ('s:http|h:com|h:world|p:europe|p:france|', 'CCL'),
+                ('s:http|h:com|h:world|p:europe|p:romania|', 'CCLR'),
+                ('s:http|h:com|h:world|p:europe|p:spain|', 'CC'),
+                ('s:http|h:com|h:world|p:europe|p:spain|p:barcelona|', 'CCCL'),
+                ('s:http|h:com|h:world|p:europe|p:spain|p:madrid|', 'CCC'),
+                ('s:http|h:com|h:world|p:europe|p:spain|p:toledo|', 'CCCR'),
+                ('s:http|h:com|h:world|p:oceania|', 'CR')
+            ]
+
+            # Fetching everything
+            self.assertEqual(
+                traph.paginate_webentity_pages(None, prefixes),
+                {
+                    'done': True,
+                    'count': len(webentity_inorder),
+                    'pages': [
+                        {'lru': lru, 'crawled': False}
+                        for lru, _ in webentity_inorder
+                    ]
+                }
+            )
+
+            # TODO: make a call with exact count
+
+            # from pprint import pprint
+            # pprint(traph.paginate_webentity_pages(None, prefixes))

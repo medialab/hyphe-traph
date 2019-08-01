@@ -15,7 +15,12 @@ from traph_iterator_state import TraphIteratorState, run_iterator
 from storage import FileStorage, MemoryStorage
 from lru_trie import LRUTrie, LRU_TRIE_NODE_BLOCK_SIZE
 from link_store import LinkStore, LINK_STORE_NODE_BLOCK_SIZE
-from helpers import lru_variations
+
+from helpers import (
+    lru_variations,
+    build_pagination_token,
+    parse_pagination_token
+)
 
 
 # Exceptions
@@ -517,7 +522,60 @@ class Traph(object):
         # NOTE: we iterate on k + 1 pages to be sure to exhaust the inorder
         # traversal and not require of the user to make an additional pointless
         # pagination call to assert we finished the list
-        k = page_count + 1 if page_count is not None else page_count
+        k = page_count + 1 if page_count is not None else None
+
+        start_i = 0
+        path = None
+        pages = []
+        n = 0
+        done_count = k is None
+        last_path = None
+
+        if pagination_token:
+            start_i, path = parse_pagination_token(pagination_token)
+
+        for i in range(start_i, len(prefixes)):
+            current_prefix = prefixes[i]
+
+            starting_node = self.lru_trie.lru_node(current_prefix)
+
+            generator = self.lru_trie.webentity_inorder_iter(
+                starting_node,
+                current_prefix,
+                pagination_path=path
+            )
+
+            for node, lru, path in generator:
+                if not node.is_page():
+                    continue
+
+                n += 1
+
+                if k is not None and n >= k:
+                    done_count = True
+                    break
+
+                pages.append({
+                    'lru': lru,
+                    'crawled': node.is_crawled()
+                })
+
+                last_path = path
+
+            if done_count:
+                break
+
+        result = {
+            'done': True,
+            'count': n - 1 if page_count is not None else n,
+            'pages': pages[:page_count] if page_count is not None else pages
+        }
+
+        if not done_count and last_path is not None:
+            result['done'] = False
+            result['token'] = build_pagination_token(i, last_path)
+
+        return result
 
     def get_webentity_crawled_pages_iter(self, weid, prefixes):
         '''
