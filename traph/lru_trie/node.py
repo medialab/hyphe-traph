@@ -254,6 +254,12 @@ class LRUTrieNode(object):
     def is_tail(self):
         return test(self.data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_IS_TAIL)
 
+    def can_have_child_webentities(self):
+        return not test(self.data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_NO_CHILD_WEBENTITIES)
+
+    def flag_can_have_child_webentities(self):
+        unflag(self.data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_NO_CHILD_WEBENTITIES)
+
     # =========================================================================
     # Stem methods
     # =========================================================================
