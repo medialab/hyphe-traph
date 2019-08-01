@@ -579,6 +579,9 @@ class Traph(object):
 
                 last_path = path
 
+            # We reset the pagination path for next prefix
+            pagination_path = None
+
         return {
             'done': True,
             'count': n,
