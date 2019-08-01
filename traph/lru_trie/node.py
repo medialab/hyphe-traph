@@ -195,7 +195,7 @@ class LRUTrieNode(object):
         # NOTE: does not work on subsequent updates
         if self.tail and not self.exists:
             for is_last, chunk in detailed_chunks_iter(LRU_TRIE_STEM_SIZE, self.tail):
-                data = [chunk] + [0] * LRU_TRIE_NODE_REGISTERS
+                data = [chunk, DEFAULT_FLAGS_VALUE] + [0] * LRU_TRIE_NODE_REGISTERS
 
                 flag(data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_IS_TAIL)
 
