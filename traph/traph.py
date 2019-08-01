@@ -511,6 +511,14 @@ class Traph(object):
     def get_webentity_pages(self, weid, prefixes):
         return run_iterator(self.get_webentity_pages_iter(weid, prefixes))
 
+    def paginate_webentity_pages(self, weid, prefixes,
+                                 page_count=None, pagination_token=None):
+
+        # NOTE: we iterate on k + 1 pages to be sure to exhaust the inorder
+        # traversal and not require of the user to make an additional pointless
+        # pagination call to assert we finished the list
+        k = page_count + 1 if page_count is not None else page_count
+
     def get_webentity_crawled_pages_iter(self, weid, prefixes):
         '''
         Note: the prefixes are supposed to match the webentity id. We do not check.

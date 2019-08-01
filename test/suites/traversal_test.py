@@ -181,7 +181,7 @@ class TestTraversal(TraphTestCase):
             ]
 
             self.assertEqual(
-                [lru for node, lru in trie.webentity_inorder_iter(prefix_node, prefix)],
+                [lru for node, lru, _ in trie.webentity_inorder_iter(prefix_node, prefix)],
                 webentity_inorder
             )
 
@@ -198,7 +198,7 @@ class TestTraversal(TraphTestCase):
             ]
 
             self.assertEqual(
-                [lru for node, lru in trie.webentity_inorder_iter(prefix_node, prefix)],
+                [lru for node, lru, _ in trie.webentity_inorder_iter(prefix_node, prefix)],
                 webentity_inorder
             )
 
@@ -241,7 +241,7 @@ class TestTraversal(TraphTestCase):
                 pagination_path = ops_to_base4(pagination_path)
 
                 self.assertEqual(
-                    [lru for node, lru in trie.webentity_inorder_iter(prefix_node, prefix, pagination_path)],
+                    [lru for node, lru, _ in trie.webentity_inorder_iter(prefix_node, prefix, pagination_path)],
                     [lru for lru, _ in webentity_inorder[i + 1:]]
                 )
 

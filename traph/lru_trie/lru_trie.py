@@ -440,7 +440,7 @@ class LRUTrie(object):
 
             if relevant_node:
                 if pagination_path is None or current_lru > pagination_lru:
-                    yield node, current_lru
+                    yield node, current_lru, path
 
                 if node.has_child():
                     for item in inorder_traversal(node.child_node(), current_lru, base4_append(path, 2)):
