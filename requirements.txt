@@ -1,3 +1,5 @@
+lru-dict
+
 # Dev Dependencies
 networkx
 pycodestyle

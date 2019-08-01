@@ -9,6 +9,7 @@ import heapq
 import os
 import re
 import warnings
+from lru import LRU as lru_dict
 from collections import defaultdict, Counter
 from traph_write_report import TraphWriteReport
 from traph_iterator_state import TraphIteratorState, run_iterator
@@ -948,14 +949,14 @@ class Traph(object):
         else:
             return len(self.get_page_links(lru, include_inbound=True, include_internal=True, include_outbound=True))
 
-    def get_webentities_links_slow_iter(self, out=True, include_auto=False):
+    def get_webentities_links_slow_iter(self, out=True, include_auto=False, lru_cache_size=2097152):
         '''
         This method should be slower than the regular version but lighter in
         memory as it does not retain a full map of pages association to
         webentities but only the least recently used ones.
         '''
         graph = defaultdict(Counter)
-        page_to_webentity = dict()
+        page_to_webentity = lru_dict(lru_cache_size)
         state = TraphIteratorState()
         target_node = self.lru_trie.node()
 
@@ -978,14 +979,15 @@ class Traph(object):
                 target_webentity = page_to_webentity.get(target_block)
 
                 if target_webentity is None:
+
                     target_node.read(target_block)
                     target_webentity = self.lru_trie.windup_lru_for_webentity(target_node)
+
+                    page_to_webentity[target_block] = target_webentity
 
                     # Beware: it's possible that we could not find a webentity
                     if not target_webentity:
                         continue
-
-                    page_to_webentity[target_block] = target_webentity
 
                 # Allowing auto links?
                 if not include_auto and source_webentity == target_webentity:
@@ -1061,8 +1063,8 @@ class Traph(object):
     def get_webentities_links(self, out=True, include_auto=False):
         return run_iterator(self.get_webentities_links_iter(out=out, include_auto=include_auto))
 
-    def get_webentities_links_slow(self, out=True, include_auto=False):
-        return run_iterator(self.get_webentities_links_slow_iter(out=out, include_auto=include_auto))
+    def get_webentities_links_slow(self, out=True, include_auto=False, lru_cache_size=2097152):
+        return run_iterator(self.get_webentities_links_slow_iter(out=out, include_auto=include_auto, lru_cache_size=lru_cache_size))
 
     def get_webentities_inlinks(self, include_auto=False):
         return self.get_webentities_links(out=False, include_auto=include_auto)
