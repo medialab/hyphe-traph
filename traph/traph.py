@@ -525,7 +525,7 @@ class Traph(object):
 
         # NOTE: we iterate on k + 1 pages to be sure to exhaust the inorder
         # traversal and not require of the user to make an additional pointless
-        # pagination call to assert we finished the list
+        # pagination call to finally find that the traversal is over
         k = page_count + 1 if page_count is not None else None
 
         start_i = 0
