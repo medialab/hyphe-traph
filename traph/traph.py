@@ -687,7 +687,7 @@ class Traph(object):
             if not starting_node:
                 raise TraphException('LRU %s not in the traph' % (prefix))
 
-            for node, _ in self.lru_trie.dfs_iter(starting_node, prefix):
+            for node, _ in self.lru_trie.dfs_iter(starting_node, prefix, skip_childless_paths=True):
                 weid2 = node.webentity()
                 if weid2 and weid2 > 0 and weid2 != weid:
                     weids.add(weid2)

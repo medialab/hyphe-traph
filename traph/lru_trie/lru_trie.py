@@ -325,7 +325,7 @@ class LRUTrie(object):
             parent.read_parent()
             yield parent
 
-    def dfs_iter(self, starting_node=None, starting_lru=''):
+    def dfs_iter(self, starting_node=None, starting_lru='', skip_childless_paths=False):
         starting_from_root = not starting_node
 
         if starting_node:
@@ -356,6 +356,9 @@ class LRUTrie(object):
 
                 if node.has_left():
                     stack.append((node.left(), lru))
+
+            if skip_childless_paths and not node.can_have_child_webentities():
+                continue
 
             if node.has_child():
                 stack.append((node.child(), current_lru))

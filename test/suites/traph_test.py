@@ -199,6 +199,8 @@ class TestTraph(TraphTestCase):
 
     def test_get_webentity_child_webentities(self):
         with self.open_traph() as traph:
+            lru_trie = traph.lru_trie
+
             report = traph.add_page('s:http|h:com|h:twitter|')
             report += traph.add_page('s:http|h:com|h:twitter|p:yomgui|')
             report += traph.add_page('s:http|h:com|h:twitter|p:boo|')
@@ -219,12 +221,21 @@ class TestTraph(TraphTestCase):
 
             for lru, flag in flag_tests:
                 self.assertEqual(
-                    traph.lru_trie.lru_node(lru).can_have_child_webentities(),
+                    lru_trie.lru_node(lru).can_have_child_webentities(),
                     flag
                 )
 
-            # for node, lru in traph.webentity_prefix_iter():
-            #     print node, lru
+            twitter_prefix = 's:http|h:com|h:twitter|'
+            twitter_node = lru_trie.lru_node(twitter_prefix)
+
+            self.assertEqual(
+                not any(
+                    node == 'p:photos|'
+                    for node, _
+                    in lru_trie.dfs_iter(twitter_node, twitter_prefix, skip_childless_paths=True)
+                ),
+                True
+            )
 
     def test_clear(self):
         with self.open_traph() as traph:
