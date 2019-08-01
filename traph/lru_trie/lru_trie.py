@@ -326,6 +326,10 @@ class LRUTrie(object):
             yield parent
 
     def dfs_iter(self, starting_node=None, starting_lru='', skip_childless_paths=False):
+        '''
+        Note that childless_paths refers to the upper webentity tree, not
+        the pages' one.
+        '''
         starting_from_root = not starting_node
 
         if starting_node:
