@@ -169,7 +169,7 @@ class Traph(object):
         invalid_prefixes = []
 
         for prefix in prefixes:
-            node, history = self.lru_trie.add_lru(prefix)
+            node, history = self.lru_trie.add_lru(prefix, flag_can_have_child_webentities=True)
 
             if node.has_webentity():
                 invalid_prefixes.append(prefix)
@@ -379,7 +379,7 @@ class Traph(object):
         prefix = self.__encode(prefix)
 
         # check prefix
-        node, history = self.lru_trie.add_lru(prefix)
+        node, history = self.lru_trie.add_lru(prefix, flag_can_have_child_webentities=True)
         if node.has_webentity():
             raise TraphException('Prefix %s already attributed to webentity %s' % (prefix, node.webentity()))
         else:

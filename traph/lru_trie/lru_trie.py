@@ -87,7 +87,7 @@ class LRUTrie(object):
     # =========================================================================
 
     # Method adding a lru to the trie
-    def add_lru(self, lru):
+    def add_lru(self, lru, flag_can_have_child_webentities=False):
 
         # Iteration state
         # TODO: we should be able to use an iterator and not keep a list!
@@ -117,6 +117,15 @@ class LRUTrie(object):
             if node.has_webentity_creation_rule():
                 history.add_webentity_creation_rule(len(lru))
 
+            # Flagging for underlying webentities
+            if (
+                i < l - 1 and
+                flag_can_have_child_webentities and
+                not node.can_have_child_webentities()
+            ):
+                node.flag_can_have_child_webentities()
+                node.write()
+
             i += 1
 
             if i < l and node.has_child():
@@ -131,6 +140,11 @@ class LRUTrie(object):
             # Creating the child
             child = self.node(stem=stem)
             child.set_parent(node.block)
+
+            # Flagging for underlying webentities
+            if i < l - 1 and flag_can_have_child_webentities:
+                child.flag_can_have_child_webentities()
+
             child.write()
 
             # Linking the child to its parent

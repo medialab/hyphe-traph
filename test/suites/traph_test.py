@@ -202,10 +202,26 @@ class TestTraph(TraphTestCase):
             report = traph.add_page('s:http|h:com|h:twitter|')
             report += traph.add_page('s:http|h:com|h:twitter|p:yomgui|')
             report += traph.add_page('s:http|h:com|h:twitter|p:boo|')
+            report += traph.add_page('s:http|h:com|h:twitter|p:boo|p:photos|')
 
             child_webentities = traph.get_webentity_child_webentities(1, ['s:http|h:com|h:twitter|'])
 
             self.assertEqual(set(child_webentities), set([2, 3]))
+
+            flag_tests = [
+                ('s:http|', True),
+                ('s:http|h:com|', True),
+                ('s:http|h:com|h:twitter|', True),
+                ('s:http|h:com|h:twitter|p:yomgui|', False),
+                ('s:http|h:com|h:twitter|p:boo|', False),
+                ('s:http|h:com|h:twitter|p:boo|p:photos|', False)
+            ]
+
+            for lru, flag in flag_tests:
+                self.assertEqual(
+                    traph.lru_trie.lru_node(lru).can_have_child_webentities(),
+                    flag
+                )
 
             # for node, lru in traph.webentity_prefix_iter():
             #     print node, lru
