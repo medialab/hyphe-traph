@@ -43,9 +43,9 @@ LRU_TRIE_NODE_PARENT_BLOCK = 6
 LRU_TRIE_NODE_OUTLINKS_BLOCK = 7
 LRU_TRIE_NODE_INLINKS_BLOCK = 8
 
-LRU_TRIE_NODE_REGISTERS = 8
+LRU_TRIE_NODE_REGISTERS = 7  # 8 - flags
 
-# Flags (Currently allocating 7/8 bits)
+# Flags (Currently allocating 8/8 bits)
 LRU_TRIE_NODE_FLAG_PAGE = 0
 LRU_TRIE_NODE_FLAG_CRAWLED = 1
 LRU_TRIE_NODE_FLAG_LINKED = 2
@@ -53,6 +53,12 @@ LRU_TRIE_NODE_FLAG_DELETED = 3
 LRU_TRIE_NODE_FLAG_WEBENTITY_CREATION_RULE = 4
 LRU_TRIE_NODE_FLAG_HAS_TAIL = 5
 LRU_TRIE_NODE_FLAG_IS_TAIL = 6
+LRU_TRIE_NODE_FLAG_NO_CHILD_WEBENTITIES = 7
+
+# NO_CHILD_WEBENTITIES is on by default:
+# Indeed, this was required not to bump a major version and ensure
+# compatibility with older corpora
+DEFAULT_FLAGS_VALUE = 0 | (1 << LRU_TRIE_NODE_FLAG_NO_CHILD_WEBENTITIES)
 
 
 # Helpers
@@ -102,9 +108,9 @@ class LRUTrieNode(object):
             self.__set_default_data(stem)
 
     def __set_default_data(self, stem=None):
-        self.data = [''] + [0] * LRU_TRIE_NODE_REGISTERS
+        self.data = ['', DEFAULT_FLAGS_VALUE] + [0] * LRU_TRIE_NODE_REGISTERS
 
-        if stem:
+        if stem is not None:
             self.set_stem(stem)
 
     def __repr__(self):
