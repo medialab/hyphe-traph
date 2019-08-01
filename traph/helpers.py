@@ -179,4 +179,4 @@ def build_pagination_token(i, path):
 def parse_pagination_token(token):
     i, b64_path = token.split('#')
 
-    return i, base64_to_int(b64_path)
+    return int(i), base64_to_int(b64_path)

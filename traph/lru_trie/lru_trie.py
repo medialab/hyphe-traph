@@ -390,6 +390,10 @@ class LRUTrie(object):
 
     def webentity_inorder_iter(self, starting_node, starting_lru,
                                pagination_path=None):
+        '''
+        Note that it would be fairly easy to resume traversal from any given
+        lru. It could simplify the pagination token scheme.
+        '''
 
         starting_lru = lru_dirname(starting_lru)
         pagination_lru = None

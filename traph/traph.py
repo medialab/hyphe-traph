@@ -517,7 +517,11 @@ class Traph(object):
         return run_iterator(self.get_webentity_pages_iter(weid, prefixes))
 
     def paginate_webentity_pages(self, weid, prefixes,
-                                 page_count=None, pagination_token=None):
+                                 page_count=None, pagination_token=None,
+                                 crawled_only=False):
+
+        if page_count is not None:
+            assert page_count > 0
 
         # NOTE: we iterate on k + 1 pages to be sure to exhaust the inorder
         # traversal and not require of the user to make an additional pointless
@@ -525,14 +529,14 @@ class Traph(object):
         k = page_count + 1 if page_count is not None else None
 
         start_i = 0
-        path = None
+        pagination_path = None
         pages = []
         n = 0
-        done_count = k is None
+        c = 0
         last_path = None
 
         if pagination_token:
-            start_i, path = parse_pagination_token(pagination_token)
+            start_i, pagination_path = parse_pagination_token(pagination_token)
 
         for i in range(start_i, len(prefixes)):
             current_prefix = prefixes[i]
@@ -542,38 +546,45 @@ class Traph(object):
             generator = self.lru_trie.webentity_inorder_iter(
                 starting_node,
                 current_prefix,
-                pagination_path=path
+                pagination_path=pagination_path
             )
 
             for node, lru, path in generator:
                 if not node.is_page():
                     continue
 
+                crawled = node.is_crawled()
+
+                if crawled_only and not crawled:
+                    continue
+
                 n += 1
 
                 if k is not None and n >= k:
-                    done_count = True
-                    break
+                    return {
+                        'done': False,
+                        'count': n - 1,
+                        'count_crawled': c,
+                        'pages': pages[:n - 1],
+                        'token': build_pagination_token(i, last_path)
+                    }
+
+                if crawled:
+                    c += 1
 
                 pages.append({
                     'lru': lru,
-                    'crawled': node.is_crawled()
+                    'crawled': crawled
                 })
 
                 last_path = path
 
-            if done_count:
-                break
-
-        result = {
+        return {
             'done': True,
-            'count': n - 1 if page_count is not None else n,
-            'pages': pages[:page_count] if page_count is not None else pages
+            'count': n,
+            'count_crawled': c,
+            'pages': pages
         }
-
-        if not done_count and last_path is not None:
-            result['done'] = False
-            result['token'] = build_pagination_token(i, last_path)
 
         return result
 

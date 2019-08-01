@@ -8,7 +8,7 @@
 from test.test_cases import TraphTestCase
 from test.config import WEBENTITY_CREATION_RULES_REGEXES
 
-from traph.helpers import ops_to_base4
+from traph.helpers import ops_to_base4, build_pagination_token
 
 WEBENTITY_CREATION_RULES = {
     's:http|h:com|h:world|': WEBENTITY_CREATION_RULES_REGEXES['path1'],
@@ -292,6 +292,7 @@ class TestTraversal(TraphTestCase):
                 {
                     'done': True,
                     'count': len(webentity_inorder),
+                    'count_crawled': 0,
                     'pages': [
                         {'lru': lru, 'crawled': False}
                         for lru, _ in webentity_inorder
@@ -299,7 +300,107 @@ class TestTraversal(TraphTestCase):
                 }
             )
 
-            # TODO: make a call with exact count
+            # Fetching perfect count
+            self.assertEqual(
+                traph.paginate_webentity_pages(None, prefixes, page_count=len(webentity_inorder)),
+                {
+                    'done': True,
+                    'count': len(webentity_inorder),
+                    'count_crawled': 0,
+                    'pages': [
+                        {'lru': lru, 'crawled': False}
+                        for lru, _ in webentity_inorder
+                    ]
+                }
+            )
 
-            # from pprint import pprint
-            # pprint(traph.paginate_webentity_pages(None, prefixes))
+            # Fetching more than there is
+            self.assertEqual(
+                traph.paginate_webentity_pages(None, prefixes, page_count=50),
+                {
+                    'done': True,
+                    'count': len(webentity_inorder),
+                    'count_crawled': 0,
+                    'pages': [
+                        {'lru': lru, 'crawled': False}
+                        for lru, _ in webentity_inorder
+                    ]
+                }
+            )
+
+            # Fetching first two
+            self.assertEqual(
+                traph.paginate_webentity_pages(None, prefixes, page_count=2),
+                {
+                    'done': False,
+                    'count': 2,
+                    'count_crawled': 0,
+                    'pages': [
+                        {'lru': 's:http|h:com|h:world|p:africa|', 'crawled': False},
+                        {'lru': 's:http|h:com|h:world|p:asia|', 'crawled': False}
+                    ],
+                    'token': build_pagination_token(0, ops_to_base4('CLR'))
+                }
+            )
+
+            # Fetching second two
+            self.assertEqual(
+                traph.paginate_webentity_pages(None, prefixes, page_count=2, pagination_token=build_pagination_token(0, ops_to_base4('CLR'))),
+                {
+                    'done': False,
+                    'count': 2,
+                    'count_crawled': 0,
+                    'pages': [
+                        {'lru': 's:http|h:com|h:world|p:europe|', 'crawled': False},
+                        {'lru': 's:http|h:com|h:world|p:europe|p:france|', 'crawled': False}
+                    ],
+                    'token': build_pagination_token(0, ops_to_base4('CCL'))
+                }
+            )
+
+            # Fetching three by three
+            token = None
+            calls = 0
+
+            while True:
+                result = traph.paginate_webentity_pages(
+                    None, prefixes,
+                    page_count=3, pagination_token=token
+                )
+                calls += 1
+
+                if 'token' in result:
+                    token = result['token']
+                else:
+                    break
+
+            self.assertEqual(calls, 4)
+
+            # Crawled
+            traph.add_page('s:http|h:com|h:world|p:aaa|', crawled=True)
+
+            self.assertEqual(
+                traph.paginate_webentity_pages(None, prefixes, page_count=2),
+                {
+                    'done': False,
+                    'count': 2,
+                    'count_crawled': 1,
+                    'pages': [
+                        {'lru': 's:http|h:com|h:world|p:aaa|', 'crawled': True},
+                        {'lru': 's:http|h:com|h:world|p:africa|', 'crawled': False}
+                    ],
+                    'token': build_pagination_token(0, ops_to_base4('CLRL'))
+                }
+            )
+
+            self.assertEqual(
+                traph.paginate_webentity_pages(None, prefixes, crawled_only=True),
+                {
+                    'done': True,
+                    'count': 1,
+                    'count_crawled': 1,
+                    'pages': [
+                        {'lru': 's:http|h:com|h:world|p:aaa|', 'crawled': True}
+                    ]
+                }
+            )
