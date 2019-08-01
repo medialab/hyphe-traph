@@ -358,6 +358,23 @@ class TestTraversal(TraphTestCase):
                 }
             )
 
+            # Fetching more than one prefix
+            self.assertEqual(
+                traph.paginate_webentity_pages(
+                    None, prefixes + ['s:https|h:com|h:world|'],
+                    page_count=20, pagination_token=build_pagination_token(0, ops_to_base4('CLR'))
+                ),
+                {
+                    'done': True,
+                    'count': len(webentity_inorder) - 2,
+                    'count_crawled': 0,
+                    'pages': [
+                        {'lru': lru, 'crawled': False}
+                        for lru, _ in webentity_inorder[2:]
+                    ]
+                }
+            )
+
             # Fetching three by three
             token = None
             calls = 0
