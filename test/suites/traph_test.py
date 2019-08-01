@@ -197,6 +197,19 @@ class TestTraph(TraphTestCase):
                 ])
             )
 
+    def test_get_webentity_child_webentities(self):
+        with self.open_traph() as traph:
+            report = traph.add_page('s:http|h:com|h:twitter|')
+            report += traph.add_page('s:http|h:com|h:twitter|p:yomgui|')
+            report += traph.add_page('s:http|h:com|h:twitter|p:boo|')
+
+            child_webentities = traph.get_webentity_child_webentities(1, ['s:http|h:com|h:twitter|'])
+
+            self.assertEqual(set(child_webentities), set([2, 3]))
+
+            # for node, lru in traph.webentity_prefix_iter():
+            #     print node, lru
+
     def test_clear(self):
         with self.open_traph() as traph:
             traph = self.get_traph()
