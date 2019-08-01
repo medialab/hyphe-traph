@@ -167,3 +167,16 @@ def ops_to_base4(s):
         return 0
 
     return base4_int(''.join(OPS_TO_BASE4[op] for op in s))
+
+
+def build_pagination_token(i, path):
+    return '%i#%s' % (
+        i,
+        int_to_base64(path)
+    )
+
+
+def parse_pagination_token(token):
+    i, b64_path = token.split('#')
+
+    return i, base64_to_int(b64_path)
