@@ -13,6 +13,9 @@ setup(name='hyphe-traph',
       url='http://github.com/medialab/hyphe-traph',
       license='MIT',
       author='Guillaume Plique',
+      install_requires=[
+        'lru-dict>=1.1.6',
+      ],
       packages=[
         'traph',
         'traph.link_store',
