@@ -29,7 +29,7 @@ traph = Traph(folder='./scripts/data/',
 # webentities_network = traph.get_webentities_links()
 from pprint import pprint
 import numpy as np
-metrics = traph.lru_trie.bst_metrics()
+metrics = traph.lru_trie.metrics()
 
 pprint(metrics)
 # g = nx.Graph()

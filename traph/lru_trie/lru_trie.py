@@ -602,8 +602,12 @@ class LRUTrie(object):
 
                     last_tail_size = 0
 
-        stats['prop_fragmented_stems'] = (
+        stats['ratio_fragmented_stems'] = (
             stats['nb_fragmented_nodes'] / float(stats['nb_stems'])
+        )
+
+        stats['page_block_density'] = (
+            stats['nb_pages'] / float(stats['nb_nodes'])
         )
 
         return stats
