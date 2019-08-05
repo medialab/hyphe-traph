@@ -247,10 +247,10 @@ class TestTraversal(TraphTestCase):
 
             # print
             # print
-            # for node, lru in trie.webentity_inorder_iter(
-            #     prefix_node, prefix, trie.lru_node('s:http|h:com|h:world|p:africa|'), 'clrl'
+            # for node, lru, path in trie.webentity_inorder_iter(
+            #     prefix_node, prefix, 'clrl'
             # ):
-            #     print lru, node
+            #     print lru, node, base4_to_ops(path)
             # print
             # print
 
@@ -421,3 +421,239 @@ class TestTraversal(TraphTestCase):
                     ]
                 }
             )
+
+    def test_paginate_webentity_pagelinks(self):
+
+        with self.open_traph(default_webentity_creation_rule=WEBENTITY_CREATION_RULES_REGEXES['domain']) as traph:
+            trie = traph.lru_trie
+
+            batch_links = {
+                's:http|h:com|h:world|': [
+                    's:http|h:com|h:upsidedown|p:demogorgon|',
+                    's:http|h:com|h:world|p:europe|',
+                    's:http|h:com|h:world|p:asia|',
+                    's:http|h:com|h:world|p:africa|',
+                    's:http|h:com|h:world|p:oceania|',
+                ],
+                's:http|h:com|h:world|p:europe|': [
+                    's:http|h:com|h:world|p:europe|p:spain|',
+                    's:http|h:com|h:world|p:europe|p:france|',
+                    's:http|h:com|h:world|p:europe|p:romania|',
+                    's:http|h:com|h:world|p:europe|p:france|'
+                ],
+                's:http|h:com|h:world|p:europe|p:spain|': [
+                    's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
+                    's:http|h:com|h:world|p:europe|p:spain|p:toledo|',
+                    's:http|h:com|h:world|p:europe|p:spain|p:barcelona|',
+                    's:http|h:com|h:upsidedown|p:eleven|',
+                    's:http|h:com|h:upsidedown|p:will|',
+                ],
+                's:http|h:com|h:world|p:europe|p:romania|': []
+            }
+
+            traph.index_batch_crawl(batch_links)
+
+            prefixes = ['s:http|h:com|h:world|']
+
+            pagelinks_inorder = [
+                ['s:http|h:com|h:world|', 's:http|h:com|h:world|p:europe|', 1],
+                ['s:http|h:com|h:world|', 's:http|h:com|h:world|p:asia|', 1],
+                ['s:http|h:com|h:world|', 's:http|h:com|h:world|p:africa|', 1],
+                ['s:http|h:com|h:world|', 's:http|h:com|h:world|p:oceania|', 1],
+                ['s:http|h:com|h:world|p:europe|', 's:http|h:com|h:world|p:europe|p:spain|', 1],
+                ['s:http|h:com|h:world|p:europe|', 's:http|h:com|h:world|p:europe|p:france|', 2],
+                ['s:http|h:com|h:world|p:europe|', 's:http|h:com|h:world|p:europe|p:romania|', 1],
+                ['s:http|h:com|h:world|p:europe|p:spain|', 's:http|h:com|h:world|p:europe|p:spain|p:madrid|', 1],
+                ['s:http|h:com|h:world|p:europe|p:spain|', 's:http|h:com|h:world|p:europe|p:spain|p:toledo|', 1],
+                ['s:http|h:com|h:world|p:europe|p:spain|', 's:http|h:com|h:world|p:europe|p:spain|p:barcelona|', 1]
+            ]
+            outlinks = [
+                ['s:http|h:com|h:world|', 's:http|h:com|h:upsidedown|p:demogorgon|', 1]
+            ]
+
+            outlinks_2 = [
+                ['s:http|h:com|h:world|p:europe|p:spain|', 's:http|h:com|h:upsidedown|p:eleven|', 1],
+                ['s:http|h:com|h:world|p:europe|p:spain|', 's:http|h:com|h:upsidedown|p:will|', 1]
+            ]
+
+            # Fetching everything
+            self.assertEqual(
+                traph.paginate_webentity_pagelinks(1, prefixes),
+                {
+                    'done': True,
+                    'count_sourcepages': 3,
+                    'count_pagelinks': 10,
+                    'pagelinks': pagelinks_inorder[:]
+                }
+            )
+
+            # Fetching perfect count
+            self.assertEqual(
+                traph.paginate_webentity_pagelinks(1, prefixes, source_page_count=3),
+                {
+                    'done': True,
+                    'count_sourcepages': 3,
+                    'count_pagelinks': 10,
+                    'pagelinks': pagelinks_inorder[:]
+                }
+            )
+
+            # Fetching more than there is
+            self.assertEqual(
+                traph.paginate_webentity_pagelinks(1, prefixes, source_page_count=50),
+                {
+                    'done': True,
+                    'count_sourcepages': 3,
+                    'count_pagelinks': 10,
+                    'pagelinks': pagelinks_inorder[:]
+                }
+            )
+
+            # Fetching first two
+            self.assertEqual(
+                traph.paginate_webentity_pagelinks(1, prefixes, source_page_count=2),
+                {
+                    'done': False,
+                    'count_sourcepages': 2,
+                    'count_pagelinks': 7,
+                    'pagelinks': pagelinks_inorder[:7],
+                    'token': build_pagination_token(0, ops_to_base4('CCLR'))
+                }
+            )
+
+            # Fetching second two
+            self.assertEqual(
+                traph.paginate_webentity_pagelinks(1, prefixes, source_page_count=2,
+                    pagination_token=build_pagination_token(0, ops_to_base4('CCLR'))),
+                {
+                    'done': True,
+                    'count_sourcepages': 1,
+                    'count_pagelinks': 3,
+                    'pagelinks': pagelinks_inorder[7:]
+                }
+            )
+
+            batch_links_2 = {
+                's:https|h:com|h:world|': [
+                    's:https|h:com|h:world|p:europe|',
+                    's:https|h:com|h:world|p:asia|'
+                ],
+                's:https|h:com|h:world|p:europe|': [
+                    's:https|h:com|h:world|p:europe|p:spain|'
+                ]
+            }
+            traph.index_batch_crawl(batch_links_2)
+
+            prefixes.append('s:https|h:com|h:world|')
+
+            pagelinks_inorder_2 = [
+                ['s:https|h:com|h:world|', 's:https|h:com|h:world|p:europe|', 1],
+                ['s:https|h:com|h:world|', 's:https|h:com|h:world|p:asia|', 1],
+                ['s:https|h:com|h:world|p:europe|', 's:https|h:com|h:world|p:europe|p:spain|', 1]
+            ]
+
+            # Fetching more than one prefix all at once
+            self.assertEqual(
+                traph.paginate_webentity_pagelinks(1, prefixes, source_page_count=5),
+                {
+                    'done': True,
+                    'count_sourcepages': 5,
+                    'count_pagelinks': 13,
+                    'pagelinks': (pagelinks_inorder + pagelinks_inorder_2),
+                }
+            )
+
+            # Fetching more than one prefix all at once 2 sourcepages by 2
+            self.assertEqual(
+                traph.paginate_webentity_pagelinks(1, prefixes, source_page_count=2),
+                {
+                    'done': False,
+                    'count_sourcepages': 2,
+                    'count_pagelinks': 7,
+                    'pagelinks': (pagelinks_inorder + pagelinks_inorder_2)[0:7],
+                    'token': build_pagination_token(0, ops_to_base4('CCLR'))
+                }
+            )
+
+            self.assertEqual(
+                traph.paginate_webentity_pagelinks(1, prefixes, source_page_count=2,
+                    pagination_token=build_pagination_token(0, ops_to_base4('CCLR'))),
+                {
+                    'done': False,
+                    'count_sourcepages': 2,
+                    'count_pagelinks': 5,
+                    'pagelinks': (pagelinks_inorder + pagelinks_inorder_2)[7:12],
+                    'token': build_pagination_token(1, ops_to_base4('CRL'))
+                }
+            )
+
+            self.assertEqual(
+                traph.paginate_webentity_pagelinks(1, prefixes, source_page_count=2,
+                    pagination_token=build_pagination_token(1, ops_to_base4('CRL'))),
+                {
+                    'done': True,
+                    'count_sourcepages': 1,
+                    'count_pagelinks': 1,
+                    'pagelinks': (pagelinks_inorder + pagelinks_inorder_2)[12:]
+                }
+            )
+
+            # Fetching outbound links also
+            self.assertEqual(
+                traph.paginate_webentity_pagelinks(1, prefixes, source_page_count=10,
+                    include_outbound=True),
+                {
+                    'done': True,
+                    'count_sourcepages': 5,
+                    'count_pagelinks': 16,
+                    'pagelinks': outlinks + pagelinks_inorder + outlinks_2 + pagelinks_inorder_2
+                }
+            )
+
+            # Fetching outbound links only, at once
+            self.assertEqual(
+                traph.paginate_webentity_pagelinks(1, prefixes, source_page_count=2,
+                    include_outbound=True, include_internal=False),
+                {
+                    'done': True,
+                    'count_sourcepages': 2,
+                    'count_pagelinks': 3,
+                    'pagelinks': outlinks + outlinks_2
+                }
+            )
+
+            # Fetching outbound links only, paginated
+            self.assertEqual(
+                traph.paginate_webentity_pagelinks(1, prefixes, source_page_count=1,
+                    include_outbound=True, include_internal=False),
+                {
+                    'done': False,
+                    'count_sourcepages': 1,
+                    'count_pagelinks': 1,
+                    'pagelinks': outlinks,
+                    'token': build_pagination_token(0, ops_to_base4('CCLR'))
+                }
+            )
+
+            self.assertEqual(
+                traph.paginate_webentity_pagelinks(1, prefixes, source_page_count=1,
+                    include_outbound=True, include_internal=False,
+                    pagination_token=build_pagination_token(0, ops_to_base4('CCLR'))),
+                {
+                    'done': True,
+                    'count_sourcepages': 1,
+                    'count_pagelinks': 2,
+                    'pagelinks': outlinks_2
+                }
+            )
+
+            # print
+            # print
+            # for prefix in prefixes:
+            #     prefix_node = trie.lru_node(prefix)
+            #     for _, lru, path in trie.webentity_inorder_iter(
+            #         prefix_node, prefix
+            #     ):
+            #         print lru, base4_to_ops(path)
+            # print
+            # print

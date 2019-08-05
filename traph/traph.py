@@ -539,9 +539,12 @@ class Traph(object):
             start_i, pagination_path = parse_pagination_token(pagination_token)
 
         for i in range(start_i, len(prefixes)):
-            current_prefix = prefixes[i]
+            current_prefix = self.__encode(prefixes[i])
 
             starting_node = self.lru_trie.lru_node(current_prefix)
+
+            if not starting_node:
+                raise TraphException('LRU %s not in the traph' % (current_prefix))
 
             generator = self.lru_trie.webentity_inorder_iter(
                 starting_node,
@@ -712,6 +715,9 @@ class Traph(object):
 
         # TODO: Can be optimized caching windups
 
+        if not include_internal and not include_outbound and not include_inbound:
+            raise TraphException('At least one of include _internal or include_outbound or include_inbound should be true')
+
         state = TraphIteratorState()
         pagelinks = []
 
@@ -766,41 +772,84 @@ class Traph(object):
         return run_iterator(self.get_webentity_pagelinks_iter(weid, prefixes, include_inbound=include_inbound, include_internal=include_internal, include_outbound=include_outbound))
 
     def paginate_webentity_pagelinks(self, weid, prefixes,
+                                     include_internal=True, include_outbound=False,
                                      source_page_count=None, pagination_token=None):
 
+        if source_page_count is not None:
+            assert source_page_count > 0
+
+        if not include_internal and not include_outbound:
+            raise TraphException('At least one of include _internal or include_outbound should be true')
+
         target_node = self.lru_trie.node()
+        start_i = 0
+        pagination_path = None
         pagelinks = []
+        n = 0
+        c = 0
+        last_path = None
 
-        for prefix in prefixes:
-            prefix = self.__encode(prefix)
+        if pagination_token:
+            start_i, pagination_path = parse_pagination_token(pagination_token)
 
-            starting_node = self.lru_trie.lru_node(prefix)
+        for i in range(start_i, len(prefixes)):
+            current_prefix = self.__encode(prefixes[i])
+
+            starting_node = self.lru_trie.lru_node(current_prefix)
 
             if not starting_node:
-                raise TraphException('LRU %s not in the traph' % (prefix))
+                raise TraphException('LRU %s not in the traph' % (current_prefix))
+
+            generator = self.lru_trie.webentity_inorder_iter(
+                starting_node,
+                current_prefix,
+                pagination_path=pagination_path
+            )
 
             # Iterating over the prefix's lrus in order
-            # TODO: handle pagination
-            for node, lru in self.lru_trie.webentity_inorder_iter(starting_node, prefix):
+            for node, lru, path in generator:
                 if not node.is_page():
                     continue
 
+                if not node.has_outlinks():
+                    last_path = path
+                    continue
+
                 # Iterating over the page's outlinks
-                if node.has_outlinks():
-                    links_block = node.outlinks()
+                links_block = node.outlinks()
+                newlinks = []
 
-                    for link_node in self.link_store.link_nodes_iter(links_block):
-                        target_node.read(link_node.target())
-                        target_webentity = self.lru_trie.windup_lru_for_webentity(target_node)
+                for link_node in self.link_store.link_nodes_iter(links_block):
+                    target_node.read(link_node.target())
+                    target_webentity = self.lru_trie.windup_lru_for_webentity(target_node)
 
-                        if target_webentity != weid:
-                            target_lru = self.lru_trie.windup_lru(target_node.block)
-                            pagelinks.append([lru, target_lru, link_node.weight()])
+                    if (include_outbound and target_webentity != weid) or (include_internal and target_webentity == weid):
+                        target_lru = self.lru_trie.windup_lru(target_node.block)
+                        newlinks.append([lru, target_lru, link_node.weight()])
 
-        # TODO: return a counter on pagelinks and/or source pages?
+                if newlinks:
+                    n += 1
+
+                    if source_page_count is not None and n > source_page_count:
+                        return {
+                            'done': False,
+                            'count_sourcepages': n - 1,
+                            'count_pagelinks': len(pagelinks),
+                            'pagelinks': pagelinks,
+                            'token': build_pagination_token(i, last_path)
+                        }
+
+                    pagelinks += newlinks
+
+                last_path = path
+
+            # We reset the pagination path for next prefix
+            pagination_path = None
+
         return {
             'done': True,
-            'count': len(pagelinks),
+            'count_sourcepages': n,
+            'count_pagelinks': len(pagelinks),
             'pagelinks': pagelinks
         }
 
@@ -1185,7 +1234,7 @@ class Traph(object):
 
     def index_batch_crawl_iter(self, data):
         '''
-        data is must be a multimap 'source_lru' => 'target_lrus'
+        data must be a multimap 'source_lru' => 'target_lrus'
         '''
         store = self.link_store
         state = TraphIteratorState()
