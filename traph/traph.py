@@ -765,6 +765,45 @@ class Traph(object):
     def get_webentity_pagelinks(self, weid, prefixes, include_inbound=False, include_internal=True, include_outbound=False):
         return run_iterator(self.get_webentity_pagelinks_iter(weid, prefixes, include_inbound=include_inbound, include_internal=include_internal, include_outbound=include_outbound))
 
+    def paginate_webentity_pagelinks(self, weid, prefixes,
+                                     source_page_count=None, pagination_token=None):
+
+        target_node = self.lru_trie.node()
+        pagelinks = []
+
+        for prefix in prefixes:
+            prefix = self.__encode(prefix)
+
+            starting_node = self.lru_trie.lru_node(prefix)
+
+            if not starting_node:
+                raise TraphException('LRU %s not in the traph' % (prefix))
+
+            # Iterating over the prefix's lrus in order
+            # TODO: handle pagination
+            for node, lru in self.lru_trie.webentity_inorder_iter(starting_node, prefix):
+                if not node.is_page():
+                    continue
+
+                # Iterating over the page's outlinks
+                if node.has_outlinks():
+                    links_block = node.outlinks()
+
+                    for link_node in self.link_store.link_nodes_iter(links_block):
+                        target_node.read(link_node.target())
+                        target_webentity = self.lru_trie.windup_lru_for_webentity(target_node)
+
+                        if target_webentity != weid:
+                            target_lru = self.lru_trie.windup_lru(target_node.block)
+                            pagelinks.append([lru, target_lru, link_node.weight()])
+
+        # TODO: return a counter on pagelinks and/or source pages?
+        return {
+            'done': True,
+            'count': len(pagelinks),
+            'pagelinks': pagelinks
+        }
+
     def get_webentity_outlinks_iter(self, weid, prefixes):
         '''
         Returns the list of cited web entities
