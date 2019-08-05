@@ -523,8 +523,10 @@ class TestTraversal(TraphTestCase):
 
             # Fetching second two
             self.assertEqual(
-                traph.paginate_webentity_pagelinks(1, prefixes, source_page_count=2,
-                    pagination_token=build_pagination_token(0, ops_to_base4('CCLR'))),
+                traph.paginate_webentity_pagelinks(
+                    1, prefixes, source_page_count=2,
+                    pagination_token=build_pagination_token(0, ops_to_base4('CCLR'))
+                ),
                 {
                     'done': True,
                     'count_sourcepages': 1,
@@ -576,8 +578,10 @@ class TestTraversal(TraphTestCase):
             )
 
             self.assertEqual(
-                traph.paginate_webentity_pagelinks(1, prefixes, source_page_count=2,
-                    pagination_token=build_pagination_token(0, ops_to_base4('CCLR'))),
+                traph.paginate_webentity_pagelinks(
+                    1, prefixes, source_page_count=2,
+                    pagination_token=build_pagination_token(0, ops_to_base4('CCLR'))
+                ),
                 {
                     'done': False,
                     'count_sourcepages': 2,
@@ -588,8 +592,10 @@ class TestTraversal(TraphTestCase):
             )
 
             self.assertEqual(
-                traph.paginate_webentity_pagelinks(1, prefixes, source_page_count=2,
-                    pagination_token=build_pagination_token(1, ops_to_base4('CRL'))),
+                traph.paginate_webentity_pagelinks(
+                    1, prefixes, source_page_count=2,
+                    pagination_token=build_pagination_token(1, ops_to_base4('CRL'))
+                ),
                 {
                     'done': True,
                     'count_sourcepages': 1,
@@ -600,8 +606,9 @@ class TestTraversal(TraphTestCase):
 
             # Fetching outbound links also
             self.assertEqual(
-                traph.paginate_webentity_pagelinks(1, prefixes, source_page_count=10,
-                    include_outbound=True),
+                traph.paginate_webentity_pagelinks(
+                    1, prefixes, source_page_count=10, include_outbound=True
+                ),
                 {
                     'done': True,
                     'count_sourcepages': 5,
@@ -612,8 +619,10 @@ class TestTraversal(TraphTestCase):
 
             # Fetching outbound links only, at once
             self.assertEqual(
-                traph.paginate_webentity_pagelinks(1, prefixes, source_page_count=2,
-                    include_outbound=True, include_internal=False),
+                traph.paginate_webentity_pagelinks(
+                    1, prefixes, source_page_count=2,
+                    include_outbound=True, include_internal=False
+                ),
                 {
                     'done': True,
                     'count_sourcepages': 2,
@@ -624,8 +633,10 @@ class TestTraversal(TraphTestCase):
 
             # Fetching outbound links only, paginated
             self.assertEqual(
-                traph.paginate_webentity_pagelinks(1, prefixes, source_page_count=1,
-                    include_outbound=True, include_internal=False),
+                traph.paginate_webentity_pagelinks(
+                    1, prefixes, source_page_count=1,
+                    include_outbound=True, include_internal=False
+                ),
                 {
                     'done': False,
                     'count_sourcepages': 1,
@@ -636,9 +647,11 @@ class TestTraversal(TraphTestCase):
             )
 
             self.assertEqual(
-                traph.paginate_webentity_pagelinks(1, prefixes, source_page_count=1,
+                traph.paginate_webentity_pagelinks(
+                    1, prefixes, source_page_count=1,
                     include_outbound=True, include_internal=False,
-                    pagination_token=build_pagination_token(0, ops_to_base4('CCLR'))),
+                    pagination_token=build_pagination_token(0, ops_to_base4('CCLR'))
+                ),
                 {
                     'done': True,
                     'count_sourcepages': 1,
