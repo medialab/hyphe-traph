@@ -258,6 +258,32 @@ class TestTraph(TraphTestCase):
                 ]
             )
 
+    def test_hyphe_issue354(self):
+        from test.config import WEBENTITY_CREATION_RULES_REGEXES
+
+        with self.open_traph(default_webentity_creation_rule=WEBENTITY_CREATION_RULES_REGEXES['subdomain']) as traph:
+            traph.add_page('s:http|h:fr|h:sciences-po|h:medialab|')
+
+            traph.index_batch_crawl({
+                's:http|h:fr|h:sciences-po|h:medialab|': [
+                    's:http|h:fr|h:sciences-po|h:bibli|'
+                ]
+            })
+
+            self.assertEqual(
+                traph.get_webentity_pages(1, ['s:http|h:fr|h:sciences-po|h:medialab|']),
+                [
+                    {'crawled': True, 'lru': 's:http|h:fr|h:sciences-po|h:medialab|'}
+                ]
+            )
+
+            self.assertEqual(
+                traph.get_webentity_pages(2, ['s:http|h:fr|h:sciences-po|h:bibli|']),
+                [
+                    {'crawled': False, 'lru': 's:http|h:fr|h:sciences-po|h:bibli|'}
+                ]
+            )
+
     def test_clear(self):
         with self.open_traph() as traph:
             traph.add_page('s:http|h:fr|h:sciences-po|h:medialab|')
