@@ -237,6 +237,27 @@ class TestTraph(TraphTestCase):
                 True
             )
 
+    def test_get_webentity_pages(self):
+        with self.open_traph() as traph:
+            traph.add_page('s:http|h:fr|h:sciences-po|h:medialab|')
+
+            self.assertEqual(
+                traph.get_webentity_pages(1, ['s:http|h:fr|h:sciences-po|h:medialab|']),
+                [
+                    {'crawled': False, 'lru': 's:http|h:fr|h:sciences-po|h:medialab|'}
+                ]
+            )
+
+            traph.add_page('s:http|h:fr|h:sciences-po|h:medialab|p:people|')
+
+            self.assertEqual(
+                traph.get_webentity_pages(1, ['s:http|h:fr|h:sciences-po|h:medialab|']),
+                [
+                    {'crawled': False, 'lru': 's:http|h:fr|h:sciences-po|h:medialab|'},
+                    {'crawled': False, 'lru': 's:http|h:fr|h:sciences-po|h:medialab|p:people|'}
+                ]
+            )
+
     def test_clear(self):
         with self.open_traph() as traph:
             traph.add_page('s:http|h:fr|h:sciences-po|h:medialab|')
