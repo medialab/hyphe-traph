@@ -239,7 +239,6 @@ class TestTraph(TraphTestCase):
 
     def test_clear(self):
         with self.open_traph() as traph:
-            traph = self.get_traph()
             traph.add_page('s:http|h:fr|h:sciences-po|h:medialab|')
 
             self.assertEqual(traph.count_pages(), 1)
