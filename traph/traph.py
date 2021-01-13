@@ -1304,7 +1304,7 @@ class Traph(object):
         if self.link_store_file:
             self.link_store_file.close()
 
-    def clear(self):
+    def clear(self, default_webentity_creation_rule=None, webentity_creation_rules=None):
         self.close()
 
         if self.in_memory:
@@ -1322,6 +1322,20 @@ class Traph(object):
 
         # Link Store re-initialization
         self.link_store = LinkStore(self.links_store_storage)
+
+        # Updating creation rules?
+        # TODO: this code is basically duplicated from __init__ maybe refactor?
+        if default_webentity_creation_rule is not None:
+            self.default_webentity_creation_rule = re.compile(
+                default_webentity_creation_rule,
+                re.I
+            )
+
+        if webentity_creation_rules is not None:
+            self.webentity_creation_rules = {}
+
+            for prefix, pattern in webentity_creation_rules.items():
+                self.add_webentity_creation_rule(prefix, pattern, create)
 
     # =========================================================================
     # Iteration methods
