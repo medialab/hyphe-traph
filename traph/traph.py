@@ -1335,7 +1335,7 @@ class Traph(object):
             self.webentity_creation_rules = {}
 
             for prefix, pattern in webentity_creation_rules.items():
-                self.add_webentity_creation_rule(prefix, pattern, create)
+                self.add_webentity_creation_rule(prefix, pattern, True)
 
     # =========================================================================
     # Iteration methods
