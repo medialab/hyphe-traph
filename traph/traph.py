@@ -779,7 +779,7 @@ class Traph(object):
             assert source_page_count > 0
 
         if not include_internal and not include_outbound:
-            raise TraphException('At least one of include _internal or include_outbound should be true')
+            raise TraphException('At least one of include_internal or include_outbound should be true')
 
         target_node = self.lru_trie.node()
         start_i = 0
