@@ -22,8 +22,7 @@ results = []
 while True:
     result = traph.paginate_webentity_pagelinks(
         *WEBENTITY,
-        include_outbound=False,
-        source_page_count=1,
+        source_page_count=10,
         pagination_token=token
     )
 
@@ -37,3 +36,13 @@ while True:
 
 print sum(r['count_sourcepages'] for r in results)
 print sum(r['count_pagelinks'] for r in results)
+# print sum(r['count'] for r in results)
+# print sum(len(r['pages']) for r in results)
+
+uniques = set()
+
+for r in results:
+    for p in r['pagelinks']:
+        uniques.add((p[0], p[1]))
+
+print len(uniques)
