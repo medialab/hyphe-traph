@@ -534,6 +534,7 @@ class Traph(object):
         n = 0
         c = 0
         last_path = None
+        last_path_i = None
 
         if pagination_token:
             start_i, pagination_path = parse_pagination_token(pagination_token)
@@ -569,7 +570,7 @@ class Traph(object):
                         'count': n - 1,
                         'count_crawled': c,
                         'pages': pages[:n - 1],
-                        'token': build_pagination_token(i, last_path)
+                        'token': build_pagination_token(last_path_i, last_path)
                     }
 
                 if crawled:
@@ -581,6 +582,7 @@ class Traph(object):
                 })
 
                 last_path = path
+                last_path_i = i
 
             # We reset the pagination path for next prefix
             pagination_path = None
