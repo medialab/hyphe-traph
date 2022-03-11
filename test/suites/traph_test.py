@@ -284,6 +284,24 @@ class TestTraph(TraphTestCase):
                 ]
             )
 
+    def test_hyphe_issue444(self):
+        with self.open_traph() as traph:
+            traph.add_page('s:http|h:fr|h:sciences-po|h:medialab|')
+
+            report = traph.index_batch_crawl({
+                's:http|h:fr|h:sciences-po|h:medialab|': [
+                    's:http|h:org|h:www|'
+                ]
+            })
+
+            print(report)
+
+            self.assertEqual(len(report.created_webentities), 1)
+            self.assertEqual(
+                report.created_webentities.items()[0][1],
+                ['s:http|h:org|h:www|', 's:https|h:org|h:www|']
+            )
+
     def test_clear(self):
         with self.open_traph() as traph:
             traph.add_page('s:http|h:fr|h:sciences-po|h:medialab|')
