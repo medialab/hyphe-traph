@@ -294,9 +294,8 @@ class TestTraph(TraphTestCase):
                 ]
             })
 
-            print(report)
-
             self.assertEqual(len(report.created_webentities), 1)
+
             self.assertEqual(
                 report.created_webentities.items()[0][1],
                 ['s:http|h:org|h:www|', 's:https|h:org|h:www|']
