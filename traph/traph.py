@@ -1387,8 +1387,43 @@ class Traph(object):
     def count_links(self):
         return self.link_store.count_links()
 
+    def links_metrics(self):
+        max_inlinks_len = 0
+        max_outlinks_len = 0
+        max_inlinks_lru = None
+        max_outlinks_lru = None
+
+        for node in self.lru_trie.nodes_iter():
+            inlinks_len = 0
+            outlinks_len = 0
+
+            if node.has_inlinks():
+                for _ in self.link_store.link_nodes_iter(node.inlinks()):
+                    inlinks_len += 1
+
+            if node.has_outlinks():
+                for _ in self.link_store.link_nodes_iter(node.outlinks()):
+                    outlinks_len += 1
+
+            if inlinks_len > max_inlinks_len:
+                max_inlinks_len = inlinks_len
+                max_inlinks_lru = self.lru_trie.windup_lru(node.block)
+
+            if outlinks_len > max_outlinks_len:
+                max_outlinks_len = outlinks_len
+                max_outlinks_lru = self.lru_trie.windup_lru(node.block)
+
+        return {
+            'max_inlinks_len': max_inlinks_len,
+            'max_inlinks_lru': max_inlinks_lru,
+            'max_outlinks_len': max_outlinks_len,
+            'max_outlinks_lru': max_outlinks_lru
+        }
+
     def metrics(self):
         return {
             'lru_trie': self.lru_trie.metrics(),
-            'link_store': self.link_store.metrics()
+            'link_store': self.link_store.metrics(),
+            'bst': self.lru_trie.bst_metrics(),
+            'links': self.links_metrics()
         }
