@@ -151,7 +151,7 @@ class LinkStoreNode(object):
         if not self.has_next():
             raise LinkStoreNodeTraversalException('Node has no next sibling.')
 
-        return LRUTrieNode(self.storage, block=self.next())
+        return LinkStoreNode(self.storage, block=self.next())
 
     # =========================================================================
     # Target block methods
