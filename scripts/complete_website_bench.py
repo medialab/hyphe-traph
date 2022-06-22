@@ -22,8 +22,8 @@ traph = Traph(overwrite=True, folder='./scripts/data/',
 
 root_lru = 's:https|h:com|h:complete_website|p:base1|p:base2|'
 
-K = 1000
-D = 5
+K = 3000
+D = 1
 
 print 'Expecting %i links' % (K * K * D)
 
