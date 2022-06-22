@@ -15,7 +15,21 @@ WEBENTITY_CREATION_RULES = {
 }
 
 
+def straigthen_pagelinks(pagelinks):
+    return sorted(tuple(link) for link in pagelinks)
+
+
 class TestTraversal(TraphTestCase):
+
+    def assertPaginationResultEqual(self, p1, p2):
+        self.assertEqual(p1['count_pagelinks'], p2['count_pagelinks'])
+        self.assertEqual(p1['count_sourcepages'], p2['count_sourcepages'])
+        self.assertEqual(p1['done'], p2['done'])
+
+        pg1 = straigthen_pagelinks(p1['pagelinks'])
+        pg2 = straigthen_pagelinks(p2['pagelinks'])
+
+        self.assertEqual(pg1, pg2)
 
     def test_dfs_iter(self):
         with self.open_traph(webentity_creation_rules=WEBENTITY_CREATION_RULES) as traph:
@@ -124,7 +138,7 @@ class TestTraversal(TraphTestCase):
             ]
 
             self.assertEqual(
-                [lru for node, lru in trie.webentity_dfs_iter(prefix_node, prefix)],
+                [lru for _, lru in trie.webentity_dfs_iter(prefix_node, prefix)],
                 webentity_dfs
             )
 
@@ -477,7 +491,7 @@ class TestTraversal(TraphTestCase):
             ]
 
             # Fetching everything
-            self.assertEqual(
+            self.assertPaginationResultEqual(
                 traph.paginate_webentity_pagelinks(1, prefixes),
                 {
                     'done': True,
@@ -488,7 +502,7 @@ class TestTraversal(TraphTestCase):
             )
 
             # Fetching perfect count
-            self.assertEqual(
+            self.assertPaginationResultEqual(
                 traph.paginate_webentity_pagelinks(1, prefixes, source_page_count=3),
                 {
                     'done': True,
@@ -499,7 +513,7 @@ class TestTraversal(TraphTestCase):
             )
 
             # Fetching more than there is
-            self.assertEqual(
+            self.assertPaginationResultEqual(
                 traph.paginate_webentity_pagelinks(1, prefixes, source_page_count=50),
                 {
                     'done': True,
@@ -510,7 +524,7 @@ class TestTraversal(TraphTestCase):
             )
 
             # Fetching first two
-            self.assertEqual(
+            self.assertPaginationResultEqual(
                 traph.paginate_webentity_pagelinks(1, prefixes, source_page_count=2),
                 {
                     'done': False,
@@ -522,7 +536,7 @@ class TestTraversal(TraphTestCase):
             )
 
             # Fetching second two
-            self.assertEqual(
+            self.assertPaginationResultEqual(
                 traph.paginate_webentity_pagelinks(
                     1, prefixes, source_page_count=2,
                     pagination_token=build_pagination_token(0, ops_to_base4('CCLR'))
@@ -555,7 +569,7 @@ class TestTraversal(TraphTestCase):
             ]
 
             # Fetching more than one prefix all at once
-            self.assertEqual(
+            self.assertPaginationResultEqual(
                 traph.paginate_webentity_pagelinks(1, prefixes, source_page_count=5),
                 {
                     'done': True,
@@ -566,7 +580,7 @@ class TestTraversal(TraphTestCase):
             )
 
             # Fetching more than one prefix all at once 2 sourcepages by 2
-            self.assertEqual(
+            self.assertPaginationResultEqual(
                 traph.paginate_webentity_pagelinks(1, prefixes, source_page_count=2),
                 {
                     'done': False,
@@ -577,7 +591,7 @@ class TestTraversal(TraphTestCase):
                 }
             )
 
-            self.assertEqual(
+            self.assertPaginationResultEqual(
                 traph.paginate_webentity_pagelinks(
                     1, prefixes, source_page_count=2,
                     pagination_token=build_pagination_token(0, ops_to_base4('CCLR'))
@@ -591,7 +605,7 @@ class TestTraversal(TraphTestCase):
                 }
             )
 
-            self.assertEqual(
+            self.assertPaginationResultEqual(
                 traph.paginate_webentity_pagelinks(
                     1, prefixes, source_page_count=2,
                     pagination_token=build_pagination_token(1, ops_to_base4('CRL'))
@@ -605,7 +619,7 @@ class TestTraversal(TraphTestCase):
             )
 
             # Fetching outbound links also
-            self.assertEqual(
+            self.assertPaginationResultEqual(
                 traph.paginate_webentity_pagelinks(
                     1, prefixes, source_page_count=10, include_outbound=True
                 ),
@@ -618,7 +632,7 @@ class TestTraversal(TraphTestCase):
             )
 
             # Fetching outbound links only, at once
-            self.assertEqual(
+            self.assertPaginationResultEqual(
                 traph.paginate_webentity_pagelinks(
                     1, prefixes, source_page_count=2,
                     include_outbound=True, include_internal=False
@@ -632,7 +646,7 @@ class TestTraversal(TraphTestCase):
             )
 
             # Fetching outbound links only, paginated
-            self.assertEqual(
+            self.assertPaginationResultEqual(
                 traph.paginate_webentity_pagelinks(
                     1, prefixes, source_page_count=1,
                     include_outbound=True, include_internal=False
@@ -646,7 +660,7 @@ class TestTraversal(TraphTestCase):
                 }
             )
 
-            self.assertEqual(
+            self.assertPaginationResultEqual(
                 traph.paginate_webentity_pagelinks(
                     1, prefixes, source_page_count=1,
                     include_outbound=True, include_internal=False,

@@ -41,7 +41,7 @@ class TestTraph(TraphTestCase):
             self.assertEqual(traph.count_pages(), 2)
             self.assertEqual(traph.count_links(), 1)
 
-            # Re-adding pages should not have an effect
+            # Re-adding pages should not have an effect, except for weight
             report = traph.add_links([
                 (
                     's:http|h:fr|h:sciences-po|h:medialab|',
@@ -51,7 +51,7 @@ class TestTraph(TraphTestCase):
 
             self.assertEqual(report.nb_created_pages, 0)
             self.assertEqual(traph.count_pages(), 2)
-            self.assertEqual(traph.count_links(), 1)
+            self.assertEqual(traph.count_links(), 2)
 
     def test_index_batch_crawl(self):
         with self.open_traph() as traph:
@@ -67,7 +67,7 @@ class TestTraph(TraphTestCase):
             self.assertEqual(traph.count_pages(), 3)
             self.assertEqual(traph.count_links(), 2)
 
-            # Re-adding pages should not have an effect
+            # Re-adding pages should not have an effect, except for weight
             report = traph.index_batch_crawl({
                 's:http|h:fr|h:sciences-po|h:medialab|': [
                     's:https|h:com|h:twitter|p:paulanomalie|',
@@ -77,7 +77,7 @@ class TestTraph(TraphTestCase):
 
             self.assertEqual(report.nb_created_pages, 0)
             self.assertEqual(traph.count_pages(), 3)
-            self.assertEqual(traph.count_links(), 2)
+            self.assertEqual(traph.count_links(), 4)
 
     def test_index_batch_crawl_crawled_pages(self):
         with self.open_traph() as traph:

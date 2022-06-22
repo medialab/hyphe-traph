@@ -17,14 +17,14 @@ from traph.lru_trie.node import LRU_TRIE_FIRST_DATA_BLOCK
 # NOTE: Since python mimics C struct, the block size should be respecting
 # some rules (namely have even addresses or addresses divisble by 4 on some
 # architecture).
-LINK_STORE_NODE_FORMAT = 'QQH'
+# NOTE: the size of the header struct MUST match the node's one.
+LINK_STORE_NODE_FORMAT = 'QQ'
 LINK_STORE_NODE_BLOCK_SIZE = struct.calcsize(LINK_STORE_NODE_FORMAT)
 LINK_STORE_FIRST_DATA_BLOCK = LINK_STORE_HEADER_BLOCKS * LINK_STORE_NODE_BLOCK_SIZE
 
 # Positions
 LINK_STORE_NODE_TARGET = 0
-LINK_STORE_NODE_NEXT = 1
-LINK_STORE_NODE_WEIGHT = 2
+LINK_STORE_NODE_PREVIOUS = 1
 
 
 # Exceptions
@@ -62,8 +62,7 @@ class LinkStoreNode(object):
     def __set_default_data(self):
         self.data = [
             0,  # Target
-            0,  # Next
-            1   # Weight
+            0   # Previous
         ]
 
     def __repr__(self):
@@ -71,14 +70,13 @@ class LinkStoreNode(object):
 
         return (
             '<%(class_name)s block=%(block)s exists=%(exists)s'
-            ' target=%(target)s next=%(next)s weight=%(weight)s>'
+            ' target=%(target)s previous=%(previous)s>'
         ) % {
             'class_name': class_name,
             'block': self.block,
             'exists': self.exists,
             'target': self.target(),
-            'next': self.next(),
-            'weight': self.weight()
+            'previous': self.previous()
         }
 
     # =========================================================================
@@ -116,16 +114,16 @@ class LinkStoreNode(object):
         return self.block == LINK_STORE_FIRST_DATA_BLOCK
 
     # =========================================================================
-    # Next block methods
+    # Previous block methods
     # =========================================================================
 
-    # Method used to know whether the next block is set
-    def has_next(self):
-        return self.data[LINK_STORE_NODE_NEXT] != 0
+    # Method used to know whether the previous block is set
+    def has_previous(self):
+        return self.data[LINK_STORE_NODE_PREVIOUS] != 0
 
-    # Method used to retrieve the next block
-    def next(self):
-        block = self.data[LINK_STORE_NODE_NEXT]
+    # Method used to retrieve the previous block
+    def previous(self):
+        block = self.data[LINK_STORE_NODE_PREVIOUS]
 
         if block < LINK_STORE_FIRST_DATA_BLOCK:
             return None
@@ -133,25 +131,25 @@ class LinkStoreNode(object):
         return block
 
     # Method used to set a sibling
-    def set_next(self, block):
+    def set_previous(self, block):
         if block < LINK_STORE_FIRST_DATA_BLOCK:
-            raise LinkStoreNodeUsageException('Next node cannot be the root.')
+            raise LinkStoreNodeUsageException('Previous node cannot be the root.')
 
-        self.data[LINK_STORE_NODE_NEXT] = block
+        self.data[LINK_STORE_NODE_PREVIOUS] = block
 
-    # Method used to read the next sibling
-    def read_next(self):
-        if not self.has_next():
-            raise LinkStoreNodeTraversalException('Node has no next sibling.')
+    # Method used to read the previous sibling
+    def read_previous(self):
+        if not self.has_previous():
+            raise LinkStoreNodeTraversalException('Node has no previous sibling.')
 
-        self.read(self.next())
+        self.read(self.previous())
 
-    # Method used to get next node
-    def next_node(self):
-        if not self.has_next():
-            raise LinkStoreNodeTraversalException('Node has no next sibling.')
+    # Method used to get previous node
+    def previous_node(self):
+        if not self.has_previous():
+            raise LinkStoreNodeTraversalException('Node has no previous sibling.')
 
-        return LinkStoreNode(self.storage, block=self.next())
+        return LinkStoreNode(self.storage, block=self.previous())
 
     # =========================================================================
     # Target block methods
@@ -178,15 +176,3 @@ class LinkStoreNode(object):
             )
 
         self.data[LINK_STORE_NODE_TARGET] = block
-
-    # =========================================================================
-    # Weight methods
-    # =========================================================================
-    def weight(self):
-        return self.data[LINK_STORE_NODE_WEIGHT]
-
-    def set_weight(self, weight):
-        self.data[LINK_STORE_NODE_WEIGHT] = weight
-
-    def increment_weight(self):
-        self.data[LINK_STORE_NODE_WEIGHT] += 1

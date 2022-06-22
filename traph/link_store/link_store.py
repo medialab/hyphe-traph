@@ -3,10 +3,10 @@
 # =============================================================================
 #
 # Class representing the structure storing the links as linked list of stubs.
+# Note that linked lists are stored in reverse to allow for constant time
+# addition to the list and that link weights are stored as duplication.
 #
-from itertools import chain
 from collections import Counter
-from heapq import nlargest
 from traph.link_store.node import LinkStoreNode, LINK_STORE_FIRST_DATA_BLOCK
 from traph.link_store.header import LinkStoreHeader, LINK_STORE_HEADER_BLOCKS
 
@@ -45,94 +45,31 @@ class LinkStore(object):
     # =========================================================================
     # Mutation methods
     # =========================================================================
+    def add_links(self, source_node, target_blocks, out=True):
+        tail_node = None
+        empty = True
 
-    # TODO: not used for the time being
-    def add_link(self, source_node, target_block, out=True):
+        if source_node.has_links(out=out):
+            tail_node = self.node(block=source_node.links(out=out))
 
-        # If the node does not have outlinks yet
-        if not source_node.has_links(out=out):
+        for target_block in target_blocks:
+            empty = False
             link_node = self.node()
             link_node.set_target(target_block)
+
+            if tail_node is not None:
+                link_node.set_previous(tail_node.block)
+
             link_node.write()
 
-            source_node.set_links(link_node.block, out=out)
+            tail_node = link_node
+
+        if not empty:
+            assert tail_node is not None
+
+            # Attaching new tail
+            source_node.set_links(tail_node.block, out=out)
             source_node.write()
-
-            return
-
-        # Else:
-        link_node = self.node(block=source_node.links(out=out))
-
-        if not link_node.exists:
-            raise LinkStoreTraversalException('Block does not exist.')
-
-        # We go through the linked list to find matching link
-        while link_node.target() != target_block and link_node.has_next():
-            link_node.read_next()
-
-        # If we did not find a matching link, we add it
-        if link_node.target() != target_block:
-            sibling = self.node()
-            sibling.set_target(target_block)
-            sibling.write()
-            link_node.set_next(sibling.block)
-            link_node.write()
-
-        # Else we just increment the weight of the existing one
-        else:
-            link_node.increment_weight()
-            link_node.write()
-
-    def add_links(self, source_node, target_blocks, out=True):
-        target_blocks = iter(target_blocks)
-        links_block = source_node.links(out=out)
-
-        try:
-            first_target_block = next(target_blocks)
-        except StopIteration:
-            return
-
-        # If the node does not have outlinks yet
-        if not links_block:
-            link_node = self.node()
-            link_node.set_target(first_target_block)
-            link_node.write()
-
-            links_block = link_node.block
-            source_node.set_links(link_node.block, out=out)
-            source_node.write()
-
-            first_target_block = None
-
-        # Finding the current
-        link_nodes_index = {}
-        last_link_node = None
-
-        for link_node in self.link_nodes_iter(links_block):
-            link_nodes_index[link_node.target()] = link_node
-            last_link_node = link_node
-
-        if first_target_block:
-            target_blocks = chain([first_target_block], target_blocks)
-
-        # Adding new targets
-        # TODO: possible to virtualize chain and flush later to ease writes
-        for target_block in target_blocks:
-
-            if target_block in link_nodes_index:
-                link_node = link_nodes_index[target_block]
-                link_node.increment_weight()
-                link_node.write()
-            else:
-                link_node = self.node()
-                link_node.set_target(target_block)
-                link_node.write()
-
-                link_nodes_index[target_block] = link_node
-
-                last_link_node.set_next(link_node.block)
-                last_link_node.write()
-                last_link_node = link_node
 
     def add_outlinks(self, source_node, target_blocks):
         return self.add_links(source_node, target_blocks, out=True)
@@ -150,6 +87,7 @@ class LinkStore(object):
             yield node
             node.read(node.block + self.storage.block_size)
 
+    # NOTE: this method will yield blocks as is, so expect duplication!
     def link_nodes_iter(self, block):
         node = self.node(block=block)
 
@@ -158,9 +96,50 @@ class LinkStore(object):
 
         yield node
 
-        while node.has_next():
-            node.read_next()
+        while node.has_previous():
+            node.read_previous()
             yield node
+
+    def weighted_link_nodes_iter(self, block):
+        node = self.node(block=block)
+
+        if not node.exists:
+            raise LinkStoreTraversalException('Block does not exist.')
+
+        # TODO: it's theoretically possible to rely on constant time hashing
+        weights = Counter()
+        weights[node.target()] = 1
+
+        while node.has_previous():
+            node.read_previous()
+            weights[node.target()] += 1
+
+        for target, weight in weights.items():
+            yield target, weight
+
+    def deduped_link_nodes_iter(self, block):
+        node = self.node(block=block)
+
+        if not node.exists:
+            raise LinkStoreTraversalException('Block does not exist.')
+
+        target = node.target()
+
+        # TODO: it's theoretically possible to rely on constant time hashing
+        already_seen = set()
+        already_seen.add(target)
+
+        yield target
+
+        while node.has_previous():
+            node.read_previous()
+
+            len_before = len(already_seen)
+            target = node.target()
+            already_seen.add(target)
+
+            if len(already_seen) > len_before:
+                yield target
 
     # =========================================================================
     # Counting methods
@@ -173,46 +152,12 @@ class LinkStore(object):
     def metrics(self):
         nb_links = self.count_links()
 
-        nb_meaningful_weights = 0
-        meaningful_weights = Counter()
-        sum_weights = 0
-
-        for node in self.nodes_iter():
-            w = node.weight()
-
-            sum_weights += w
-
-            if w != 1:
-                meaningful_weights[w] += 1
-                nb_meaningful_weights += 1
-
-        # NOTE: we need to take into account that we counted each link twice
-        for k in meaningful_weights.keys():
-            meaningful_weights[k] /= 2
-
-        top_most_common = list(meaningful_weights.most_common(25))
-        top = nlargest(25, meaningful_weights.items(), key=lambda x: x[0])
-
-        sum_weights /= 2
-        nb_meaningful_weights /= 2
-        nb_outlinks = nb_links / 2
-
-        sum_meaningful_weights = sum(meaningful_weights.values())
-        blocks_to_add_to_remove_weights = sum_meaningful_weights * 2
-        ratio_blocks_to_add_to_remove_weights = blocks_to_add_to_remove_weights / float(nb_links)
-
+        # NOTE: we are now unable, from a LinkStore itself, to aggregate
+        # meaningful values about weights. Only the Traph can do this, by
+        # considering both the LinkStore and the LRUTrie.
         stats = {
             'nb_links': nb_links,
-            'nb_outlinks': nb_outlinks,
-            'avg_weight': sum_weights / float(nb_outlinks),
-            'max_weight': max(meaningful_weights) if meaningful_weights else 0,
-            'nb_meaningful_weights': nb_meaningful_weights / 2,
-            'sum_meaningful_weights': sum_meaningful_weights,
-            'ratio_meaningful_weights': nb_meaningful_weights / float(nb_outlinks),
-            'top25_weights': top,
-            'top25_most_common_weights': top_most_common,
-            'blocks_to_add_to_remove_weights': blocks_to_add_to_remove_weights,
-            'ratio_blocks_to_add_to_remove_weights': ratio_blocks_to_add_to_remove_weights
+            'nb_outlinks': nb_links / 2
         }
 
         return stats

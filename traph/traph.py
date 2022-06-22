@@ -638,7 +638,7 @@ class Traph(object):
                     # Iterate over link nodes
                     indegree = 0
 
-                    for linknode in self.link_store.link_nodes_iter(node.inlinks()):
+                    for _ in self.link_store.weighted_link_nodes_iter(node.inlinks()):
                         indegree += 1
 
                     c += 1
@@ -741,14 +741,14 @@ class Traph(object):
                 # Iterating over the page's outlinks
                 if node.has_outlinks() and (include_outbound or include_internal):
                     links_block = node.outlinks()
-                    for link_node in self.link_store.link_nodes_iter(links_block):
+                    for target, weight in self.link_store.weighted_link_nodes_iter(links_block):
 
-                        target_node.read(link_node.target())
+                        target_node.read(target)
                         target_lru = self.lru_trie.windup_lru(target_node.block)
                         target_webentity = self.lru_trie.windup_lru_for_webentity(target_node)
 
                         if (include_outbound and target_webentity != weid) or (include_internal and target_webentity == weid):
-                            pagelinks.append([lru, target_lru, link_node.weight()])
+                            pagelinks.append([lru, target_lru, weight])
 
                         if state.should_yield(5000):
                             yield state
@@ -756,14 +756,14 @@ class Traph(object):
                 # Iterating over the page's inlinks
                 if node.has_inlinks() and include_inbound:
                     links_block = node.inlinks()
-                    for link_node in self.link_store.link_nodes_iter(links_block):
+                    for target, weight in self.link_store.weighted_link_nodes_iter(links_block):
 
-                        source_node.read(link_node.target())
+                        source_node.read(target)
                         source_lru = self.lru_trie.windup_lru(source_node.block)
                         source_webentity = self.lru_trie.windup_lru_for_webentity(source_node)
 
                         if source_webentity != weid:
-                            pagelinks.append([source_lru, lru, link_node.weight()])
+                            pagelinks.append([source_lru, lru, weight])
 
                         if state.should_yield(5000):
                             yield state
@@ -822,13 +822,13 @@ class Traph(object):
                 links_block = node.outlinks()
                 newlinks = []
 
-                for link_node in self.link_store.link_nodes_iter(links_block):
-                    target_node.read(link_node.target())
+                for target, weight in self.link_store.weighted_link_nodes_iter(links_block):
+                    target_node.read(target)
                     target_webentity = self.lru_trie.windup_lru_for_webentity(target_node)
 
                     if (include_outbound and target_webentity != weid) or (include_internal and target_webentity == weid):
                         target_lru = self.lru_trie.windup_lru(target_node.block)
-                        newlinks.append([lru, target_lru, link_node.weight()])
+                        newlinks.append([lru, target_lru, weight])
 
                 if newlinks:
                     n += 1
@@ -884,8 +884,8 @@ class Traph(object):
                 # Iterating over the page's outlinks
                 if node.has_outlinks():
                     links_block = node.outlinks()
-                    for link_node in self.link_store.link_nodes_iter(links_block):
-                        target_node.read(link_node.target())
+                    for target in self.link_store.deduped_link_nodes_iter(links_block):
+                        target_node.read(target)
                         if target_node.block not in done_blocks:
                             target_webentity = self.lru_trie.windup_lru_for_webentity(target_node)
                             done_blocks.add(target_node.block)
@@ -935,8 +935,8 @@ class Traph(object):
                 # Iterating over the page's inlinks
                 if node.has_inlinks():
                     links_block = node.inlinks()
-                    for link_node in self.link_store.link_nodes_iter(links_block):
-                        source_node.read(link_node.target())
+                    for target in self.link_store.deduped_link_nodes_iter(links_block):
+                        source_node.read(target)
                         if source_node.block not in done_blocks:
                             source_webentity = self.lru_trie.windup_lru_for_webentity(source_node)
                             done_blocks.add(source_node.block)
@@ -983,24 +983,24 @@ class Traph(object):
         # Iterating over the page's outlinks
         if node.has_outlinks() and (include_outbound or include_internal):
             links_block = node.outlinks()
-            for link_node in self.link_store.link_nodes_iter(links_block):
+            for target, weight in self.link_store.weighted_link_nodes_iter(links_block):
 
-                target_node.read(link_node.target())
+                target_node.read(target)
                 target_lru = self.lru_trie.windup_lru(target_node.block)
 
                 if (include_outbound and target_lru != lru) or (include_internal and target_lru == lru):
-                    pagelinks.append([lru, target_lru, link_node.weight()])
+                    pagelinks.append([lru, target_lru, weight])
 
         # Iterating over the page's inlinks
         if node.has_inlinks() and include_inbound:
             links_block = node.inlinks()
-            for link_node in self.link_store.link_nodes_iter(links_block):
+            for target, weight in self.link_store.weighted_link_nodes_iter(links_block):
 
-                source_node.read(link_node.target())
+                source_node.read(target)
                 source_lru = self.lru_trie.windup_lru(source_node.block)
 
                 if source_lru != lru:
-                    pagelinks.append([source_lru, lru, link_node.weight()])
+                    pagelinks.append([source_lru, lru, weight])
 
         return pagelinks
 
@@ -1064,9 +1064,7 @@ class Traph(object):
 
             # Iterating over the page's links
             links_block = node.links(out=out)
-            for link_node in self.link_store.link_nodes_iter(links_block):
-
-                target_block = link_node.target()
+            for target_block, weight in self.link_store.weighted_link_nodes_iter(links_block):
                 target_webentity = page_to_webentity.get(target_block)
 
                 if target_webentity is None:
@@ -1084,7 +1082,7 @@ class Traph(object):
                     continue
 
                 # Adding to the graph
-                graph[source_webentity][target_webentity] += link_node.weight()
+                graph[source_webentity][target_webentity] += weight
 
                 if state.should_yield(5000):
                     yield state
@@ -1126,8 +1124,8 @@ class Traph(object):
         # Computing the links
         for source_webentity, links_block in link_pointers:
 
-            for link_node in self.link_store.link_nodes_iter(links_block):
-                target_webentity = page_to_webentity.get(link_node.target())
+            for target, weight in self.link_store.weighted_link_nodes_iter(links_block):
+                target_webentity = page_to_webentity.get(target)
 
                 # The target page might not have a target webentity
                 if not target_webentity:
@@ -1137,7 +1135,7 @@ class Traph(object):
                     continue
 
                 # Adding to the graph
-                graph[source_webentity][target_webentity] += link_node.weight()
+                graph[source_webentity][target_webentity] += weight
 
                 if state.should_yield(5000):
                     yield state
@@ -1349,8 +1347,8 @@ class Traph(object):
             if not page_node.links(out=out):
                 continue
 
-            for link_node in self.link_store.link_nodes_iter(page_node.links(out=out)):
-                yield lru, self.lru_trie.windup_lru(link_node.target())
+            for target in self.link_store.deduped_link_nodes_iter(page_node.links(out=out)):
+                yield lru, self.lru_trie.windup_lru(target)
 
     def pages_iter(self):
         return self.lru_trie.pages_iter()
@@ -1398,11 +1396,11 @@ class Traph(object):
             outlinks_len = 0
 
             if node.has_inlinks():
-                for _ in self.link_store.link_nodes_iter(node.inlinks()):
+                for _ in self.link_store.deduped_link_nodes_iter(node.inlinks()):
                     inlinks_len += 1
 
             if node.has_outlinks():
-                for _ in self.link_store.link_nodes_iter(node.outlinks()):
+                for _ in self.link_store.deduped_link_nodes_iter(node.outlinks()):
                     outlinks_len += 1
 
             if inlinks_len > max_inlinks_len:

@@ -14,6 +14,7 @@ from traph.version import __version__ as TRAPH_VERSION
 # NOTE: Since python mimics C struct, the block size should be respecting
 # some rules (namely have even addresses or addresses divisible by 4 on some
 # architecture).
+# NOTE: the size of the header struct MUST match the node's one.
 LRU_TRIE_HEADER_FORMAT = 'I12p112x'
 LRU_TRIE_HEADER_BLOCK_SIZE = struct.calcsize(LRU_TRIE_HEADER_FORMAT)
 

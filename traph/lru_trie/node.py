@@ -18,6 +18,7 @@ from traph.helpers import detailed_chunks_iter
 # NOTE: Since python mimics C struct, the block size should be respecting
 # some rules (namely have even addresses or addresses divisble by 4 on some
 # architecture).
+# NOTE: the size of the header struct MUST match the node's one.
 
 # TODO: it's possible to differentiate the tail's blocks format if needed
 LRU_TRIE_NODE_FORMAT = '75pBI6Q'
