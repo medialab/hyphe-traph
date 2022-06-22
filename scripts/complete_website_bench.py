@@ -1,3 +1,4 @@
+import random
 from traph import Traph
 
 webentity_creation_rules_regexp = {
@@ -22,8 +23,9 @@ traph = Traph(overwrite=True, folder='./scripts/data/',
 root_lru = 's:https|h:com|h:complete_website|p:base1|p:base2|'
 
 K = 1000
+D = 5
 
-print 'Expecting %i links' % (K * K)
+print 'Expecting %i links' % (K * K * D)
 
 batch_crawl = {}
 
@@ -34,8 +36,12 @@ for i in xrange(K):
 
     for j in xrange(K):
         target_lru = '%sp:leaf%i|' % (root_lru, j)
-        links.append(target_lru)
 
+        # NOTE: link duplication
+        for _ in xrange(D):
+            links.append(target_lru)
+
+    random.shuffle(links)
     batch_crawl[source_lru] = links
 
 traph.index_batch_crawl(batch_crawl)
