@@ -205,7 +205,7 @@ class LinkStore(object):
             'nb_links': nb_links,
             'nb_outlinks': nb_outlinks,
             'avg_weight': sum_weights / float(nb_outlinks),
-            'max_weight': max(meaningful_weights) or 0,
+            'max_weight': max(meaningful_weights) if meaningful_weights else 0,
             'nb_meaningful_weights': nb_meaningful_weights / 2,
             'sum_meaningful_weights': sum_meaningful_weights,
             'ratio_meaningful_weights': nb_meaningful_weights / float(nb_outlinks),
