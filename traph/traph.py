@@ -1271,7 +1271,7 @@ class Traph(object):
                     pages[target_page] = target_node
                     target_blocks.append(target_node.block)
 
-                    if state.should_yield(200):
+                    if state.should_yield(50):
                         yield state
 
                 else:
