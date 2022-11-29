@@ -1234,7 +1234,7 @@ class Traph(object):
 
         return report
 
-    def index_batch_crawl_iter(self, data):
+    def index_batch_crawl_iter(self, data, yield_frequency):
         '''
         data must be a multimap 'source_lru' => 'target_lrus'
         '''
@@ -1271,7 +1271,7 @@ class Traph(object):
                     pages[target_page] = target_node
                     target_blocks.append(target_node.block)
 
-                    if state.should_yield(50):
+                    if state.should_yield(yield_frequency):
                         yield state
 
                 else:
@@ -1294,8 +1294,8 @@ class Traph(object):
 
         yield state.finalize(report)
 
-    def index_batch_crawl(self, data):
-        return run_iterator(self.index_batch_crawl_iter(data))
+    def index_batch_crawl(self, data, yield_frequency=50):
+        return run_iterator(self.index_batch_crawl_iter(data, yield_frequency))
 
     def close(self):
 
