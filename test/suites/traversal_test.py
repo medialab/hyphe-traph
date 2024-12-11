@@ -464,8 +464,6 @@ class TestTraversal(TraphTestCase):
                 ],
             }
 
-            print(list(batch_links.keys()))
-
             traph.index_batch_crawl(batch_links)
 
             prefixes = [b's:http|h:com|h:world|']
