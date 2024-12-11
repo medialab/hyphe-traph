@@ -41,7 +41,7 @@ class LRUTrieHeader(object):
         self.storage = storage
         self.data = [
             0,              # Last webentity id
-            TRAPH_VERSION   # Traph version
+            TRAPH_VERSION.encode()   # Traph version
         ]
 
         self.__ensure()

@@ -11,7 +11,7 @@ from test.config import WEBENTITY_CREATION_RULES_REGEXES
 from traph.helpers import ops_to_base4, build_pagination_token
 
 WEBENTITY_CREATION_RULES = {
-    's:http|h:com|h:world|': WEBENTITY_CREATION_RULES_REGEXES['path1'],
+    b's:http|h:com|h:world|': WEBENTITY_CREATION_RULES_REGEXES['path1'],
 }
 
 
@@ -35,70 +35,70 @@ class TestTraversal(TraphTestCase):
         with self.open_traph(webentity_creation_rules=WEBENTITY_CREATION_RULES) as traph:
             trie = traph.lru_trie
 
-            traph.add_page('s:http|h:com|h:world|p:europe|')
-            traph.add_page('s:http|h:com|h:world|p:asia|')
-            traph.add_page('s:http|h:com|h:world|p:africa|')
-            traph.add_page('s:http|h:com|h:world|p:oceania|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|')
+            traph.add_page(b's:http|h:com|h:world|p:asia|')
+            traph.add_page(b's:http|h:com|h:world|p:africa|')
+            traph.add_page(b's:http|h:com|h:world|p:oceania|')
 
-            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|')
-            traph.add_page('s:http|h:com|h:world|p:europe|p:france|')
-            traph.add_page('s:http|h:com|h:world|p:europe|p:romania|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:spain|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:france|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:romania|')
 
             traph.add_webentity_creation_rule(
-                's:http|h:com|h:world|p:europe|',
+                b's:http|h:com|h:world|p:europe|',
                 WEBENTITY_CREATION_RULES_REGEXES['path2']
             )
 
             full_dfs = list(node.stem() for node, _ in trie.dfs_iter())
 
             self.assertEqual(full_dfs, [
-                's:http|',
-                'h:com|',
-                'h:world|',
-                'p:europe|',
-                'p:spain|',
-                'p:france|',
-                'p:romania|',
-                'h:www|',
-                'p:europe|',
-                'p:spain|',
-                'p:france|',
-                'p:romania|',
-                'p:asia|',
-                'p:africa|',
-                'p:oceania|',
-                'p:asia|',
-                'p:africa|',
-                'p:oceania|',
-                's:https|',
-                'h:com|',
-                'h:world|',
-                'p:europe|',
-                'p:spain|',
-                'p:france|',
-                'p:romania|',
-                'h:www|',
-                'p:europe|',
-                'p:spain|',
-                'p:france|',
-                'p:romania|',
-                'p:asia|',
-                'p:africa|',
-                'p:oceania|',
-                'p:asia|',
-                'p:africa|',
-                'p:oceania|'
+                b's:http|',
+                b'h:com|',
+                b'h:world|',
+                b'p:europe|',
+                b'p:spain|',
+                b'p:france|',
+                b'p:romania|',
+                b'h:www|',
+                b'p:europe|',
+                b'p:spain|',
+                b'p:france|',
+                b'p:romania|',
+                b'p:asia|',
+                b'p:africa|',
+                b'p:oceania|',
+                b'p:asia|',
+                b'p:africa|',
+                b'p:oceania|',
+                b's:https|',
+                b'h:com|',
+                b'h:world|',
+                b'p:europe|',
+                b'p:spain|',
+                b'p:france|',
+                b'p:romania|',
+                b'h:www|',
+                b'p:europe|',
+                b'p:spain|',
+                b'p:france|',
+                b'p:romania|',
+                b'p:asia|',
+                b'p:africa|',
+                b'p:oceania|',
+                b'p:asia|',
+                b'p:africa|',
+                b'p:oceania|'
             ])
 
-            starting_node = trie.lru_node('s:http|h:com|h:world|p:europe|')
+            starting_node = trie.lru_node(b's:http|h:com|h:world|p:europe|')
 
-            partial_dfs = list(node.stem() for node, _ in trie.dfs_iter(starting_node, 's:http|h:com|h:world|p:europe|'))
+            partial_dfs = list(node.stem() for node, _ in trie.dfs_iter(starting_node, b's:http|h:com|h:world|p:europe|'))
 
             self.assertEqual(partial_dfs, [
-                'p:europe|',
-                'p:spain|',
-                'p:france|',
-                'p:romania|'
+                b'p:europe|',
+                b'p:spain|',
+                b'p:france|',
+                b'p:romania|'
             ])
 
     def test_webentity_dfs_iter(self):
@@ -106,35 +106,35 @@ class TestTraversal(TraphTestCase):
         with self.open_traph(default_webentity_creation_rule=WEBENTITY_CREATION_RULES_REGEXES['domain']) as traph:
             trie = traph.lru_trie
 
-            traph.add_page('s:http|h:com|h:world|p:europe|')
-            traph.add_page('s:http|h:com|h:world|p:asia|')
-            traph.add_page('s:http|h:com|h:world|p:africa|')
-            traph.add_page('s:http|h:com|h:world|p:oceania|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|')
+            traph.add_page(b's:http|h:com|h:world|p:asia|')
+            traph.add_page(b's:http|h:com|h:world|p:africa|')
+            traph.add_page(b's:http|h:com|h:world|p:oceania|')
 
-            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|')
-            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:madrid|')
-            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:toledo|')
-            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:barcelona|')
-            traph.add_page('s:http|h:com|h:world|p:europe|p:france|')
-            traph.add_page('s:http|h:com|h:world|p:europe|p:romania|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:spain|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:spain|p:madrid|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:spain|p:toledo|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:spain|p:barcelona|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:france|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:romania|')
 
-            prefix = 's:http|h:com|h:world|'
+            prefix = b's:http|h:com|h:world|'
 
             prefix_node = trie.lru_node(prefix)
 
             # NOTE: beware, order is mostly arbitrary here
             webentity_dfs = [
-                's:http|h:com|h:world|',
-                's:http|h:com|h:world|p:europe|',
-                's:http|h:com|h:world|p:europe|p:spain|',
-                's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
-                's:http|h:com|h:world|p:europe|p:spain|p:barcelona|',
-                's:http|h:com|h:world|p:europe|p:spain|p:toledo|',
-                's:http|h:com|h:world|p:europe|p:france|',
-                's:http|h:com|h:world|p:europe|p:romania|',
-                's:http|h:com|h:world|p:asia|',
-                's:http|h:com|h:world|p:africa|',
-                's:http|h:com|h:world|p:oceania|'
+                b's:http|h:com|h:world|',
+                b's:http|h:com|h:world|p:europe|',
+                b's:http|h:com|h:world|p:europe|p:spain|',
+                b's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
+                b's:http|h:com|h:world|p:europe|p:spain|p:barcelona|',
+                b's:http|h:com|h:world|p:europe|p:spain|p:toledo|',
+                b's:http|h:com|h:world|p:europe|p:france|',
+                b's:http|h:com|h:world|p:europe|p:romania|',
+                b's:http|h:com|h:world|p:asia|',
+                b's:http|h:com|h:world|p:africa|',
+                b's:http|h:com|h:world|p:oceania|'
             ]
 
             self.assertEqual(
@@ -142,16 +142,16 @@ class TestTraversal(TraphTestCase):
                 webentity_dfs
             )
 
-            traph.create_webentity(['s:http|h:com|h:world|p:europe|p:spain|'])
+            traph.create_webentity([b's:http|h:com|h:world|p:europe|p:spain|'])
 
             webentity_dfs = [
-                's:http|h:com|h:world|',
-                's:http|h:com|h:world|p:europe|',
-                's:http|h:com|h:world|p:europe|p:france|',
-                's:http|h:com|h:world|p:europe|p:romania|',
-                's:http|h:com|h:world|p:asia|',
-                's:http|h:com|h:world|p:africa|',
-                's:http|h:com|h:world|p:oceania|'
+                b's:http|h:com|h:world|',
+                b's:http|h:com|h:world|p:europe|',
+                b's:http|h:com|h:world|p:europe|p:france|',
+                b's:http|h:com|h:world|p:europe|p:romania|',
+                b's:http|h:com|h:world|p:asia|',
+                b's:http|h:com|h:world|p:africa|',
+                b's:http|h:com|h:world|p:oceania|'
             ]
 
             self.assertEqual(
@@ -164,34 +164,34 @@ class TestTraversal(TraphTestCase):
         with self.open_traph(default_webentity_creation_rule=WEBENTITY_CREATION_RULES_REGEXES['domain']) as traph:
             trie = traph.lru_trie
 
-            traph.add_page('s:http|h:com|h:world|p:europe|')
-            traph.add_page('s:http|h:com|h:world|p:asia|')
-            traph.add_page('s:http|h:com|h:world|p:africa|')
-            traph.add_page('s:http|h:com|h:world|p:oceania|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|')
+            traph.add_page(b's:http|h:com|h:world|p:asia|')
+            traph.add_page(b's:http|h:com|h:world|p:africa|')
+            traph.add_page(b's:http|h:com|h:world|p:oceania|')
 
-            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|')
-            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:madrid|')
-            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:toledo|')
-            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:barcelona|')
-            traph.add_page('s:http|h:com|h:world|p:europe|p:france|')
-            traph.add_page('s:http|h:com|h:world|p:europe|p:romania|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:spain|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:spain|p:madrid|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:spain|p:toledo|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:spain|p:barcelona|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:france|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:romania|')
 
-            prefix = 's:http|h:com|h:world|'
+            prefix = b's:http|h:com|h:world|'
 
             prefix_node = trie.lru_node(prefix)
 
             webentity_inorder = [
-                's:http|h:com|h:world|',
-                's:http|h:com|h:world|p:africa|',
-                's:http|h:com|h:world|p:asia|',
-                's:http|h:com|h:world|p:europe|',
-                's:http|h:com|h:world|p:europe|p:france|',
-                's:http|h:com|h:world|p:europe|p:romania|',
-                's:http|h:com|h:world|p:europe|p:spain|',
-                's:http|h:com|h:world|p:europe|p:spain|p:barcelona|',
-                's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
-                's:http|h:com|h:world|p:europe|p:spain|p:toledo|',
-                's:http|h:com|h:world|p:oceania|'
+                b's:http|h:com|h:world|',
+                b's:http|h:com|h:world|p:africa|',
+                b's:http|h:com|h:world|p:asia|',
+                b's:http|h:com|h:world|p:europe|',
+                b's:http|h:com|h:world|p:europe|p:france|',
+                b's:http|h:com|h:world|p:europe|p:romania|',
+                b's:http|h:com|h:world|p:europe|p:spain|',
+                b's:http|h:com|h:world|p:europe|p:spain|p:barcelona|',
+                b's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
+                b's:http|h:com|h:world|p:europe|p:spain|p:toledo|',
+                b's:http|h:com|h:world|p:oceania|'
             ]
 
             self.assertEqual(
@@ -199,16 +199,16 @@ class TestTraversal(TraphTestCase):
                 webentity_inorder
             )
 
-            traph.create_webentity(['s:http|h:com|h:world|p:europe|p:spain|'])
+            traph.create_webentity([b's:http|h:com|h:world|p:europe|p:spain|'])
 
             webentity_inorder = [
-                's:http|h:com|h:world|',
-                's:http|h:com|h:world|p:africa|',
-                's:http|h:com|h:world|p:asia|',
-                's:http|h:com|h:world|p:europe|',
-                's:http|h:com|h:world|p:europe|p:france|',
-                's:http|h:com|h:world|p:europe|p:romania|',
-                's:http|h:com|h:world|p:oceania|'
+                b's:http|h:com|h:world|',
+                b's:http|h:com|h:world|p:africa|',
+                b's:http|h:com|h:world|p:asia|',
+                b's:http|h:com|h:world|p:europe|',
+                b's:http|h:com|h:world|p:europe|p:france|',
+                b's:http|h:com|h:world|p:europe|p:romania|',
+                b's:http|h:com|h:world|p:oceania|'
             ]
 
             self.assertEqual(
@@ -221,34 +221,34 @@ class TestTraversal(TraphTestCase):
         with self.open_traph(default_webentity_creation_rule=WEBENTITY_CREATION_RULES_REGEXES['domain']) as traph:
             trie = traph.lru_trie
 
-            traph.add_page('s:http|h:com|h:world|p:europe|')
-            traph.add_page('s:http|h:com|h:world|p:asia|')
-            traph.add_page('s:http|h:com|h:world|p:africa|')
-            traph.add_page('s:http|h:com|h:world|p:oceania|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|')
+            traph.add_page(b's:http|h:com|h:world|p:asia|')
+            traph.add_page(b's:http|h:com|h:world|p:africa|')
+            traph.add_page(b's:http|h:com|h:world|p:oceania|')
 
-            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|')
-            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:madrid|')
-            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:toledo|')
-            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:barcelona|')
-            traph.add_page('s:http|h:com|h:world|p:europe|p:france|')
-            traph.add_page('s:http|h:com|h:world|p:europe|p:romania|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:spain|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:spain|p:madrid|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:spain|p:toledo|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:spain|p:barcelona|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:france|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:romania|')
 
-            prefix = 's:http|h:com|h:world|'
+            prefix = b's:http|h:com|h:world|'
 
             prefix_node = trie.lru_node(prefix)
 
             webentity_inorder = [
-                ('s:http|h:com|h:world|', ''),
-                ('s:http|h:com|h:world|p:africa|', 'CLRL'),
-                ('s:http|h:com|h:world|p:asia|', 'CLR'),
-                ('s:http|h:com|h:world|p:europe|', 'C'),
-                ('s:http|h:com|h:world|p:europe|p:france|', 'CCL'),
-                ('s:http|h:com|h:world|p:europe|p:romania|', 'CCLR'),
-                ('s:http|h:com|h:world|p:europe|p:spain|', 'CC'),
-                ('s:http|h:com|h:world|p:europe|p:spain|p:barcelona|', 'CCCL'),
-                ('s:http|h:com|h:world|p:europe|p:spain|p:madrid|', 'CCC'),
-                ('s:http|h:com|h:world|p:europe|p:spain|p:toledo|', 'CCCR'),
-                ('s:http|h:com|h:world|p:oceania|', 'CR')
+                (b's:http|h:com|h:world|', ''),
+                (b's:http|h:com|h:world|p:africa|', 'CLRL'),
+                (b's:http|h:com|h:world|p:asia|', 'CLR'),
+                (b's:http|h:com|h:world|p:europe|', 'C'),
+                (b's:http|h:com|h:world|p:europe|p:france|', 'CCL'),
+                (b's:http|h:com|h:world|p:europe|p:romania|', 'CCLR'),
+                (b's:http|h:com|h:world|p:europe|p:spain|', 'CC'),
+                (b's:http|h:com|h:world|p:europe|p:spain|p:barcelona|', 'CCCL'),
+                (b's:http|h:com|h:world|p:europe|p:spain|p:madrid|', 'CCC'),
+                (b's:http|h:com|h:world|p:europe|p:spain|p:toledo|', 'CCCR'),
+                (b's:http|h:com|h:world|p:oceania|', 'CR')
             ]
 
             for i, (pagination_lru, pagination_path) in enumerate(webentity_inorder):
@@ -273,31 +273,31 @@ class TestTraversal(TraphTestCase):
         with self.open_traph(default_webentity_creation_rule=WEBENTITY_CREATION_RULES_REGEXES['domain']) as traph:
             trie = traph.lru_trie
 
-            traph.add_page('s:http|h:com|h:world|p:europe|')
-            traph.add_page('s:http|h:com|h:world|p:asia|')
-            traph.add_page('s:http|h:com|h:world|p:africa|')
-            traph.add_page('s:http|h:com|h:world|p:oceania|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|')
+            traph.add_page(b's:http|h:com|h:world|p:asia|')
+            traph.add_page(b's:http|h:com|h:world|p:africa|')
+            traph.add_page(b's:http|h:com|h:world|p:oceania|')
 
-            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|')
-            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:madrid|')
-            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:toledo|')
-            traph.add_page('s:http|h:com|h:world|p:europe|p:spain|p:barcelona|')
-            traph.add_page('s:http|h:com|h:world|p:europe|p:france|')
-            traph.add_page('s:http|h:com|h:world|p:europe|p:romania|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:spain|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:spain|p:madrid|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:spain|p:toledo|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:spain|p:barcelona|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:france|')
+            traph.add_page(b's:http|h:com|h:world|p:europe|p:romania|')
 
-            prefixes = ['s:http|h:com|h:world|']
+            prefixes = [b's:http|h:com|h:world|']
 
             webentity_inorder = [
-                ('s:http|h:com|h:world|p:africa|', 'CLRL'),
-                ('s:http|h:com|h:world|p:asia|', 'CLR'),
-                ('s:http|h:com|h:world|p:europe|', 'C'),
-                ('s:http|h:com|h:world|p:europe|p:france|', 'CCL'),
-                ('s:http|h:com|h:world|p:europe|p:romania|', 'CCLR'),
-                ('s:http|h:com|h:world|p:europe|p:spain|', 'CC'),
-                ('s:http|h:com|h:world|p:europe|p:spain|p:barcelona|', 'CCCL'),
-                ('s:http|h:com|h:world|p:europe|p:spain|p:madrid|', 'CCC'),
-                ('s:http|h:com|h:world|p:europe|p:spain|p:toledo|', 'CCCR'),
-                ('s:http|h:com|h:world|p:oceania|', 'CR')
+                (b's:http|h:com|h:world|p:africa|', 'CLRL'),
+                (b's:http|h:com|h:world|p:asia|', 'CLR'),
+                (b's:http|h:com|h:world|p:europe|', 'C'),
+                (b's:http|h:com|h:world|p:europe|p:france|', 'CCL'),
+                (b's:http|h:com|h:world|p:europe|p:romania|', 'CCLR'),
+                (b's:http|h:com|h:world|p:europe|p:spain|', 'CC'),
+                (b's:http|h:com|h:world|p:europe|p:spain|p:barcelona|', 'CCCL'),
+                (b's:http|h:com|h:world|p:europe|p:spain|p:madrid|', 'CCC'),
+                (b's:http|h:com|h:world|p:europe|p:spain|p:toledo|', 'CCCR'),
+                (b's:http|h:com|h:world|p:oceania|', 'CR')
             ]
 
             # Fetching everything
@@ -350,8 +350,8 @@ class TestTraversal(TraphTestCase):
                     'count': 2,
                     'count_crawled': 0,
                     'pages': [
-                        {'lru': 's:http|h:com|h:world|p:africa|', 'crawled': False},
-                        {'lru': 's:http|h:com|h:world|p:asia|', 'crawled': False}
+                        {'lru': b's:http|h:com|h:world|p:africa|', 'crawled': False},
+                        {'lru': b's:http|h:com|h:world|p:asia|', 'crawled': False}
                     ],
                     'token': build_pagination_token(0, ops_to_base4('CLR'))
                 }
@@ -365,8 +365,8 @@ class TestTraversal(TraphTestCase):
                     'count': 2,
                     'count_crawled': 0,
                     'pages': [
-                        {'lru': 's:http|h:com|h:world|p:europe|', 'crawled': False},
-                        {'lru': 's:http|h:com|h:world|p:europe|p:france|', 'crawled': False}
+                        {'lru': b's:http|h:com|h:world|p:europe|', 'crawled': False},
+                        {'lru': b's:http|h:com|h:world|p:europe|p:france|', 'crawled': False}
                     ],
                     'token': build_pagination_token(0, ops_to_base4('CCL'))
                 }
@@ -375,7 +375,7 @@ class TestTraversal(TraphTestCase):
             # Fetching more than one prefix
             self.assertEqual(
                 traph.paginate_webentity_pages(
-                    None, prefixes + ['s:https|h:com|h:world|'],
+                    None, prefixes + [b's:https|h:com|h:world|'],
                     page_count=20, pagination_token=build_pagination_token(0, ops_to_base4('CLR'))
                 ),
                 {
@@ -408,7 +408,7 @@ class TestTraversal(TraphTestCase):
             self.assertEqual(calls, 4)
 
             # Crawled
-            traph.add_page('s:http|h:com|h:world|p:aaa|', crawled=True)
+            traph.add_page(b's:http|h:com|h:world|p:aaa|', crawled=True)
 
             self.assertEqual(
                 traph.paginate_webentity_pages(None, prefixes, page_count=2),
@@ -417,8 +417,8 @@ class TestTraversal(TraphTestCase):
                     'count': 2,
                     'count_crawled': 1,
                     'pages': [
-                        {'lru': 's:http|h:com|h:world|p:aaa|', 'crawled': True},
-                        {'lru': 's:http|h:com|h:world|p:africa|', 'crawled': False}
+                        {'lru': b's:http|h:com|h:world|p:aaa|', 'crawled': True},
+                        {'lru': b's:http|h:com|h:world|p:africa|', 'crawled': False}
                     ],
                     'token': build_pagination_token(0, ops_to_base4('CLRL'))
                 }
@@ -431,7 +431,7 @@ class TestTraversal(TraphTestCase):
                     'count': 1,
                     'count_crawled': 1,
                     'pages': [
-                        {'lru': 's:http|h:com|h:world|p:aaa|', 'crawled': True}
+                        {'lru': b's:http|h:com|h:world|p:aaa|', 'crawled': True}
                     ]
                 }
             )
@@ -442,52 +442,52 @@ class TestTraversal(TraphTestCase):
             trie = traph.lru_trie
 
             batch_links = {
-                's:http|h:com|h:world|': [
-                    's:http|h:com|h:upsidedown|p:demogorgon|',
-                    's:http|h:com|h:world|p:europe|',
-                    's:http|h:com|h:world|p:asia|',
-                    's:http|h:com|h:world|p:africa|',
-                    's:http|h:com|h:world|p:oceania|',
+                b's:http|h:com|h:world|': [
+                    b's:http|h:com|h:upsidedown|p:demogorgon|',
+                    b's:http|h:com|h:world|p:europe|',
+                    b's:http|h:com|h:world|p:asia|',
+                    b's:http|h:com|h:world|p:africa|',
+                    b's:http|h:com|h:world|p:oceania|',
                 ],
-                's:http|h:com|h:world|p:europe|': [
-                    's:http|h:com|h:world|p:europe|p:spain|',
-                    's:http|h:com|h:world|p:europe|p:france|',
-                    's:http|h:com|h:world|p:europe|p:romania|',
-                    's:http|h:com|h:world|p:europe|p:france|'
+                b's:http|h:com|h:world|p:europe|': [
+                    b's:http|h:com|h:world|p:europe|p:spain|',
+                    b's:http|h:com|h:world|p:europe|p:france|',
+                    b's:http|h:com|h:world|p:europe|p:romania|',
+                    b's:http|h:com|h:world|p:europe|p:france|'
                 ],
-                's:http|h:com|h:world|p:europe|p:spain|': [
-                    's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
-                    's:http|h:com|h:world|p:europe|p:spain|p:toledo|',
-                    's:http|h:com|h:world|p:europe|p:spain|p:barcelona|',
-                    's:http|h:com|h:upsidedown|p:eleven|',
-                    's:http|h:com|h:upsidedown|p:will|',
+                b's:http|h:com|h:world|p:europe|p:spain|': [
+                    b's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
+                    b's:http|h:com|h:world|p:europe|p:spain|p:toledo|',
+                    b's:http|h:com|h:world|p:europe|p:spain|p:barcelona|',
+                    b's:http|h:com|h:upsidedown|p:eleven|',
+                    b's:http|h:com|h:upsidedown|p:will|',
                 ],
-                's:http|h:com|h:world|p:europe|p:romania|': []
+                b's:http|h:com|h:world|p:europe|p:romania|': []
             }
 
             traph.index_batch_crawl(batch_links)
 
-            prefixes = ['s:http|h:com|h:world|']
+            prefixes = [b's:http|h:com|h:world|']
 
             pagelinks_inorder = [
-                ['s:http|h:com|h:world|', 's:http|h:com|h:world|p:europe|', 1],
-                ['s:http|h:com|h:world|', 's:http|h:com|h:world|p:asia|', 1],
-                ['s:http|h:com|h:world|', 's:http|h:com|h:world|p:africa|', 1],
-                ['s:http|h:com|h:world|', 's:http|h:com|h:world|p:oceania|', 1],
-                ['s:http|h:com|h:world|p:europe|', 's:http|h:com|h:world|p:europe|p:spain|', 1],
-                ['s:http|h:com|h:world|p:europe|', 's:http|h:com|h:world|p:europe|p:france|', 2],
-                ['s:http|h:com|h:world|p:europe|', 's:http|h:com|h:world|p:europe|p:romania|', 1],
-                ['s:http|h:com|h:world|p:europe|p:spain|', 's:http|h:com|h:world|p:europe|p:spain|p:madrid|', 1],
-                ['s:http|h:com|h:world|p:europe|p:spain|', 's:http|h:com|h:world|p:europe|p:spain|p:toledo|', 1],
-                ['s:http|h:com|h:world|p:europe|p:spain|', 's:http|h:com|h:world|p:europe|p:spain|p:barcelona|', 1]
+                [b's:http|h:com|h:world|', b's:http|h:com|h:world|p:europe|', 1],
+                [b's:http|h:com|h:world|', b's:http|h:com|h:world|p:asia|', 1],
+                [b's:http|h:com|h:world|', b's:http|h:com|h:world|p:africa|', 1],
+                [b's:http|h:com|h:world|', b's:http|h:com|h:world|p:oceania|', 1],
+                [b's:http|h:com|h:world|p:europe|', b's:http|h:com|h:world|p:europe|p:spain|', 1],
+                [b's:http|h:com|h:world|p:europe|', b's:http|h:com|h:world|p:europe|p:france|', 2],
+                [b's:http|h:com|h:world|p:europe|', b's:http|h:com|h:world|p:europe|p:romania|', 1],
+                [b's:http|h:com|h:world|p:europe|p:spain|', b's:http|h:com|h:world|p:europe|p:spain|p:madrid|', 1],
+                [b's:http|h:com|h:world|p:europe|p:spain|', b's:http|h:com|h:world|p:europe|p:spain|p:toledo|', 1],
+                [b's:http|h:com|h:world|p:europe|p:spain|', b's:http|h:com|h:world|p:europe|p:spain|p:barcelona|', 1]
             ]
             outlinks = [
-                ['s:http|h:com|h:world|', 's:http|h:com|h:upsidedown|p:demogorgon|', 1]
+                [b's:http|h:com|h:world|', b's:http|h:com|h:upsidedown|p:demogorgon|', 1]
             ]
 
             outlinks_2 = [
-                ['s:http|h:com|h:world|p:europe|p:spain|', 's:http|h:com|h:upsidedown|p:eleven|', 1],
-                ['s:http|h:com|h:world|p:europe|p:spain|', 's:http|h:com|h:upsidedown|p:will|', 1]
+                [b's:http|h:com|h:world|p:europe|p:spain|', b's:http|h:com|h:upsidedown|p:eleven|', 1],
+                [b's:http|h:com|h:world|p:europe|p:spain|', b's:http|h:com|h:upsidedown|p:will|', 1]
             ]
 
             # Fetching everything
@@ -550,22 +550,22 @@ class TestTraversal(TraphTestCase):
             )
 
             batch_links_2 = {
-                's:https|h:com|h:world|': [
-                    's:https|h:com|h:world|p:europe|',
-                    's:https|h:com|h:world|p:asia|'
+                b's:https|h:com|h:world|': [
+                    b's:https|h:com|h:world|p:europe|',
+                    b's:https|h:com|h:world|p:asia|'
                 ],
-                's:https|h:com|h:world|p:europe|': [
-                    's:https|h:com|h:world|p:europe|p:spain|'
+                b's:https|h:com|h:world|p:europe|': [
+                    b's:https|h:com|h:world|p:europe|p:spain|'
                 ]
             }
             traph.index_batch_crawl(batch_links_2)
 
-            prefixes.append('s:https|h:com|h:world|')
+            prefixes.append(b's:https|h:com|h:world|')
 
             pagelinks_inorder_2 = [
-                ['s:https|h:com|h:world|', 's:https|h:com|h:world|p:europe|', 1],
-                ['s:https|h:com|h:world|', 's:https|h:com|h:world|p:asia|', 1],
-                ['s:https|h:com|h:world|p:europe|', 's:https|h:com|h:world|p:europe|p:spain|', 1]
+                [b's:https|h:com|h:world|', b's:https|h:com|h:world|p:europe|', 1],
+                [b's:https|h:com|h:world|', b's:https|h:com|h:world|p:asia|', 1],
+                [b's:https|h:com|h:world|p:europe|', b's:https|h:com|h:world|p:europe|p:spain|', 1]
             ]
 
             # Fetching more than one prefix all at once

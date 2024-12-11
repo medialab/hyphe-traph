@@ -13,14 +13,14 @@ class TestTraph(TraphTestCase):
 
     def test_add_page(self):
         with self.open_traph() as traph:
-            report = traph.add_page('s:http|h:fr|h:sciences-po|h:medialab|')
+            report = traph.add_page(b's:http|h:fr|h:sciences-po|h:medialab|')
 
             self.assertEqual(report.nb_created_pages, 1)
             self.assertEqual(traph.count_pages(), 1)
             self.assertEqual(traph.count_crawled_pages(), 0)
 
             # Re-adding pages should not have an effect, except on crawled flag
-            report = traph.add_page('s:http|h:fr|h:sciences-po|h:medialab|', crawled=True)
+            report = traph.add_page(b's:http|h:fr|h:sciences-po|h:medialab|', crawled=True)
 
             self.assertEqual(report.nb_created_pages, 0)
             self.assertEqual(traph.count_pages(), 1)
@@ -32,8 +32,8 @@ class TestTraph(TraphTestCase):
 
             report = traph.add_links([
                 (
-                    's:http|h:fr|h:sciences-po|h:medialab|',
-                    's:https|h:com|h:twitter|p:paulanomalie|'
+                    b's:http|h:fr|h:sciences-po|h:medialab|',
+                    b's:https|h:com|h:twitter|p:paulanomalie|'
                 )
             ])
 
@@ -44,8 +44,8 @@ class TestTraph(TraphTestCase):
             # Re-adding pages should not have an effect, except for weight
             report = traph.add_links([
                 (
-                    's:http|h:fr|h:sciences-po|h:medialab|',
-                    's:https|h:com|h:twitter|p:paulanomalie|'
+                    b's:http|h:fr|h:sciences-po|h:medialab|',
+                    b's:https|h:com|h:twitter|p:paulanomalie|'
                 )
             ])
 
@@ -57,9 +57,9 @@ class TestTraph(TraphTestCase):
         with self.open_traph() as traph:
 
             report = traph.index_batch_crawl({
-                's:http|h:fr|h:sciences-po|h:medialab|': [
-                    's:https|h:com|h:twitter|p:paulanomalie|',
-                    's:http|h:com|h:twitter|p:pépé|yesterday|'
+                b's:http|h:fr|h:sciences-po|h:medialab|': [
+                    b's:https|h:com|h:twitter|p:paulanomalie|',
+                    's:http|h:com|h:twitter|p:pépé|yesterday|'.encode()
                 ]
             })
 
@@ -69,9 +69,9 @@ class TestTraph(TraphTestCase):
 
             # Re-adding pages should not have an effect, except for weight
             report = traph.index_batch_crawl({
-                's:http|h:fr|h:sciences-po|h:medialab|': [
-                    's:https|h:com|h:twitter|p:paulanomalie|',
-                    's:http|h:com|h:twitter|p:pépé|yesterday|'
+                b's:http|h:fr|h:sciences-po|h:medialab|': [
+                    b's:https|h:com|h:twitter|p:paulanomalie|',
+                    's:http|h:com|h:twitter|p:pépé|yesterday|'.encode()
                 ]
             })
 
@@ -81,42 +81,42 @@ class TestTraph(TraphTestCase):
 
     def test_index_batch_crawl_crawled_pages(self):
         with self.open_traph() as traph:
-            traph.create_webentity(['s:http|h:fr|h:sciences-po|h:medialab|'])
+            traph.create_webentity([b's:http|h:fr|h:sciences-po|h:medialab|'])
 
             traph.index_batch_crawl({
-                's:http|h:fr|h:sciences-po|h:medialab|': [
-                    's:http|h:fr|h:sciences-po|h:medialab|p:publications|',
-                    's:http|h:fr|h:sciences-po|h:medialab|p:people|'
+                b's:http|h:fr|h:sciences-po|h:medialab|': [
+                    b's:http|h:fr|h:sciences-po|h:medialab|p:publications|',
+                    b's:http|h:fr|h:sciences-po|h:medialab|p:people|'
                 ]
             })
 
-            pages = traph.get_webentity_crawled_pages(1, ['s:http|h:fr|h:sciences-po|h:medialab|'])
-            self.assertEqual([item['lru'] for item in pages], ['s:http|h:fr|h:sciences-po|h:medialab|'])
+            pages = traph.get_webentity_crawled_pages(1, [b's:http|h:fr|h:sciences-po|h:medialab|'])
+            self.assertEqual([item['lru'] for item in pages], [b's:http|h:fr|h:sciences-po|h:medialab|'])
 
             traph.index_batch_crawl({
-                's:http|h:fr|h:sciences-po|h:medialab|p:publications|': [
-                    's:http|h:fr|h:sciences-po|h:medialab|',
-                    's:http|h:fr|h:sciences-po|h:medialab|p:people|'
+                b's:http|h:fr|h:sciences-po|h:medialab|p:publications|': [
+                    b's:http|h:fr|h:sciences-po|h:medialab|',
+                    b's:http|h:fr|h:sciences-po|h:medialab|p:people|'
                 ],
-                's:http|h:fr|h:sciences-po|h:medialab|p:people|': [
-                    's:http|h:fr|h:sciences-po|h:medialab|p:publications|',
-                    's:http|h:fr|h:sciences-po|h:medialab|'
+                b's:http|h:fr|h:sciences-po|h:medialab|p:people|': [
+                    b's:http|h:fr|h:sciences-po|h:medialab|p:publications|',
+                    b's:http|h:fr|h:sciences-po|h:medialab|'
                 ]
             })
 
-            pages = traph.get_webentity_crawled_pages(1, ['s:http|h:fr|h:sciences-po|h:medialab|'])
+            pages = traph.get_webentity_crawled_pages(1, [b's:http|h:fr|h:sciences-po|h:medialab|'])
             self.assertEqual(set([item['lru'] for item in pages]), set([
-                's:http|h:fr|h:sciences-po|h:medialab|p:people|',
-                's:http|h:fr|h:sciences-po|h:medialab|p:publications|',
-                's:http|h:fr|h:sciences-po|h:medialab|'
+                b's:http|h:fr|h:sciences-po|h:medialab|p:people|',
+                b's:http|h:fr|h:sciences-po|h:medialab|p:publications|',
+                b's:http|h:fr|h:sciences-po|h:medialab|'
             ]))
 
     def test_index_and_retrieve_pages(self):
         wiki_prefixes = [
-            's:https|h:org|h:wikipedia|h:www|',
-            's:http|h:org|h:wikipedia|',
-            's:http|h:org|h:wikipedia|h:www|',
-            's:https|h:org|h:wikipedia|'
+            b's:https|h:org|h:wikipedia|h:www|',
+            b's:http|h:org|h:wikipedia|',
+            b's:http|h:org|h:wikipedia|h:www|',
+            b's:https|h:org|h:wikipedia|'
         ]
 
         with self.open_traph() as traph:
@@ -126,9 +126,9 @@ class TestTraph(TraphTestCase):
             self.assertEqual(len(report.created_webentities), 1)
 
             report = traph.index_batch_crawl({
-                's:https|h:org|h:wikipedia|h:www|': [
-                    's:https|h:org|h:wikipedia|h:fr|',
-                    's:https|h:org|h:wikipedia|h:en|'
+                b's:https|h:org|h:wikipedia|h:www|': [
+                    b's:https|h:org|h:wikipedia|h:fr|',
+                    b's:https|h:org|h:wikipedia|h:en|'
                 ]
             })
 
@@ -138,11 +138,11 @@ class TestTraph(TraphTestCase):
             self.assertEqual(traph.count_links(), 2)
 
             for lru, prefix, isPrefix in [
-                ('s:https|h:org|h:wikipedia|', 's:https|h:org|h:wikipedia|', True),
-                ('s:https|h:org|h:wikipedia|h:en|', 's:https|h:org|h:wikipedia|', False),
-                ('s:https|h:org|h:wikipedia|h:en|p:wiki|p:Crawl|', 's:https|h:org|h:wikipedia|', False),
-                ('s:https|h:org|h:wikipedia|h:www|', 's:https|h:org|h:wikipedia|h:www|', True),
-                ('s:https|h:org|h:wikipedia|h:www|p:wiki|p:Crawl|', 's:https|h:org|h:wikipedia|h:www|', False)
+                (b's:https|h:org|h:wikipedia|', b's:https|h:org|h:wikipedia|', True),
+                (b's:https|h:org|h:wikipedia|h:en|', b's:https|h:org|h:wikipedia|', False),
+                (b's:https|h:org|h:wikipedia|h:en|p:wiki|p:Crawl|', b's:https|h:org|h:wikipedia|', False),
+                (b's:https|h:org|h:wikipedia|h:www|', b's:https|h:org|h:wikipedia|h:www|', True),
+                (b's:https|h:org|h:wikipedia|h:www|p:wiki|p:Crawl|', b's:https|h:org|h:wikipedia|h:www|', False)
             ]:
                 self.assertEqual(traph.retrieve_prefix(lru), prefix)
                 self.assertEqual(traph.retrieve_webentity(lru), 1)
@@ -153,38 +153,38 @@ class TestTraph(TraphTestCase):
 
             crawled_pages = traph.get_webentity_crawled_pages(1, wiki_prefixes)
 
-            self.assertEqual(set(page['lru'] for page in crawled_pages), set(['s:https|h:org|h:wikipedia|h:www|']))
+            self.assertEqual(set(page['lru'] for page in crawled_pages), set([b's:https|h:org|h:wikipedia|h:www|']))
 
             pages = traph.get_webentity_pages(1, wiki_prefixes)
 
-            self.assertEqual(set(page['lru'] for page in pages), set(['s:https|h:org|h:wikipedia|h:www|', 's:https|h:org|h:wikipedia|h:fr|', 's:https|h:org|h:wikipedia|h:en|']))
+            self.assertEqual(set(page['lru'] for page in pages), set([b's:https|h:org|h:wikipedia|h:www|', b's:https|h:org|h:wikipedia|h:fr|', b's:https|h:org|h:wikipedia|h:en|']))
 
     def test_prefix_methods(self):
         with self.open_traph() as traph:
 
             # 1) Potential prefix when the traph is empty
-            prefix = traph.get_potential_prefix('s:http|h:fr|h:sciences-po|h:medialab|')
-            self.assertEqual(prefix, 's:http|h:fr|h:sciences-po|')
+            prefix = traph.get_potential_prefix(b's:http|h:fr|h:sciences-po|h:medialab|')
+            self.assertEqual(prefix, b's:http|h:fr|h:sciences-po|')
 
             # 2) Test with existing webentity on path
-            traph.create_webentity(['s:http|h:fr|h:sciences-po|h:medialab|'])
-            prefix = traph.get_potential_prefix('s:http|h:fr|h:sciences-po|h:medialab|p:www|p:publications|')
-            self.assertEqual(prefix, 's:http|h:fr|h:sciences-po|h:medialab|')
+            traph.create_webentity([b's:http|h:fr|h:sciences-po|h:medialab|'])
+            prefix = traph.get_potential_prefix(b's:http|h:fr|h:sciences-po|h:medialab|p:www|p:publications|')
+            self.assertEqual(prefix, b's:http|h:fr|h:sciences-po|h:medialab|')
 
             # 3) With an upper webentity
-            traph.create_webentity(['s:http|h:fr|h:sciences-po|'])
-            prefix = traph.get_potential_prefix('s:http|h:fr|h:sciences-po|h:medialab|p:www|p:publications|')
-            self.assertEqual(prefix, 's:http|h:fr|h:sciences-po|h:medialab|')
+            traph.create_webentity([b's:http|h:fr|h:sciences-po|'])
+            prefix = traph.get_potential_prefix(b's:http|h:fr|h:sciences-po|h:medialab|p:www|p:publications|')
+            self.assertEqual(prefix, b's:http|h:fr|h:sciences-po|h:medialab|')
 
             # 4) Identity case
-            prefix = traph.get_potential_prefix('s:http|h:fr|h:sciences-po|h:medialab|')
-            self.assertEqual(prefix, 's:http|h:fr|h:sciences-po|h:medialab|')
+            prefix = traph.get_potential_prefix(b's:http|h:fr|h:sciences-po|h:medialab|')
+            self.assertEqual(prefix, b's:http|h:fr|h:sciences-po|h:medialab|')
 
     def test_long_stems(self):
         with self.open_traph() as traph:
 
-            traph.add_page('s:http|h:fr|h:sciences-po|p:thisisaveryveryveryverylooooooooooooooooongstem|p:thisalsoisquitethelongstemisntitnotsomuchtobehonest|')
-            traph.add_page('s:http|h:fr|h:sciences-po|p:sooooooofunnnnnnyyyyyyyyyyyyyyyyyyyyy|')
+            traph.add_page(b's:http|h:fr|h:sciences-po|p:thisisaveryveryveryverylooooooooooooooooongstem|p:thisalsoisquitethelongstemisntitnotsomuchtobehonest|')
+            traph.add_page(b's:http|h:fr|h:sciences-po|p:sooooooofunnnnnnyyyyyyyyyyyyyyyyyyyyy|')
 
             pages_in_traph = [lru for _, lru in traph.pages_iter()]
             for node in traph.lru_trie.nodes_iter():
@@ -192,8 +192,8 @@ class TestTraph(TraphTestCase):
             self.assertEqual(
                 set(pages_in_traph),
                 set([
-                    's:http|h:fr|h:sciences-po|p:thisisaveryveryveryverylooooooooooooooooongstem|p:thisalsoisquitethelongstemisntitnotsomuchtobehonest|',
-                    's:http|h:fr|h:sciences-po|p:sooooooofunnnnnnyyyyyyyyyyyyyyyyyyyyy|'
+                    b's:http|h:fr|h:sciences-po|p:thisisaveryveryveryverylooooooooooooooooongstem|p:thisalsoisquitethelongstemisntitnotsomuchtobehonest|',
+                    b's:http|h:fr|h:sciences-po|p:sooooooofunnnnnnyyyyyyyyyyyyyyyyyyyyy|'
                 ])
             )
 
@@ -201,22 +201,22 @@ class TestTraph(TraphTestCase):
         with self.open_traph() as traph:
             lru_trie = traph.lru_trie
 
-            report = traph.add_page('s:http|h:com|h:twitter|')
-            report += traph.add_page('s:http|h:com|h:twitter|p:yomgui|')
-            report += traph.add_page('s:http|h:com|h:twitter|p:boo|')
-            report += traph.add_page('s:http|h:com|h:twitter|p:boo|p:photos|')
+            report = traph.add_page(b's:http|h:com|h:twitter|')
+            report += traph.add_page(b's:http|h:com|h:twitter|p:yomgui|')
+            report += traph.add_page(b's:http|h:com|h:twitter|p:boo|')
+            report += traph.add_page(b's:http|h:com|h:twitter|p:boo|p:photos|')
 
-            child_webentities = traph.get_webentity_child_webentities(1, ['s:http|h:com|h:twitter|'])
+            child_webentities = traph.get_webentity_child_webentities(1, [b's:http|h:com|h:twitter|'])
 
             self.assertEqual(set(child_webentities), set([2, 3]))
 
             flag_tests = [
-                ('s:http|', True),
-                ('s:http|h:com|', True),
-                ('s:http|h:com|h:twitter|', True),
-                ('s:http|h:com|h:twitter|p:yomgui|', False),
-                ('s:http|h:com|h:twitter|p:boo|', False),
-                ('s:http|h:com|h:twitter|p:boo|p:photos|', False)
+                (b's:http|', True),
+                (b's:http|h:com|', True),
+                (b's:http|h:com|h:twitter|', True),
+                (b's:http|h:com|h:twitter|p:yomgui|', False),
+                (b's:http|h:com|h:twitter|p:boo|', False),
+                (b's:http|h:com|h:twitter|p:boo|p:photos|', False)
             ]
 
             for lru, flag in flag_tests:
@@ -225,7 +225,7 @@ class TestTraph(TraphTestCase):
                     flag
                 )
 
-            twitter_prefix = 's:http|h:com|h:twitter|'
+            twitter_prefix = b's:http|h:com|h:twitter|'
             twitter_node = lru_trie.lru_node(twitter_prefix)
 
             self.assertEqual(
@@ -239,22 +239,22 @@ class TestTraph(TraphTestCase):
 
     def test_get_webentity_pages(self):
         with self.open_traph() as traph:
-            traph.add_page('s:http|h:fr|h:sciences-po|h:medialab|')
+            traph.add_page(b's:http|h:fr|h:sciences-po|h:medialab|')
 
             self.assertEqual(
-                traph.get_webentity_pages(1, ['s:http|h:fr|h:sciences-po|h:medialab|']),
+                traph.get_webentity_pages(1, [b's:http|h:fr|h:sciences-po|h:medialab|']),
                 [
-                    {'crawled': False, 'lru': 's:http|h:fr|h:sciences-po|h:medialab|'}
+                    {'crawled': False, 'lru': b's:http|h:fr|h:sciences-po|h:medialab|'}
                 ]
             )
 
-            traph.add_page('s:http|h:fr|h:sciences-po|h:medialab|p:people|')
+            traph.add_page(b's:http|h:fr|h:sciences-po|h:medialab|p:people|')
 
             self.assertEqual(
-                traph.get_webentity_pages(1, ['s:http|h:fr|h:sciences-po|h:medialab|']),
+                traph.get_webentity_pages(1, [b's:http|h:fr|h:sciences-po|h:medialab|']),
                 [
-                    {'crawled': False, 'lru': 's:http|h:fr|h:sciences-po|h:medialab|'},
-                    {'crawled': False, 'lru': 's:http|h:fr|h:sciences-po|h:medialab|p:people|'}
+                    {'crawled': False, 'lru': b's:http|h:fr|h:sciences-po|h:medialab|'},
+                    {'crawled': False, 'lru': b's:http|h:fr|h:sciences-po|h:medialab|p:people|'}
                 ]
             )
 
@@ -262,48 +262,48 @@ class TestTraph(TraphTestCase):
         from test.config import WEBENTITY_CREATION_RULES_REGEXES
 
         with self.open_traph(default_webentity_creation_rule=WEBENTITY_CREATION_RULES_REGEXES['subdomain']) as traph:
-            traph.add_page('s:http|h:fr|h:sciences-po|h:medialab|')
+            traph.add_page(b's:http|h:fr|h:sciences-po|h:medialab|')
 
             traph.index_batch_crawl({
-                's:http|h:fr|h:sciences-po|h:medialab|': [
-                    's:http|h:fr|h:sciences-po|h:bibli|'
+                b's:http|h:fr|h:sciences-po|h:medialab|': [
+                    b's:http|h:fr|h:sciences-po|h:bibli|'
                 ]
             })
 
             self.assertEqual(
-                traph.get_webentity_pages(1, ['s:http|h:fr|h:sciences-po|h:medialab|']),
+                traph.get_webentity_pages(1, [b's:http|h:fr|h:sciences-po|h:medialab|']),
                 [
-                    {'crawled': True, 'lru': 's:http|h:fr|h:sciences-po|h:medialab|'}
+                    {'crawled': True, 'lru': b's:http|h:fr|h:sciences-po|h:medialab|'}
                 ]
             )
 
             self.assertEqual(
-                traph.get_webentity_pages(2, ['s:http|h:fr|h:sciences-po|h:bibli|']),
+                traph.get_webentity_pages(2, [b's:http|h:fr|h:sciences-po|h:bibli|']),
                 [
-                    {'crawled': False, 'lru': 's:http|h:fr|h:sciences-po|h:bibli|'}
+                    {'crawled': False, 'lru': b's:http|h:fr|h:sciences-po|h:bibli|'}
                 ]
             )
 
     def test_hyphe_issue444(self):
         with self.open_traph() as traph:
-            traph.add_page('s:http|h:fr|h:sciences-po|h:medialab|')
+            traph.add_page(b's:http|h:fr|h:sciences-po|h:medialab|')
 
             report = traph.index_batch_crawl({
-                's:http|h:fr|h:sciences-po|h:medialab|': [
-                    's:http|h:org|h:www|'
+                b's:http|h:fr|h:sciences-po|h:medialab|': [
+                    b's:http|h:org|h:www|'
                 ]
             })
 
             self.assertEqual(len(report.created_webentities), 1)
 
             self.assertEqual(
-                report.created_webentities.items()[0][1],
-                ['s:http|h:org|h:www|', 's:https|h:org|h:www|']
+                list(report.created_webentities.items())[0][1],
+                [b's:http|h:org|h:www|', b's:https|h:org|h:www|']
             )
 
     def test_clear(self):
         with self.open_traph() as traph:
-            traph.add_page('s:http|h:fr|h:sciences-po|h:medialab|')
+            traph.add_page(b's:http|h:fr|h:sciences-po|h:medialab|')
 
             self.assertEqual(traph.count_pages(), 1)
 

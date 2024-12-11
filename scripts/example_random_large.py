@@ -16,10 +16,10 @@ webentity_creation_rules_regexp = {
     'path2':        '(s:[a-zA-Z]+\\|(t:[0-9]+\\|)?(h:[^\\|]+\\|(h:[^\\|]+\\|)+|h:(localhost|(\\d{1,3}\\.){3}\\d{1,3}|\\[[\\da-f]*:[\\da-f:]*\\])\\|)(p:[^\\|]+\\|){2})',
 }
 
-print 'Default creation rule: subdomain'
+print('Default creation rule: subdomain')
 default_webentity_creation_rule = webentity_creation_rules_regexp['subdomain']
 
-print 'Custom creation rules: "Hodor" is path-2 platform and "Lorem Ipsum" is path-1 platform'
+print('Custom creation rules: "Hodor" is path-2 platform and "Lorem Ipsum" is path-1 platform')
 webentity_creation_rules = {
     's:http|h:com|h:hodor|': webentity_creation_rules_regexp['path2'],    
     's:http|h:com|h:lorem|h:ipsum|': webentity_creation_rules_regexp['path1'],    
@@ -63,7 +63,7 @@ for i in range(pages_count):
     lru = random_lru(voc, domain_sizes, path_sizes)
     crawled_pages.add(lru)
 
-print '\n:: %s pages generated. Generate and add links...' % (len(crawled_pages))
+print('\n:: %s pages generated. Generate and add links...' % (len(crawled_pages)))
 add_links_start = time.time()
 links_count = 0
 for lru in crawled_pages:
@@ -84,19 +84,19 @@ for lru in crawled_pages:
     # print '%s links for \t%s' % (len(links), lru)
 
 add_links_duration = time.time() - add_links_start
-print '\t...%s page links added in %s ms' % (format(links_count, ',.0f'), format(1000*add_links_duration, ',.0f') )
+print('\t...%s page links added in %s ms' % (format(links_count, ',.0f'), format(1000*add_links_duration, ',.0f') ))
 
-print '\n:: Stats'
-print ' - %s webentities (from Store)' % (format(len(webentity_store.data['webentities']), ',.0f'))
+print('\n:: Stats')
+print(' - %s webentities (from Store)' % (format(len(webentity_store.data['webentities']), ',.0f')))
 
-print '\n:: Get network...'
+print('\n:: Get network...')
 get_network_start = time.time()
 webentities_network = traph.get_webentities_links()
 get_network_duration = time.time() - get_network_start
 webentity_links_count = 0
-for source, targets in webentities_network.items():
+for source, targets in list(webentities_network.items()):
     webentity_links_count += len(targets)
-print '\t...%s webentity links obtained in %s ms' % (format(webentity_links_count, ',.0f'), format(1000*get_network_duration, ',.0f') )
+print('\t...%s webentity links obtained in %s ms' % (format(webentity_links_count, ',.0f'), format(1000*get_network_duration, ',.0f') ))
 
 # print '\n:: Breakdown by webentity'
 # webentities = set()

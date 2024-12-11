@@ -49,8 +49,8 @@ traph = Traph(overwrite=True, folder='./scripts/data/',
 trie = traph.lru_trie
 links = traph.link_store
 
-print trie.header
-print links.header
+print(trie.header)
+print(links.header)
 
 
 for page in PAGES:
@@ -59,15 +59,15 @@ for page in PAGES:
 traph.add_links(LINKS)
 
 for source_lru, target_lru in traph.links_iter():
-    print 'Source: %s, Target: %s' % (source_lru, target_lru)
+    print('Source: %s, Target: %s' % (source_lru, target_lru))
 
 for node in links.nodes_iter():
-    print node
+    print(node)
 
-print '\nDetailed DFS...'
+print('\nDetailed DFS...')
 g = nx.Graph()
 for state in trie.detailed_dfs_iter():
-    print state
+    print(state)
 
     g.add_node(state.node.block, label=state.node.char_as_str())
 
@@ -77,8 +77,8 @@ for state in trie.detailed_dfs_iter():
     if not state.node.is_root():
         g.add_edge(state.node.parent(), state.node.block)
 
-print '\nRepresentation:'
-print trie.representation()
+print('\nRepresentation:')
+print(trie.representation())
 
 # nx.write_gexf(g, './scripts/data/dump.gexf')
 

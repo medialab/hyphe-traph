@@ -114,7 +114,7 @@ class LinkStore(object):
             node.read_previous()
             weights[node.target()] += 1
 
-        for target, weight in weights.items():
+        for target, weight in list(weights.items()):
             yield target, weight
 
     def deduped_link_nodes_iter(self, block):

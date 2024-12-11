@@ -16,7 +16,7 @@ WEBENTITY_CREATION_RULES = {
 def compare_webentities(actual, expected):
     webentities = set()
 
-    for prefixes in actual.values():
+    for prefixes in list(actual.values()):
         webentities.add(webentity_label_from_prefixes(prefixes))
 
     return webentities == set(expected)
@@ -39,7 +39,7 @@ class TestCreationRules(TraphTestCase):
         webentities.update(report.created_webentities)
 
         self.assertWebentities(webentities, [
-            's:http|h:com|h:world|p:europe|'
+            b's:http|h:com|h:world|p:europe|'
         ])
 
         '''
@@ -51,8 +51,8 @@ class TestCreationRules(TraphTestCase):
         webentities.update(report.created_webentities)
 
         self.assertWebentities(webentities, [
-            's:http|h:com|h:world|p:europe|',
-            's:http|h:com|h:world|'
+            b's:http|h:com|h:world|p:europe|',
+            b's:http|h:com|h:world|'
         ])
 
         '''
@@ -60,15 +60,15 @@ class TestCreationRules(TraphTestCase):
         Expected: "Madrid" webentity created
         '''
         report = traph.add_webentity_creation_rule(
-            's:http|h:com|h:world|p:europe|p:spain|',
+            b's:http|h:com|h:world|p:europe|p:spain|',
             WEBENTITY_CREATION_RULES_REGEXES['path3']
         )
         webentities.update(report.created_webentities)
 
         self.assertWebentities(webentities, [
-            's:http|h:com|h:world|p:europe|',
-            's:http|h:com|h:world|',
-            's:http|h:com|h:world|p:europe|p:spain|p:madrid|'
+            b's:http|h:com|h:world|p:europe|',
+            b's:http|h:com|h:world|',
+            b's:http|h:com|h:world|p:europe|p:spain|p:madrid|'
         ])
 
         '''
@@ -77,16 +77,16 @@ class TestCreationRules(TraphTestCase):
         already is in a more precise web entity ("Madrid" too).
         '''
         report = traph.add_webentity_creation_rule(
-            's:http|h:com|h:world|',
+            b's:http|h:com|h:world|',
             WEBENTITY_CREATION_RULES_REGEXES['path2']
         )
         webentities.update(report.created_webentities)
 
         self.assertWebentities(webentities, [
-            's:http|h:com|h:world|p:europe|',
-            's:http|h:com|h:world|',
-            's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
-            's:http|h:com|h:world|p:asia|p:japan|'
+            b's:http|h:com|h:world|p:europe|',
+            b's:http|h:com|h:world|',
+            b's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
+            b's:http|h:com|h:world|p:asia|p:japan|'
         ])
 
         '''
@@ -97,32 +97,32 @@ class TestCreationRules(TraphTestCase):
         webentities.update(report.created_webentities)
 
         self.assertWebentities(webentities, [
-            's:http|h:com|h:world|p:europe|',
-            's:http|h:com|h:world|',
-            's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
-            's:http|h:com|h:world|p:asia|p:japan|',
-            's:http|h:com|h:world|p:europe|p:france|'
+            b's:http|h:com|h:world|p:europe|',
+            b's:http|h:com|h:world|',
+            b's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
+            b's:http|h:com|h:world|p:asia|p:japan|',
+            b's:http|h:com|h:world|p:europe|p:france|'
         ])
 
         '''
         Step 6: Remove the "Country" rule and add the "City" rule
         Expected: Create "Paris" and "Tokyo" ("Madrid" already exists)
         '''
-        traph.remove_webentity_creation_rule('s:http|h:com|h:world|')
+        traph.remove_webentity_creation_rule(b's:http|h:com|h:world|')
         report = traph.add_webentity_creation_rule(
-            's:http|h:com|h:world|',
+            b's:http|h:com|h:world|',
             WEBENTITY_CREATION_RULES_REGEXES['path3']
         )
         webentities.update(report.created_webentities)
 
         self.assertWebentities(webentities, [
-            's:http|h:com|h:world|p:europe|',
-            's:http|h:com|h:world|',
-            's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
-            's:http|h:com|h:world|p:asia|p:japan|',
-            's:http|h:com|h:world|p:europe|p:france|',
-            's:http|h:com|h:world|p:europe|p:france|p:paris|',
-            's:http|h:com|h:world|p:asia|p:japan|p:tokyo|'
+            b's:http|h:com|h:world|p:europe|',
+            b's:http|h:com|h:world|',
+            b's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
+            b's:http|h:com|h:world|p:asia|p:japan|',
+            b's:http|h:com|h:world|p:europe|p:france|',
+            b's:http|h:com|h:world|p:europe|p:france|p:paris|',
+            b's:http|h:com|h:world|p:asia|p:japan|p:tokyo|'
         ])
 
         '''
@@ -131,19 +131,19 @@ class TestCreationRules(TraphTestCase):
         webentities (cities). "Spain" still does not exist.
         '''
         report = traph.add_webentity_creation_rule(
-            's:http|h:com|h:world|p:europe|',
+            b's:http|h:com|h:world|p:europe|',
             WEBENTITY_CREATION_RULES_REGEXES['path2']
         )
         webentities.update(report.created_webentities)
 
         self.assertWebentities(webentities, [
-            's:http|h:com|h:world|p:europe|',
-            's:http|h:com|h:world|',
-            's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
-            's:http|h:com|h:world|p:asia|p:japan|',
-            's:http|h:com|h:world|p:europe|p:france|',
-            's:http|h:com|h:world|p:europe|p:france|p:paris|',
-            's:http|h:com|h:world|p:asia|p:japan|p:tokyo|'
+            b's:http|h:com|h:world|p:europe|',
+            b's:http|h:com|h:world|',
+            b's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
+            b's:http|h:com|h:world|p:asia|p:japan|',
+            b's:http|h:com|h:world|p:europe|p:france|',
+            b's:http|h:com|h:world|p:europe|p:france|p:paris|',
+            b's:http|h:com|h:world|p:asia|p:japan|p:tokyo|'
         ])
 
         '''
@@ -157,14 +157,14 @@ class TestCreationRules(TraphTestCase):
         webentities.update(report.created_webentities)
 
         self.assertWebentities(webentities, [
-            's:http|h:com|h:world|p:europe|',
-            's:http|h:com|h:world|',
-            's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
-            's:http|h:com|h:world|p:asia|p:japan|',
-            's:http|h:com|h:world|p:europe|p:france|',
-            's:http|h:com|h:world|p:europe|p:france|p:paris|',
-            's:http|h:com|h:world|p:asia|p:japan|p:tokyo|',
-            's:http|h:com|h:world|p:europe|p:germany|p:berlin|'
+            b's:http|h:com|h:world|p:europe|',
+            b's:http|h:com|h:world|',
+            b's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
+            b's:http|h:com|h:world|p:asia|p:japan|',
+            b's:http|h:com|h:world|p:europe|p:france|',
+            b's:http|h:com|h:world|p:europe|p:france|p:paris|',
+            b's:http|h:com|h:world|p:asia|p:japan|p:tokyo|',
+            b's:http|h:com|h:world|p:europe|p:germany|p:berlin|'
         ])
 
         '''
@@ -176,26 +176,26 @@ class TestCreationRules(TraphTestCase):
         webentities.update(report.created_webentities)
 
         self.assertWebentities(webentities, [
-            's:http|h:com|h:world|p:europe|',
-            's:http|h:com|h:world|',
-            's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
-            's:http|h:com|h:world|p:asia|p:japan|',
-            's:http|h:com|h:world|p:europe|p:france|',
-            's:http|h:com|h:world|p:europe|p:france|p:paris|',
-            's:http|h:com|h:world|p:asia|p:japan|p:tokyo|',
-            's:http|h:com|h:world|p:europe|p:germany|p:berlin|',
-            's:http|h:com|h:world|p:europe|p:spain|p:barcelona|'
+            b's:http|h:com|h:world|p:europe|',
+            b's:http|h:com|h:world|',
+            b's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
+            b's:http|h:com|h:world|p:asia|p:japan|',
+            b's:http|h:com|h:world|p:europe|p:france|',
+            b's:http|h:com|h:world|p:europe|p:france|p:paris|',
+            b's:http|h:com|h:world|p:asia|p:japan|p:tokyo|',
+            b's:http|h:com|h:world|p:europe|p:germany|p:berlin|',
+            b's:http|h:com|h:world|p:europe|p:spain|p:barcelona|'
         ])
 
         # Testing the inserted pages
         pages_in_traph = set(lru for _, lru in traph.pages_iter())
 
         self.assertTrue(pages_in_traph == set([
-            's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
-            's:http|h:com|h:world|p:europe|p:spain|p:barcelona|',
-            's:http|h:com|h:world|p:europe|p:france|p:paris|',
-            's:http|h:com|h:world|p:europe|p:germany|p:berlin|',
-            's:http|h:com|h:world|p:asia|p:japan|p:tokyo|'
+            b's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
+            b's:http|h:com|h:world|p:europe|p:spain|p:barcelona|',
+            b's:http|h:com|h:world|p:europe|p:france|p:paris|',
+            b's:http|h:com|h:world|p:europe|p:germany|p:berlin|',
+            b's:http|h:com|h:world|p:asia|p:japan|p:tokyo|'
         ]))
 
         traph.close()

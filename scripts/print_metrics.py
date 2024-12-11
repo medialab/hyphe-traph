@@ -1,4 +1,4 @@
-from __future__ import print_function
+
 
 import sys
 from traph import Traph
@@ -6,10 +6,10 @@ from traph import Traph
 traph = Traph(folder=sys.argv[1], debug=True)
 metrics = traph.metrics()
 
-for name, metrics in metrics.items():
+for name, metrics in list(metrics.items()):
     print(name)
 
-    for k, v in metrics.items():
+    for k, v in list(metrics.items()):
         print('  ', k, v)
 
     print()

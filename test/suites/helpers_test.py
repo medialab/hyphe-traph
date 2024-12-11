@@ -25,36 +25,36 @@ class TestHelpers(TestCase):
 
     def test_lru_variations(self):
         self.assertEqual(
-            set(lru_variations('s:http|h:fr|h:sciences-po|h:medialab|')),
+            set(lru_variations(b's:http|h:fr|h:sciences-po|h:medialab|')),
             set([
-                's:http|h:fr|h:sciences-po|h:medialab|',
-                's:https|h:fr|h:sciences-po|h:medialab|',
-                's:http|h:fr|h:sciences-po|h:medialab|h:www|',
-                's:https|h:fr|h:sciences-po|h:medialab|h:www|'
+                b's:http|h:fr|h:sciences-po|h:medialab|',
+                b's:https|h:fr|h:sciences-po|h:medialab|',
+                b's:http|h:fr|h:sciences-po|h:medialab|h:www|',
+                b's:https|h:fr|h:sciences-po|h:medialab|h:www|'
             ])
         )
 
     def test_lru_iter(self):
         self.assertEqual(
-            list(lru_iter('s:http|h:fr|h:sciences-po|h:medialab|')),
-            ['s:http|', 'h:fr|', 'h:sciences-po|', 'h:medialab|']
+            list(lru_iter(b's:http|h:fr|h:sciences-po|h:medialab|')),
+            [b's:http|', b'h:fr|', b'h:sciences-po|', b'h:medialab|']
         )
 
     def test_lru_dirname(self):
         self.assertEqual(
-            lru_dirname('s:http|h:fr|h:sciences-po|h:medialab|'),
-            's:http|h:fr|h:sciences-po|'
+            lru_dirname(b's:http|h:fr|h:sciences-po|h:medialab|'),
+            b's:http|h:fr|h:sciences-po|'
         )
 
     def test_chunks_iter(self):
         self.assertEqual(
-            list(chunks_iter(5, 's:http|h:fr|h:sciences-po|h:medialab|')),
-            ['s:htt', 'p|h:f', 'r|h:s', 'cienc', 'es-po', '|h:me', 'diala', 'b|']
+            list(chunks_iter(5, b's:http|h:fr|h:sciences-po|h:medialab|')),
+            [b's:htt', b'p|h:f', b'r|h:s', b'cienc', b'es-po', b'|h:me', b'diala', b'b|']
         )
 
         self.assertEqual(
-            list(chunks_iter(7, 's:http|h:fr|h:sciences-po|h:medialab|')),
-            ['s:http|', 'h:fr|h:', 'science', 's-po|h:', 'mediala', 'b|']
+            list(chunks_iter(7, b's:http|h:fr|h:sciences-po|h:medialab|')),
+            [b's:http|', b'h:fr|h:', b'science', b's-po|h:', b'mediala', b'b|']
         )
 
     def test_base4_append(self):

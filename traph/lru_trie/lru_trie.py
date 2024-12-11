@@ -96,7 +96,7 @@ class LRUTrie(object):
         i = 0
         history = LRUTrieWalkHistory(lru)
         node = self.root()
-        lru = ''
+        lru = b''
 
         # Descending the trie
         while i < l:
@@ -232,7 +232,7 @@ class LRUTrie(object):
         history = LRUTrieWalkHistory(lru)
 
         stems = list(lru_iter(lru))
-        lru = ''
+        lru = b''
         l = len(stems)
 
         for i in range(l):
@@ -325,7 +325,7 @@ class LRUTrie(object):
             parent.read_parent()
             yield parent
 
-    def dfs_iter(self, starting_node=None, starting_lru='', skip_childless_paths=False):
+    def dfs_iter(self, starting_node=None, starting_lru=b'', skip_childless_paths=False):
         '''
         Note that childless_paths refers to the upper webentity tree, not
         the pages' one.

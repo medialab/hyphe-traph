@@ -25,20 +25,20 @@ root_lru = 's:https|h:com|h:complete_website|p:base1|p:base2|'
 K = 3000
 D = 1
 
-print 'Expecting %i links' % (K * K * D)
+print('Expecting %i links' % (K * K * D))
 
 batch_crawl = {}
 
-for i in xrange(K):
+for i in range(K):
 
     source_lru = '%sp:leaf%i|' % (root_lru, i)
     links = []
 
-    for j in xrange(K):
+    for j in range(K):
         target_lru = '%sp:leaf%i|' % (root_lru, j)
 
         # NOTE: link duplication
-        for _ in xrange(D):
+        for _ in range(D):
             links.append(target_lru)
 
     random.shuffle(links)
@@ -46,5 +46,5 @@ for i in xrange(K):
 
 traph.index_batch_crawl(batch_crawl)
 
-print 'Got %i links' % traph.link_store.count_links()
-print 'Max inlinks: %i' % traph.links_metrics()['max_inlinks_len']
+print('Got %i links' % traph.link_store.count_links())
+print('Max inlinks: %i' % traph.links_metrics()['max_inlinks_len'])

@@ -32,10 +32,10 @@ while True:
     if token is None:
         break
 
-    print 'Token:', token, explain_token(token), int_to_base4(parse_pagination_token(token)[1]), parse_pagination_token(token)
+    print('Token:', token, explain_token(token), int_to_base4(parse_pagination_token(token)[1]), parse_pagination_token(token))
 
-print sum(r['count_sourcepages'] for r in results)
-print sum(r['count_pagelinks'] for r in results)
+print(sum(r['count_sourcepages'] for r in results))
+print(sum(r['count_pagelinks'] for r in results))
 # print sum(r['count'] for r in results)
 # print sum(len(r['pages']) for r in results)
 
@@ -45,4 +45,4 @@ for r in results:
     for p in r['pagelinks']:
         uniques.add((p[0], p[1]))
 
-print len(uniques)
+print(len(uniques))

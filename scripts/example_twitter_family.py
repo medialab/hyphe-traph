@@ -80,31 +80,31 @@ traph = Traph(overwrite=True, folder='./scripts/data/',
               webentity_creation_rules=webentity_creation_rules)
 
 # Store data
-print 'Store pages...'
+print('Store pages...')
 for page in PAGES:
     report = traph.add_page(page)
     webentity_store.data['webentities'].update(report.created_webentities)
     # print report
 
-print 'Store links...'
+print('Store links...')
 links_report = traph.add_links(LINKS)
 webentity_store.data['webentities'].update(links_report.created_webentities)
 # print links_report
 
-print '...data stored.'
+print('...data stored.')
 
 # Log result
-print '\nPages:'
+print('\nPages:')
 for node, lru in traph.pages_iter():
-    print ' - '+lru
+    print(' - '+lru)
 
-print '\nPage Links:'
+print('\nPage Links:')
 for source_lru, target_lru in traph.links_iter():
-    print ' - %s\t->  %s' % (source_lru, target_lru)
+    print(' - %s\t->  %s' % (source_lru, target_lru))
 
-print '\nWebentities:'
-for weid, prefixes in webentity_store.data['webentities'].items():
-    print ' - Webentity %s\t%s + %s other prefixes' % (weid, prefixes[0], len(prefixes)-1)
+print('\nWebentities:')
+for weid, prefixes in list(webentity_store.data['webentities'].items()):
+    print(' - Webentity %s\t%s + %s other prefixes' % (weid, prefixes[0], len(prefixes)-1))
 
 # import networkx as nx
 

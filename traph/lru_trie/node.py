@@ -96,7 +96,7 @@ class LRUTrieNode(object):
         self.storage = storage
         self.block = None
         self.exists = False
-        self.tail = ''
+        self.tail = b''
 
         # Loading node from storage
         if block is not None:
@@ -109,7 +109,7 @@ class LRUTrieNode(object):
             self.__set_default_data(stem)
 
     def __set_default_data(self, stem=None):
-        self.data = ['', DEFAULT_FLAGS_VALUE] + [0] * LRU_TRIE_NODE_REGISTERS
+        self.data = [b'', DEFAULT_FLAGS_VALUE] + [0] * LRU_TRIE_NODE_REGISTERS
 
         if stem is not None:
             self.set_stem(stem)
@@ -154,12 +154,12 @@ class LRUTrieNode(object):
         if data is None:
             self.exists = False
             self.__set_default_data()
-            self.tail = ''
+            self.tail = b''
         else:
             self.exists = True
             self.data = self.unpack(data)
             self.block = block
-            self.tail = ''
+            self.tail = b''
 
             # Reading the tail recursively
             # TODO: it's possible not to read the tail in some cases
@@ -177,7 +177,7 @@ class LRUTrieNode(object):
                     if not test(data, LRU_TRIE_NODE_FLAGS, LRU_TRIE_NODE_FLAG_HAS_TAIL):
                         break
 
-                self.tail = ''.join(chunks)
+                self.tail = b''.join(chunks)
 
     # re-acquiring data from storage because it may have changed
     def refresh(self):

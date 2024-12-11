@@ -28,19 +28,19 @@ OPS_TO_BASE4 = {
 }
 
 
-def https_variation(lru):
+def https_variation(lru: bytes):
     '''
     Returning the http(s) variation of the given lru
     '''
 
-    if 's:http|' in lru:
-        return lru.replace('s:http|', 's:https|', 1)
-    if 's:https|' in lru:
-        return lru.replace('s:https|', 's:http|', 1)
+    if b's:http|' in lru:
+        return lru.replace(b's:http|', b's:https|', 1)
+    if b's:https|' in lru:
+        return lru.replace(b's:https|', b's:http|', 1)
     return None
 
 
-def lru_variations(lru):
+def lru_variations(lru: bytes):
     '''
     Returning the www/http(s) variations of the given lru
     '''
@@ -52,40 +52,41 @@ def lru_variations(lru):
     https_var = https_variation(lru)
     if https_var:
         variations.append(https_var)
-    stems = lru.split('|')
-    hosts = [s for s in stems if s.startswith('h:')]
-    hosts_str = '|'.join(hosts) + '|'
+    stems = lru.split(b'|')
+    hosts = [s for s in stems if s.startswith(b'h:')]
+    hosts_str = b'|'.join(hosts) + b'|'
     if len(hosts) == 1:
         return variations
-    if hosts[-1] == 'h:www':
+    if hosts[-1] == b'h:www':
         hosts.pop(-1)
     else:
-        hosts.append('h:www')
+        hosts.append(b'h:www')
     if len(hosts) == 1:
-        return(variations)
-    www_hosts_var = '|'.join(hosts) + '|'
+        return variations
+    www_hosts_var = b'|'.join(hosts) + b'|'
     variations.append(lru.replace(hosts_str, www_hosts_var, 1))
     if https_var:
         variations.append(https_var.replace(hosts_str, www_hosts_var, 1))
     return variations
 
 
-def lru_iter(lru):
+def lru_iter(lru: bytes):
     '''
     Returning an iterator over a lru's stems.
     '''
     last = 0
-    for i in xrange(len(lru)):
-        if lru[i] == '|':
+    for i in range(len(lru)):
+        # Indexing bytestring returns byte
+        if lru[i:i+1] == b'|':
             yield lru[last:i + 1]
             last = i + 1
 
 
-def lru_dirname(lru):
-    return ''.join(list(lru_iter(lru))[:-1])
+def lru_dirname(lru: bytes):
+    return b''.join(list(lru_iter(lru))[:-1])
 
 
-def detailed_chunks_iter(chunk_size, string):
+def detailed_chunks_iter(chunk_size: int, string: bytes):
     '''
     Returning an iterator over a string's chunks of the given size.
     '''
@@ -94,12 +95,12 @@ def detailed_chunks_iter(chunk_size, string):
 
     nb_chunks = int(math.ceil(len(string) / float(chunk_size)))
 
-    for chunk in xrange(nb_chunks):
+    for chunk in range(nb_chunks):
         start = chunk * chunk_size
         yield chunk == nb_chunks - 1, string[start:start + chunk_size]
 
 
-def chunks_iter(chunk_size, string):
+def chunks_iter(chunk_size: int, string: bytes):
     for _, chunk in detailed_chunks_iter(chunk_size, string):
         yield chunk
 
@@ -147,7 +148,7 @@ def base64_to_int(s):
     p = 1
     x = 0
 
-    for i in xrange(l - 1, -1, -1):
+    for i in range(l - 1, -1, -1):
         c = s[i]
         v = BASE64_INDEX[c]
 

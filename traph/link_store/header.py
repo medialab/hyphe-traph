@@ -39,7 +39,7 @@ class LinkStoreHeader(object):
         # Properties
         self.storage = storage
         self.data = [
-            TRAPH_VERSION  # Traph version
+            TRAPH_VERSION.encode()  # Traph version
         ] * LINK_STORE_HEADER_BLOCKS
 
         self.__ensure()

@@ -33,9 +33,9 @@ traph = Traph(overwrite=True, folder='./scripts/data/',
               default_webentity_creation_rule=default_webentity_creation_rule,
               webentity_creation_rules=webentity_creation_rules)
 
-print '\n:: Setup'
+print('\n:: Setup')
 
-print '- Create a "Twitter" webentity with the 4 prefix variations (WWW and HTTPS cases)'
+print('- Create a "Twitter" webentity with the 4 prefix variations (WWW and HTTPS cases)')
 twitter_prefixes = [
     's:http|h:com|h:twitter|',
     's:http|h:com|h:twitter|h:www|',
@@ -44,9 +44,9 @@ twitter_prefixes = [
 ]
 report = traph.create_webentity(twitter_prefixes)
 webentity_store.data['webentities'].update(report.created_webentities)
-twitter_weid = report.created_webentities.keys()[0] # Used below
+twitter_weid = list(report.created_webentities.keys())[0] # Used below
 
-print '- Create a "Ego" webentity with ego.com (4 prefixes) as well as a Twitter account (additional 4 prefixes)'
+print('- Create a "Ego" webentity with ego.com (4 prefixes) as well as a Twitter account (additional 4 prefixes)')
 ego_prefixes = [
     's:http|h:com|h:ego|',
     's:http|h:com|h:ego|h:www|',
@@ -59,9 +59,9 @@ ego_prefixes = [
 ]
 report = traph.create_webentity(ego_prefixes)
 webentity_store.data['webentities'].update(report.created_webentities)
-ego_weid = report.created_webentities.keys()[0] # Used below
+ego_weid = list(report.created_webentities.keys())[0] # Used below
 
-print '- Create a "Cheese" webentity with cheese.ego.com, Tweets about cheese  and cheese.fr (12 prefixes)'
+print('- Create a "Cheese" webentity with cheese.ego.com, Tweets about cheese  and cheese.fr (12 prefixes)')
 cheese_prefixes = [
     's:http|h:fr|h:cheese|',
     's:http|h:fr|h:cheese|h:www|',
@@ -78,42 +78,42 @@ cheese_prefixes = [
 ]
 report = traph.create_webentity(cheese_prefixes)
 webentity_store.data['webentities'].update(report.created_webentities)
-cheese_weid = report.created_webentities.keys()[0] # Used below
+cheese_weid = list(report.created_webentities.keys())[0] # Used below
 
-print '\n:: Stats'
-print '- %s webentities in the Store' % (len(webentity_store.data['webentities']))
+print('\n:: Stats')
+print('- %s webentities in the Store' % (len(webentity_store.data['webentities'])))
 webentities = set()
 for node, lru in traph.webentity_prefix_iter():
     webentities.add(node.webentity())
-print '- %s webentities in the Traph' % (len(webentities))
+print('- %s webentities in the Traph' % (len(webentities)))
 pages = []
 for node, lru in traph.lru_trie.dfs_iter():
     if node.is_page():
         pages.append(lru)
-print '- %s pages in the Traph' % (len(pages))
+print('- %s pages in the Traph' % (len(pages)))
 
 
-print '\n:: Results - Breakdown by webentity'
+print('\n:: Results - Breakdown by webentity')
 for weid in webentities:
-    print '\nWebentity %s' % (weid)
+    print('\nWebentity %s' % (weid))
     
     we_prefixes = webentity_store.data['webentities'][weid]
-    print ' - %s prefixes (store)' % (len(we_prefixes))
+    print(' - %s prefixes (store)' % (len(we_prefixes)))
     
     for prefix in we_prefixes:
-        print ' \t- %s' % (prefix)
+        print(' \t- %s' % (prefix))
     
     parent_webentities = traph.get_webentity_parent_webentities(weid, we_prefixes)
-    print ' - %s parent webentities (traph)' % (len(parent_webentities))
+    print(' - %s parent webentities (traph)' % (len(parent_webentities)))
     
     for parent_weid in parent_webentities:
-        print ' \t- webentity %s' % (parent_weid)
+        print(' \t- webentity %s' % (parent_weid))
 
     child_webentities = traph.get_webentity_child_webentities(weid, we_prefixes)
-    print ' - %s child webentities (traph)' % (len(child_webentities))
+    print(' - %s child webentities (traph)' % (len(child_webentities)))
     
     for child_weid in child_webentities:
-        print ' \t- webentity %s' % (child_weid)
+        print(' \t- webentity %s' % (child_weid))
 
 
 traph.close()

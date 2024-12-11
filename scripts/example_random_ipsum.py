@@ -33,7 +33,7 @@ traph = Traph(overwrite=True, folder='./scripts/data/',
 
 # Generate random pages
 pages_count = 100
-print '\n:: Generate %s lorem-ipsum-based pages' % (pages_count)
+print('\n:: Generate %s lorem-ipsum-based pages' % (pages_count))
 voc = ['lorem', 'ipsum', 'dolor', 'sit', 'amet', 'hodor', 'consectetur']
 path_sizes = [1,2,3]
 for i in range(pages_count):
@@ -49,21 +49,21 @@ for i in range(pages_count):
     report = traph.add_page(lru)
     webentity_store.data['webentities'].update(report.created_webentities)
 
-print '\n:: Webentities'
-print '\nExisting webentities from Store:'
-for weid, prefixes in webentity_store.data['webentities'].items():
-    print ' - Webentity %s:' % (weid)
+print('\n:: Webentities')
+print('\nExisting webentities from Store:')
+for weid, prefixes in list(webentity_store.data['webentities'].items()):
+    print(' - Webentity %s:' % (weid))
     for prefix in prefixes:
-        print '\t\t' + prefix
+        print('\t\t' + prefix)
 
-print '\nPrefixes from Traph:'
+print('\nPrefixes from Traph:')
 for node, lru in traph.webentity_prefix_iter():
-    print ' - (%s) \t%s' % (node.webentity(), lru)
+    print(' - (%s) \t%s' % (node.webentity(), lru))
 
-print '\n:: Pages in "Lorem" webentity'
+print('\n:: Pages in "Lorem" webentity')
 lorem_weid = traph.get_webentity_by_prefix('s:http|h:com|h:lorem|')
 lorem_prefixes = webentity_store.data['webentities'][lorem_weid]
 for lru in traph.get_webentity_pages(lorem_weid, lorem_prefixes):
-    print ' - %s' % (lru)
+    print(' - %s' % (lru))
 
 traph.close()

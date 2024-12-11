@@ -14,7 +14,7 @@ class TestNetwork(TraphTestCase):
 
     def test_network(self):
         creation_rules = {
-            's:http|h:com|h:world|': WEBENTITY_CREATION_RULES_REGEXES['path1']
+            b's:http|h:com|h:world|': WEBENTITY_CREATION_RULES_REGEXES['path1']
         }
 
         webentities = {}
@@ -22,16 +22,16 @@ class TestNetwork(TraphTestCase):
         with self.open_traph(webentity_creation_rules=creation_rules) as traph:
 
             report = traph.index_batch_crawl({
-                's:http|h:com|h:world|p:europe|p:spain|': [
-                    's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
-                    's:http|h:com|h:world|p:america|'
+                b's:http|h:com|h:world|p:europe|p:spain|': [
+                    b's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
+                    b's:http|h:com|h:world|p:america|'
                 ],
-                's:http|h:com|h:world|p:america|': [
-                    's:http|h:com|h:world|p:asia|'
+                b's:http|h:com|h:world|p:america|': [
+                    b's:http|h:com|h:world|p:asia|'
                 ]
             })
 
-            for weid, prefixes in report.created_webentities.items():
+            for weid, prefixes in list(report.created_webentities.items()):
                 webentities[weid] = webentity_label_from_prefixes(prefixes)
 
             # Normal network
@@ -47,11 +47,11 @@ class TestNetwork(TraphTestCase):
             legible = legible_network(webentities, network)
 
             self.assertIdenticalMultimaps(legible, {
-                's:http|h:com|h:world|p:europe|': [
-                    's:http|h:com|h:world|p:america|'
+                b's:http|h:com|h:world|p:europe|': [
+                    b's:http|h:com|h:world|p:america|'
                 ],
-                's:http|h:com|h:world|p:america|': [
-                    's:http|h:com|h:world|p:asia|'
+                b's:http|h:com|h:world|p:america|': [
+                    b's:http|h:com|h:world|p:asia|'
                 ]
             })
 
@@ -59,12 +59,12 @@ class TestNetwork(TraphTestCase):
             network = legible_network(webentities, traph.get_webentities_links(include_auto=True))
 
             self.assertIdenticalMultimaps(network, {
-                's:http|h:com|h:world|p:europe|': [
-                    's:http|h:com|h:world|p:america|',
-                    's:http|h:com|h:world|p:europe|'
+                b's:http|h:com|h:world|p:europe|': [
+                    b's:http|h:com|h:world|p:america|',
+                    b's:http|h:com|h:world|p:europe|'
                 ],
-                's:http|h:com|h:world|p:america|': [
-                    's:http|h:com|h:world|p:asia|'
+                b's:http|h:com|h:world|p:america|': [
+                    b's:http|h:com|h:world|p:asia|'
                 ]
             })
 
@@ -72,29 +72,29 @@ class TestNetwork(TraphTestCase):
             network = legible_network(webentities, traph.get_webentities_links(out=False))
 
             self.assertIdenticalMultimaps(network, {
-                's:http|h:com|h:world|p:america|': [
-                    's:http|h:com|h:world|p:europe|'
+                b's:http|h:com|h:world|p:america|': [
+                    b's:http|h:com|h:world|p:europe|'
                 ],
-                's:http|h:com|h:world|p:asia|': [
-                    's:http|h:com|h:world|p:america|'
+                b's:http|h:com|h:world|p:asia|': [
+                    b's:http|h:com|h:world|p:america|'
                 ]
             })
 
             report = traph.add_pages([
-                's:http|h:com|h:world|p:africa|',
-                's:http|h:com|h:world|p:oceania|',
+                b's:http|h:com|h:world|p:africa|',
+                b's:http|h:com|h:world|p:oceania|',
             ])
 
-            for weid, prefixes in report.created_webentities.items():
+            for weid, prefixes in list(report.created_webentities.items()):
                 webentities[weid] = webentity_label_from_prefixes(prefixes)
 
             traph.add_links([
-                ('s:http|h:com|h:world|p:america|', 's:http|h:com|h:world|p:africa|p:raba|'),
-                ('s:http|h:com|h:world|p:asia|', 's:http|h:com|h:world|p:africa|p:raba|'),
-                ('s:http|h:com|h:world|p:europe|p:spain|p:madrid|', 's:http|h:com|h:world|p:africa|p:raba|'),
-                ('s:http|h:com|h:world|p:asia|', 's:http|h:com|h:world|p:africa|p:tunis|'),
-                ('s:http|h:com|h:world|p:europe|p:spain|p:madrid|', 's:http|h:com|h:world|p:africa|p:tunis|'),
-                ('s:http|h:com|h:world|p:europe|p:spain|p:madrid|', 's:http|h:com|h:world|p:africa|p:bamako|')
+                (b's:http|h:com|h:world|p:america|', b's:http|h:com|h:world|p:africa|p:raba|'),
+                (b's:http|h:com|h:world|p:asia|', b's:http|h:com|h:world|p:africa|p:raba|'),
+                (b's:http|h:com|h:world|p:europe|p:spain|p:madrid|', b's:http|h:com|h:world|p:africa|p:raba|'),
+                (b's:http|h:com|h:world|p:asia|', b's:http|h:com|h:world|p:africa|p:tunis|'),
+                (b's:http|h:com|h:world|p:europe|p:spain|p:madrid|', b's:http|h:com|h:world|p:africa|p:tunis|'),
+                (b's:http|h:com|h:world|p:europe|p:spain|p:madrid|', b's:http|h:com|h:world|p:africa|p:bamako|')
             ])
 
             network = legible_network(webentities, traph.get_webentities_links())
@@ -102,99 +102,99 @@ class TestNetwork(TraphTestCase):
             self.assertEqual(traph.count_pages(), 9)
 
             self.assertIdenticalMultimaps(network, {
-                's:http|h:com|h:world|p:europe|': [
-                    's:http|h:com|h:world|p:america|',
-                    's:http|h:com|h:world|p:africa|'
+                b's:http|h:com|h:world|p:europe|': [
+                    b's:http|h:com|h:world|p:america|',
+                    b's:http|h:com|h:world|p:africa|'
                 ],
-                's:http|h:com|h:world|p:america|': [
-                    's:http|h:com|h:world|p:africa|',
-                    's:http|h:com|h:world|p:asia|'
+                b's:http|h:com|h:world|p:america|': [
+                    b's:http|h:com|h:world|p:africa|',
+                    b's:http|h:com|h:world|p:asia|'
                 ],
-                's:http|h:com|h:world|p:asia|': [
-                    's:http|h:com|h:world|p:africa|'
+                b's:http|h:com|h:world|p:asia|': [
+                    b's:http|h:com|h:world|p:africa|'
                 ]
             })
 
-            europe_pages = traph.get_webentity_pages(1, ['s:http|h:com|h:world|p:europe|'])
+            europe_pages = traph.get_webentity_pages(1, [b's:http|h:com|h:world|p:europe|'])
 
             self.assertEqual(set(page['lru'] for page in europe_pages), set([
-                's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
-                's:http|h:com|h:world|p:europe|p:spain|'
+                b's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
+                b's:http|h:com|h:world|p:europe|p:spain|'
             ]))
 
             most_linked_pages = traph.get_webentity_most_linked_pages(
                 4,
-                ['s:http|h:com|h:world|p:africa|']
+                [b's:http|h:com|h:world|p:africa|']
             )
 
             self.assertEqual(
                 set((page['lru'], page['indegree']) for page in most_linked_pages),
                 set([
-                    ('s:http|h:com|h:world|p:africa|p:raba|', 3),
-                    ('s:http|h:com|h:world|p:africa|p:tunis|', 2),
-                    ('s:http|h:com|h:world|p:africa|', 1),
-                    ('s:http|h:com|h:world|p:africa|p:bamako|', 1)
+                    (b's:http|h:com|h:world|p:africa|p:raba|', 3),
+                    (b's:http|h:com|h:world|p:africa|p:tunis|', 2),
+                    (b's:http|h:com|h:world|p:africa|', 1),
+                    (b's:http|h:com|h:world|p:africa|p:bamako|', 1)
                 ])
             )
 
             most_linked_pages = traph.get_webentity_most_linked_pages(
                 4,
-                ['s:http|h:com|h:world|p:africa|'],
+                [b's:http|h:com|h:world|p:africa|'],
                 pages_count=2
             )
 
             self.assertEqual(
                 set((page['lru'], page['indegree']) for page in most_linked_pages),
                 set([
-                    ('s:http|h:com|h:world|p:africa|p:raba|', 3),
-                    ('s:http|h:com|h:world|p:africa|p:tunis|', 2)
+                    (b's:http|h:com|h:world|p:africa|p:raba|', 3),
+                    (b's:http|h:com|h:world|p:africa|p:tunis|', 2)
                 ])
             )
 
             most_linked_pages = traph.get_webentity_most_linked_pages(
                 4,
-                ['s:http|h:com|h:world|p:africa|'],
+                [b's:http|h:com|h:world|p:africa|'],
                 max_depth=0
             )
 
             self.assertEqual(
                 set((page['lru'], page['indegree']) for page in most_linked_pages),
                 set([
-                    ('s:http|h:com|h:world|p:africa|', 1)
+                    (b's:http|h:com|h:world|p:africa|', 1)
                 ])
             )
 
     def test_network_with_multiple_root_stems(self):
         creation_rules = {
-            's:http|h:com|h:world|': WEBENTITY_CREATION_RULES_REGEXES['path1']
+            b's:http|h:com|h:world|': WEBENTITY_CREATION_RULES_REGEXES['path1']
         }
 
         webentities = {}
 
         with self.open_traph(webentity_creation_rules=creation_rules) as traph:
             report = traph.index_batch_crawl({
-                's:http|h:com|h:world|p:europe|p:spain|': [
-                    's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
-                    's:http|h:com|h:world|p:america|'
+                b's:http|h:com|h:world|p:europe|p:spain|': [
+                    b's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
+                    b's:http|h:com|h:world|p:america|'
                 ],
-                's:http|h:com|h:world|p:america|': [
-                    's:http|h:com|h:world|p:asia|',
-                    's:https|h:com|h:world|p:africa|'
+                b's:http|h:com|h:world|p:america|': [
+                    b's:http|h:com|h:world|p:asia|',
+                    b's:https|h:com|h:world|p:africa|'
                 ]
             })
 
-            for weid, prefixes in report.created_webentities.items():
+            for weid, prefixes in list(report.created_webentities.items()):
                 webentities[weid] = webentity_label_from_prefixes(prefixes)
 
             # Normal network
             network = legible_network(webentities, traph.get_webentities_links())
 
             self.assertIdenticalMultimaps(network, {
-                's:http|h:com|h:world|p:europe|': [
-                    's:http|h:com|h:world|p:america|'
+                b's:http|h:com|h:world|p:europe|': [
+                    b's:http|h:com|h:world|p:america|'
                 ],
-                's:http|h:com|h:world|p:america|': [
-                    's:http|h:com|h:world|p:asia|',
-                    's:http|h:com|h:world|'
+                b's:http|h:com|h:world|p:america|': [
+                    b's:http|h:com|h:world|p:asia|',
+                    b's:http|h:com|h:world|'
                 ]
             })

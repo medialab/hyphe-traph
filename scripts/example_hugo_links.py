@@ -367,7 +367,7 @@ traph = Traph(overwrite=True, folder='./scripts/data/',
               default_webentity_creation_rule=default_webentity_creation_rule,
               webentity_creation_rules=webentity_creation_rules)
 
-print '\n:: Store network...'
+print('\n:: Store network...')
 
 use_index_batch_crawl=True
 
@@ -392,32 +392,32 @@ else:
     links_report = traph.add_links(LINKS)
     webentity_store.data['webentities'].update(links_report.created_webentities)
 
-print '...data stored.'
+print('...data stored.')
 
 # Log result
-print '\nPages:'
+print('\nPages:')
 for node, lru in traph.pages_iter():
-    print ' - '+lru
+    print(' - '+lru)
 
-print '\nPage Links:'
+print('\nPage Links:')
 i = 0
 for source_lru, target_lru in traph.links_iter():
     i += 1
-    print ' - %s\t->  %s' % (source_lru, target_lru)
-print 'Total: %s' % i
+    print(' - %s\t->  %s' % (source_lru, target_lru))
+print('Total: %s' % i)
 
-print '\nWebentities:'
-for weid, prefixes in webentity_store.data['webentities'].items():
-    print ' - Webentity %s\t%s + %s other prefixes' % (weid, prefixes[0], len(prefixes)-1)
+print('\nWebentities:')
+for weid, prefixes in list(webentity_store.data['webentities'].items()):
+    print(' - Webentity %s\t%s + %s other prefixes' % (weid, prefixes[0], len(prefixes)-1))
 
-print '\nFocus on Valjean:'
+print('\nFocus on Valjean:')
 valjean_inlinks = traph.get_page_links('s:http|h:com|h:valjean|', include_inbound=True, include_internal=False, include_outbound=False)
 for source_lru, lru, weight in valjean_inlinks:
-    print '\t<- (weight %s) \t%s' % (weight, source_lru)
-print ''
+    print('\t<- (weight %s) \t%s' % (weight, source_lru))
+print('')
 valjean_outlinks = traph.get_page_links('s:http|h:com|h:valjean|', include_inbound=False, include_internal=False, include_outbound=True)
 for lru, target_lru, weight in valjean_outlinks:
-    print '\t-> (weight %s) \t%s' % (weight, target_lru)
+    print('\t-> (weight %s) \t%s' % (weight, target_lru))
 
 # import networkx as nx
 
