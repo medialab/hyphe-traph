@@ -439,9 +439,14 @@ class TestTraversal(TraphTestCase):
     def test_paginate_webentity_pagelinks(self):
 
         with self.open_traph(default_webentity_creation_rule=WEBENTITY_CREATION_RULES_REGEXES['domain']) as traph:
-            trie = traph.lru_trie
 
             batch_links = {
+                b's:http|h:com|h:world|p:europe|': [
+                    b's:http|h:com|h:world|p:europe|p:spain|',
+                    b's:http|h:com|h:world|p:europe|p:france|',
+                    b's:http|h:com|h:world|p:europe|p:romania|',
+                    b's:http|h:com|h:world|p:europe|p:france|'
+                ],
                 b's:http|h:com|h:world|': [
                     b's:http|h:com|h:upsidedown|p:demogorgon|',
                     b's:http|h:com|h:world|p:europe|',
@@ -449,12 +454,7 @@ class TestTraversal(TraphTestCase):
                     b's:http|h:com|h:world|p:africa|',
                     b's:http|h:com|h:world|p:oceania|',
                 ],
-                b's:http|h:com|h:world|p:europe|': [
-                    b's:http|h:com|h:world|p:europe|p:spain|',
-                    b's:http|h:com|h:world|p:europe|p:france|',
-                    b's:http|h:com|h:world|p:europe|p:romania|',
-                    b's:http|h:com|h:world|p:europe|p:france|'
-                ],
+                b's:http|h:com|h:world|p:europe|p:romania|': [],
                 b's:http|h:com|h:world|p:europe|p:spain|': [
                     b's:http|h:com|h:world|p:europe|p:spain|p:madrid|',
                     b's:http|h:com|h:world|p:europe|p:spain|p:toledo|',
@@ -462,8 +462,9 @@ class TestTraversal(TraphTestCase):
                     b's:http|h:com|h:upsidedown|p:eleven|',
                     b's:http|h:com|h:upsidedown|p:will|',
                 ],
-                b's:http|h:com|h:world|p:europe|p:romania|': []
             }
+
+            print(list(batch_links.keys()))
 
             traph.index_batch_crawl(batch_links)
 

@@ -6,6 +6,7 @@
 #
 import math
 import string
+from typing import Tuple
 
 BASE64 = string.digits + string.ascii_letters + '-_'
 BASE64_INDEX = {}
@@ -105,15 +106,15 @@ def chunks_iter(chunk_size: int, string: bytes):
         yield chunk
 
 
-def base4_append(p, n):
+def base4_append(p: int, n: int) -> int:
     return p * 4 + n
 
 
-def base4_int(s):
+def base4_int(s: str) -> int:
     return int(s, 4)
 
 
-def int_to_base4(x):
+def int_to_base4(x: int) -> str:
     if x == 0:
         return BASE64[0]
 
@@ -128,7 +129,7 @@ def int_to_base4(x):
     return ''.join(digits)
 
 
-def int_to_base64(x):
+def int_to_base64(x: int) -> str:
     if x == 0:
         return BASE64[0]
 
@@ -143,7 +144,7 @@ def int_to_base64(x):
     return ''.join(digits)
 
 
-def base64_to_int(s):
+def base64_to_int(s: str) -> int:
     l = len(s)
     p = 1
     x = 0
@@ -158,33 +159,33 @@ def base64_to_int(s):
     return x
 
 
-def base4_to_ops(n):
+def base4_to_ops(n: int) -> str:
     if n == 0:
         return ''
 
     return ''.join(BASE4_TO_OPS[i] for i in int_to_base4(n))
 
 
-def ops_to_base4(s):
+def ops_to_base4(s: str) -> int:
     if len(s) == 0:
         return 0
 
     return base4_int(''.join(OPS_TO_BASE4[op] for op in s))
 
 
-def build_pagination_token(i, path):
+def build_pagination_token(i: int, path: int) -> str:
     return '%i#%s' % (
         i,
         int_to_base64(path)
     )
 
 
-def parse_pagination_token(token):
+def parse_pagination_token(token: str) -> Tuple[int, int]:
     i, b64_path = token.split('#')
 
     return int(i), base64_to_int(b64_path)
 
 
-def explain_token(token):
+def explain_token(token: str) -> str:
     _, int_token = parse_pagination_token(token)
     return base4_to_ops(int_token)

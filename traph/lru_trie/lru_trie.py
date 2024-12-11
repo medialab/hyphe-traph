@@ -420,7 +420,7 @@ class LRUTrie(object):
         pagination_lru = None
         comparison_path = None
 
-        def follow_path(p):
+        def follow_path(p: str):
             n = self.node(block=starting_node.block)
             lru = starting_lru
 

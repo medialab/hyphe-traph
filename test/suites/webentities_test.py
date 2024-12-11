@@ -44,10 +44,10 @@ class TestWebentities(TraphTestCase):
         Expected: Creates the entity with the 4 prefixes. This is the typical use case.
         '''
         boeing_prefixes = [
-            's:http|h:com|h:boeing|',
-            's:http|h:com|h:boeing|h:www|',
-            's:https|h:com|h:boeing|',
-            's:https|h:com|h:boeing|h:www|'
+            b's:http|h:com|h:boeing|',
+            b's:http|h:com|h:boeing|h:www|',
+            b's:https|h:com|h:boeing|',
+            b's:https|h:com|h:boeing|h:www|'
         ]
 
         report = traph.create_webentity(boeing_prefixes)
@@ -63,13 +63,13 @@ class TestWebentities(TraphTestCase):
         Expected: Creates the entity with the 2 prefixes.
         '''
         airbus_https_prefixes = [
-            's:https|h:com|h:airbus|',
-            's:https|h:com|h:airbus|h:www|'
+            b's:https|h:com|h:airbus|',
+            b's:https|h:com|h:airbus|h:www|'
         ]
 
         airbus_http_prefixes = [
-            's:http|h:com|h:airbus|',
-            's:http|h:com|h:airbus|h:www|'
+            b's:http|h:com|h:airbus|',
+            b's:http|h:com|h:airbus|h:www|'
         ]
 
         report = traph.create_webentity(airbus_https_prefixes)
@@ -97,7 +97,7 @@ class TestWebentities(TraphTestCase):
         Step 4 - Add the "Airbus/blog" page
         Expected: Create the NON-HTTPS Airbus webentity
         '''
-        report = traph.add_page('s:http|h:com|h:airbus|p:blog|')
+        report = traph.add_page(b's:http|h:com|h:airbus|p:blog|')
         webentities.update(report.created_webentities)
 
         self.assertWebentities(traph, {
@@ -106,11 +106,11 @@ class TestWebentities(TraphTestCase):
         })
         self.assertWebentities(traph, webentities)
 
-        webentity = traph.retrieve_webentity('s:http|h:com|h:airbus|p:blog|')
-        prefix = traph.retrieve_prefix('s:http|h:com|h:airbus|p:blog|')
+        webentity = traph.retrieve_webentity(b's:http|h:com|h:airbus|p:blog|')
+        prefix = traph.retrieve_prefix(b's:http|h:com|h:airbus|p:blog|')
 
         self.assertEqual(webentity, 3)
-        self.assertEqual(prefix, 's:http|h:com|h:airbus|')
+        self.assertEqual(prefix, b's:http|h:com|h:airbus|')
 
         '''
         Step 5 - Move the NON-HTTPS prefixes to the HTTPS Airbus entity
@@ -127,10 +127,10 @@ class TestWebentities(TraphTestCase):
         })
         self.assertWebentities(traph, webentities)
 
-        webentity = traph.retrieve_webentity('s:http|h:com|h:airbus|p:blog|')
-        prefix = traph.retrieve_prefix('s:http|h:com|h:airbus|p:blog|')
+        webentity = traph.retrieve_webentity(b's:http|h:com|h:airbus|p:blog|')
+        prefix = traph.retrieve_prefix(b's:http|h:com|h:airbus|p:blog|')
 
         self.assertEqual(webentity, 2)
-        self.assertEqual(prefix, 's:http|h:com|h:airbus|')
+        self.assertEqual(prefix, b's:http|h:com|h:airbus|')
 
         traph.close()
