@@ -10,6 +10,10 @@ clean:
 	rm -rf *.egg-info .pytest_cache build dist
 	find . -name "*.pyc" | xargs rm
 
+deps:
+	pip install -U pip
+	pip install -r requirements.txt
+
 fmt:
 	ruff format
 
