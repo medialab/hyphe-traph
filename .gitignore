@@ -6,6 +6,7 @@ build
 dist
 *.egg-info
 .python-version
+.ruff_cache
 .vscode
 
 # Scripts data etc.

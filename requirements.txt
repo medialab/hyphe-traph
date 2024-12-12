@@ -2,4 +2,5 @@
 networkx
 pymongo
 ruff
+setuptools
 twine
