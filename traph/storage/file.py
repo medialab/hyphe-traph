@@ -10,9 +10,7 @@ from traph.storage.memmap import MemMapStorage
 
 # Main class
 class FileStorage(object):
-
     def __init__(self, block_size, file):
-
         # Properties
         self.block_size = block_size
         self.file = file
@@ -36,7 +34,6 @@ class FileStorage(object):
 
     # Method reading a block in the file and returning the contained node
     def read(self, block=None):
-
         if block is not None:
             self.file.seek(block)
 

@@ -15,7 +15,7 @@ from traph.version import __version__ as TRAPH_VERSION
 # some rules (namely have even addresses or addresses divisible by 4 on some
 # architecture).
 # NOTE: the size of the header struct MUST match the node's one.
-LRU_TRIE_HEADER_FORMAT = 'I12p112x'
+LRU_TRIE_HEADER_FORMAT = "I12p112x"
 LRU_TRIE_HEADER_BLOCK_SIZE = struct.calcsize(LRU_TRIE_HEADER_FORMAT)
 
 # Header blocks
@@ -31,17 +31,15 @@ LRU_TRIE_HEADER_TRAPH_VERSION = 1
 
 # Main class
 class LRUTrieHeader(object):
-
     # =========================================================================
     # Constructor
     # =========================================================================
     def __init__(self, storage):
-
         # Properties
         self.storage = storage
         self.data = [
-            0,              # Last webentity id
-            TRAPH_VERSION.encode()   # Traph version
+            0,  # Last webentity id
+            TRAPH_VERSION.encode(),  # Traph version
         ]
 
         self.__ensure()
@@ -51,13 +49,13 @@ class LRUTrieHeader(object):
         class_name = self.__class__.__name__
 
         return (
-            '<%(class_name)s'
-            ' version=%(version)s'
-            ' last_webentity_id=%(last_webentity_id)s>'
+            "<%(class_name)s"
+            " version=%(version)s"
+            " last_webentity_id=%(last_webentity_id)s>"
         ) % {
-            'class_name': class_name,
-            'version': self.get_version(),
-            'last_webentity_id': self.last_webentity_id(),
+            "class_name": class_name,
+            "version": self.get_version(),
+            "last_webentity_id": self.last_webentity_id(),
         }
 
     def __ensure(self):

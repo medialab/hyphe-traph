@@ -8,9 +8,7 @@
 
 # Main class
 class MemoryStorage(object):
-
     def __init__(self, block_size):
-
         # Properties
         self.block_size = block_size
         self.array = bytearray()
@@ -29,7 +27,7 @@ class MemoryStorage(object):
     # Method reading a block in the bytearray
     def read(self, block):
         try:
-            return self.array[block:block + self.block_size] or None
+            return self.array[block : block + self.block_size] or None
         except IndexError:
             return None
         except:
@@ -43,6 +41,6 @@ class MemoryStorage(object):
             # TODO: cache the length maybe?
             block = len(self.array) - self.block_size
         else:
-            self.array[block:block + self.block_size] = data
+            self.array[block : block + self.block_size] = data
 
         return block

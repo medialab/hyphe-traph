@@ -18,12 +18,10 @@ class LinkStoreTraversalException(Exception):
 
 # Main class
 class LinkStore(object):
-
     # =========================================================================
     # Constructor
     # =========================================================================
     def __init__(self, storage):
-
         # Properties
         self.storage = storage
 
@@ -92,7 +90,7 @@ class LinkStore(object):
         node = self.node(block=block)
 
         if not node.exists:
-            raise LinkStoreTraversalException('Block does not exist.')
+            raise LinkStoreTraversalException("Block does not exist.")
 
         yield node
 
@@ -104,7 +102,7 @@ class LinkStore(object):
         node = self.node(block=block)
 
         if not node.exists:
-            raise LinkStoreTraversalException('Block does not exist.')
+            raise LinkStoreTraversalException("Block does not exist.")
 
         # TODO: it's theoretically possible to rely on constant time hashing
         weights = Counter()
@@ -121,7 +119,7 @@ class LinkStore(object):
         node = self.node(block=block)
 
         if not node.exists:
-            raise LinkStoreTraversalException('Block does not exist.')
+            raise LinkStoreTraversalException("Block does not exist.")
 
         target = node.target()
 
@@ -155,9 +153,6 @@ class LinkStore(object):
         # NOTE: we are now unable, from a LinkStore itself, to aggregate
         # meaningful values about weights. Only the Traph can do this, by
         # considering both the LinkStore and the LRUTrie.
-        stats = {
-            'nb_links': nb_links,
-            'nb_outlinks': nb_links / 2
-        }
+        stats = {"nb_links": nb_links, "nb_outlinks": nb_links / 2}
 
         return stats

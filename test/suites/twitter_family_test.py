@@ -12,46 +12,49 @@ from test.helpers import webentity_label_from_prefixes, legible_network
 # TODO: reinstate unit tests with significantother full length!
 
 PAGES = [
-    b's:http|h:com|h:twitter|p:daughter|',
-    b's:http|h:com|h:twitter|p:son|',
-    b's:http|h:com|h:twitter|p:niece|',
-    b's:http|h:com|h:twitter|p:nephew|',
-    b's:http|h:com|h:twitter|p:significantother|',
-    b's:http|h:com|h:twitter|p:ego|',
-    b's:http|h:com|h:twitter|p:sister|',
-    b's:http|h:com|h:twitter|p:cousin|',
-    b's:http|h:com|h:twitter|p:brotherinlaw|',
-    b's:http|h:com|h:twitter|p:brother|',
-    b's:http|h:com|h:twitter|p:dad|',
-    b's:http|h:com|h:twitter|p:mom|',
-    b's:http|h:com|h:twitter|p:uncle|',
-    b's:http|h:com|h:twitter|p:aunt|',
-    b's:http|h:com|h:twitter|p:grandpa|',
-    b's:http|h:com|h:twitter|p:grandma|'
+    b"s:http|h:com|h:twitter|p:daughter|",
+    b"s:http|h:com|h:twitter|p:son|",
+    b"s:http|h:com|h:twitter|p:niece|",
+    b"s:http|h:com|h:twitter|p:nephew|",
+    b"s:http|h:com|h:twitter|p:significantother|",
+    b"s:http|h:com|h:twitter|p:ego|",
+    b"s:http|h:com|h:twitter|p:sister|",
+    b"s:http|h:com|h:twitter|p:cousin|",
+    b"s:http|h:com|h:twitter|p:brotherinlaw|",
+    b"s:http|h:com|h:twitter|p:brother|",
+    b"s:http|h:com|h:twitter|p:dad|",
+    b"s:http|h:com|h:twitter|p:mom|",
+    b"s:http|h:com|h:twitter|p:uncle|",
+    b"s:http|h:com|h:twitter|p:aunt|",
+    b"s:http|h:com|h:twitter|p:grandpa|",
+    b"s:http|h:com|h:twitter|p:grandma|",
 ]
 
 LINKS = [
-    (b's:http|h:com|h:twitter|p:daughter|', b's:http|h:com|h:twitter|p:ego|'),
-    (b's:http|h:com|h:twitter|p:daughter|', b's:http|h:com|h:twitter|p:significantother|'),
-    (b's:http|h:com|h:twitter|p:son|', b's:http|h:com|h:twitter|p:ego|'),
-    (b's:http|h:com|h:twitter|p:son|', b's:http|h:com|h:twitter|p:significantother|'),
-    (b's:http|h:com|h:twitter|p:niece|', b's:http|h:com|h:twitter|p:sister|'),
-    (b's:http|h:com|h:twitter|p:niece|', b's:http|h:com|h:twitter|p:brotherinlaw|'),
-    (b's:http|h:com|h:twitter|p:nephew|', b's:http|h:com|h:twitter|p:sister|'),
-    (b's:http|h:com|h:twitter|p:nephew|', b's:http|h:com|h:twitter|p:brotherinlaw|'),
-    (b's:http|h:com|h:twitter|p:ego|', b's:http|h:com|h:twitter|p:mom|'),
-    (b's:http|h:com|h:twitter|p:ego|', b's:http|h:com|h:twitter|p:dad|'),
-    (b's:http|h:com|h:twitter|p:brother|', b's:http|h:com|h:twitter|p:mom|'),
-    (b's:http|h:com|h:twitter|p:brother|', b's:http|h:com|h:twitter|p:dad|'),
-    (b's:http|h:com|h:twitter|p:sister|', b's:http|h:com|h:twitter|p:mom|'),
-    (b's:http|h:com|h:twitter|p:sister|', b's:http|h:com|h:twitter|p:dad|'),
-    (b's:http|h:com|h:twitter|p:cousin|', b's:http|h:com|h:twitter|p:aunt|'),
-    (b's:http|h:com|h:twitter|p:mom|', b's:http|h:com|h:twitter|p:grandpa|'),
-    (b's:http|h:com|h:twitter|p:mom|', b's:http|h:com|h:twitter|p:grandma|'),
-    (b's:http|h:com|h:twitter|p:uncle|', b's:http|h:com|h:twitter|p:grandpa|'),
-    (b's:http|h:com|h:twitter|p:uncle|', b's:http|h:com|h:twitter|p:grandma|'),
-    (b's:http|h:com|h:twitter|p:aunt|', b's:http|h:com|h:twitter|p:grandpa|'),
-    (b's:http|h:com|h:twitter|p:aunt|', b's:http|h:com|h:twitter|p:grandma|')
+    (b"s:http|h:com|h:twitter|p:daughter|", b"s:http|h:com|h:twitter|p:ego|"),
+    (
+        b"s:http|h:com|h:twitter|p:daughter|",
+        b"s:http|h:com|h:twitter|p:significantother|",
+    ),
+    (b"s:http|h:com|h:twitter|p:son|", b"s:http|h:com|h:twitter|p:ego|"),
+    (b"s:http|h:com|h:twitter|p:son|", b"s:http|h:com|h:twitter|p:significantother|"),
+    (b"s:http|h:com|h:twitter|p:niece|", b"s:http|h:com|h:twitter|p:sister|"),
+    (b"s:http|h:com|h:twitter|p:niece|", b"s:http|h:com|h:twitter|p:brotherinlaw|"),
+    (b"s:http|h:com|h:twitter|p:nephew|", b"s:http|h:com|h:twitter|p:sister|"),
+    (b"s:http|h:com|h:twitter|p:nephew|", b"s:http|h:com|h:twitter|p:brotherinlaw|"),
+    (b"s:http|h:com|h:twitter|p:ego|", b"s:http|h:com|h:twitter|p:mom|"),
+    (b"s:http|h:com|h:twitter|p:ego|", b"s:http|h:com|h:twitter|p:dad|"),
+    (b"s:http|h:com|h:twitter|p:brother|", b"s:http|h:com|h:twitter|p:mom|"),
+    (b"s:http|h:com|h:twitter|p:brother|", b"s:http|h:com|h:twitter|p:dad|"),
+    (b"s:http|h:com|h:twitter|p:sister|", b"s:http|h:com|h:twitter|p:mom|"),
+    (b"s:http|h:com|h:twitter|p:sister|", b"s:http|h:com|h:twitter|p:dad|"),
+    (b"s:http|h:com|h:twitter|p:cousin|", b"s:http|h:com|h:twitter|p:aunt|"),
+    (b"s:http|h:com|h:twitter|p:mom|", b"s:http|h:com|h:twitter|p:grandpa|"),
+    (b"s:http|h:com|h:twitter|p:mom|", b"s:http|h:com|h:twitter|p:grandma|"),
+    (b"s:http|h:com|h:twitter|p:uncle|", b"s:http|h:com|h:twitter|p:grandpa|"),
+    (b"s:http|h:com|h:twitter|p:uncle|", b"s:http|h:com|h:twitter|p:grandma|"),
+    (b"s:http|h:com|h:twitter|p:aunt|", b"s:http|h:com|h:twitter|p:grandpa|"),
+    (b"s:http|h:com|h:twitter|p:aunt|", b"s:http|h:com|h:twitter|p:grandma|"),
 ]
 
 NETWORK = defaultdict(list)
@@ -61,7 +64,6 @@ for source, target in LINKS:
 
 
 class TestTwitterFamily(TraphTestCase):
-
     def test_twitter_family(self):
         traph = self.get_traph()
         webentities = {}

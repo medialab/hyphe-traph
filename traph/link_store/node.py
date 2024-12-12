@@ -18,7 +18,7 @@ from traph.lru_trie.node import LRU_TRIE_FIRST_DATA_BLOCK
 # some rules (namely have even addresses or addresses divisble by 4 on some
 # architecture).
 # NOTE: the size of the header struct MUST match the node's one.
-LINK_STORE_NODE_FORMAT = 'QQ'
+LINK_STORE_NODE_FORMAT = "QQ"
 LINK_STORE_NODE_BLOCK_SIZE = struct.calcsize(LINK_STORE_NODE_FORMAT)
 LINK_STORE_FIRST_DATA_BLOCK = LINK_STORE_HEADER_BLOCKS * LINK_STORE_NODE_BLOCK_SIZE
 
@@ -38,12 +38,10 @@ class LinkStoreNodeUsageException(Exception):
 
 # Main class
 class LinkStoreNode(object):
-
     # =========================================================================
     # Constructor
     # =========================================================================
     def __init__(self, storage, block=None, data=None):
-
         # Properties
         self.storage = storage
         self.block = None
@@ -62,21 +60,21 @@ class LinkStoreNode(object):
     def __set_default_data(self):
         self.data = [
             0,  # Target
-            0   # Previous
+            0,  # Previous
         ]
 
     def __repr__(self):
         class_name = self.__class__.__name__
 
         return (
-            '<%(class_name)s block=%(block)s exists=%(exists)s'
-            ' target=%(target)s previous=%(previous)s>'
+            "<%(class_name)s block=%(block)s exists=%(exists)s"
+            " target=%(target)s previous=%(previous)s>"
         ) % {
-            'class_name': class_name,
-            'block': self.block,
-            'exists': self.exists,
-            'target': self.target(),
-            'previous': self.previous()
+            "class_name": class_name,
+            "block": self.block,
+            "exists": self.exists,
+            "target": self.target(),
+            "previous": self.previous(),
         }
 
     # =========================================================================
@@ -133,21 +131,21 @@ class LinkStoreNode(object):
     # Method used to set a sibling
     def set_previous(self, block):
         if block < LINK_STORE_FIRST_DATA_BLOCK:
-            raise LinkStoreNodeUsageException('Previous node cannot be the root.')
+            raise LinkStoreNodeUsageException("Previous node cannot be the root.")
 
         self.data[LINK_STORE_NODE_PREVIOUS] = block
 
     # Method used to read the previous sibling
     def read_previous(self):
         if not self.has_previous():
-            raise LinkStoreNodeTraversalException('Node has no previous sibling.')
+            raise LinkStoreNodeTraversalException("Node has no previous sibling.")
 
         self.read(self.previous())
 
     # Method used to get previous node
     def previous_node(self):
         if not self.has_previous():
-            raise LinkStoreNodeTraversalException('Node has no previous sibling.')
+            raise LinkStoreNodeTraversalException("Node has no previous sibling.")
 
         return LinkStoreNode(self.storage, block=self.previous())
 
@@ -171,8 +169,6 @@ class LinkStoreNode(object):
     # Method used to set the target block
     def set_target(self, block):
         if block < LRU_TRIE_FIRST_DATA_BLOCK:
-            raise LinkStoreNodeUsageException(
-                'Target node cannot be the root.'
-            )
+            raise LinkStoreNodeUsageException("Target node cannot be the root.")
 
         self.data[LINK_STORE_NODE_TARGET] = block

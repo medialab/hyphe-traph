@@ -9,9 +9,7 @@ import json
 
 
 class WebEntityCreationRuleStore(object):
-
     def __init__(self, path):
-
         # Properties
         self.path = path
         self.data = {}
@@ -21,11 +19,11 @@ class WebEntityCreationRuleStore(object):
 
     def read(self):
         try:
-            with open(self.path, 'r') as f:
+            with open(self.path, "r") as f:
                 self.data = json.load(f)
         except IOError:
             self.write()
 
     def write(self):
-        with open(self.path, 'w') as f:
+        with open(self.path, "w") as f:
             json.dump(self.data, f)

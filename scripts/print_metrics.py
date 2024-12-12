@@ -1,5 +1,3 @@
-
-
 import sys
 from traph import Traph
 
@@ -10,6 +8,6 @@ for name, metrics in list(metrics.items()):
     print(name)
 
     for k, v in list(metrics.items()):
-        print('  ', k, v)
+        print("  ", k, v)
 
     print()

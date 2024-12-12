@@ -1,6 +1,5 @@
 # Dev Dependencies
 networkx
-pycodestyle
-pylint
 pymongo
+ruff
 twine

@@ -9,9 +9,7 @@ import mmap
 
 # Main class
 class MemMapStorage(object):
-
     def __init__(self, block_size, file):
-
         # Properties
         self.block_size = block_size
         self.file = file
@@ -19,7 +17,7 @@ class MemMapStorage(object):
 
     # Method reading a block in the map and returning the contained node
     def read(self, block):
-        return self.map[block:block + self.block_size] or None
+        return self.map[block : block + self.block_size] or None
 
     # Method releasing the map from memory
     def release(self):

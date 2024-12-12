@@ -6,27 +6,23 @@
 #
 import math
 import warnings
-from collections import Counter
-from traph.lru_trie.node import LRUTrieNode, LRU_TRIE_FIRST_DATA_BLOCK, LRU_TRIE_STEM_SIZE
+from traph.lru_trie.node import (
+    LRUTrieNode,
+    LRU_TRIE_FIRST_DATA_BLOCK,
+    LRU_TRIE_STEM_SIZE,
+)
 from traph.lru_trie.header import LRUTrieHeader
 from traph.lru_trie.walk_history import LRUTrieWalkHistory
 
-from traph.helpers import (
-    lru_iter,
-    lru_dirname,
-    base4_append,
-    int_to_base4
-)
+from traph.helpers import lru_iter, lru_dirname, base4_append, int_to_base4
 
 
 # Main class
 class LRUTrie(object):
-
     # =========================================================================
     # Constructor
     # =========================================================================
-    def __init__(self, storage, encoding='utf-8'):
-
+    def __init__(self, storage, encoding="utf-8"):
         # Properties
         self.storage = storage
         self.encoding = encoding
@@ -40,7 +36,6 @@ class LRUTrie(object):
 
     # Method ensuring that a sibling with the desired char exists
     def __ensure_stem_from_siblings(self, node, stem):
-
         # If the node does not exist, we create it
         if not node.exists:
             node.set_stem(stem)
@@ -88,7 +83,6 @@ class LRUTrie(object):
 
     # Method adding a lru to the trie
     def add_lru(self, lru, flag_can_have_child_webentities=False):
-
         # Iteration state
         # TODO: we should be able to use an iterator and not keep a list!
         stems = list(lru_iter(lru))
@@ -96,7 +90,7 @@ class LRUTrie(object):
         i = 0
         history = LRUTrieWalkHistory(lru)
         node = self.root()
-        lru = b''
+        lru = b""
 
         # Descending the trie
         while i < l:
@@ -107,11 +101,7 @@ class LRUTrie(object):
 
             # Tracking webentities
             if node.has_webentity():
-                history.update_webentity(
-                    node.webentity(),
-                    lru,
-                    len(lru)
-                )
+                history.update_webentity(node.webentity(), lru, len(lru))
 
             # Tracking webentity creation rules
             if node.has_webentity_creation_rule():
@@ -119,9 +109,9 @@ class LRUTrie(object):
 
             # Flagging for underlying webentities
             if (
-                i < l - 1 and
-                flag_can_have_child_webentities and
-                not node.can_have_child_webentities()
+                i < l - 1
+                and flag_can_have_child_webentities
+                and not node.can_have_child_webentities()
             ):
                 node.flag_can_have_child_webentities()
                 node.write()
@@ -232,7 +222,7 @@ class LRUTrie(object):
         history = LRUTrieWalkHistory(lru)
 
         stems = list(lru_iter(lru))
-        lru = b''
+        lru = b""
         l = len(stems)
 
         for i in range(l):
@@ -257,11 +247,7 @@ class LRUTrie(object):
                         return None, history
 
             if node.has_webentity():
-                history.update_webentity(
-                    node.webentity(),
-                    lru,
-                    len(lru)
-                )
+                history.update_webentity(node.webentity(), lru, len(lru))
 
             if node.has_webentity_creation_rule():
                 history.add_webentity_creation_rule(len(lru))
@@ -295,8 +281,8 @@ class LRUTrie(object):
 
         # We could not find a webentity for the given node, we should warn
         warnings.warn(
-            'Could not find a webentity for the given node %s!' % node.__repr__(),
-            RuntimeWarning
+            "Could not find a webentity for the given node %s!" % node.__repr__(),
+            RuntimeWarning,
         )
 
         return None
@@ -312,7 +298,6 @@ class LRUTrie(object):
             node.read(node.block + self.storage.block_size)
 
     def node_parents_iter(self, node):
-
         # TODO: block
         if not node.has_parent():
             return
@@ -325,11 +310,13 @@ class LRUTrie(object):
             parent.read_parent()
             yield parent
 
-    def dfs_iter(self, starting_node=None, starting_lru=b'', skip_childless_paths=False):
-        '''
+    def dfs_iter(
+        self, starting_node=None, starting_lru=b"", skip_childless_paths=False
+    ):
+        """
         Note that childless_paths refers to the upper webentity tree, not
         the pages' one.
-        '''
+        """
         starting_from_root = not starting_node
 
         if starting_node:
@@ -368,12 +355,12 @@ class LRUTrie(object):
                 stack.append((node.child(), current_lru))
 
     def webentity_dfs_iter(self, starting_node, starting_lru, max_depth=None):
-        '''
+        """
         Note that this algorithm will peruse the webentity nodes only for the
         given prefix. We would need a refined algorithm for the cases when
         then prefixes are not given and we need to peruse the webentity's
         whole realm.
-        '''
+        """
         starting_block = starting_node.block
         starting_lru = lru_dirname(starting_lru)
 
@@ -409,12 +396,11 @@ class LRUTrie(object):
 
                 stack.append((node.child(), current_lru, level + 1))
 
-    def webentity_inorder_iter(self, starting_node, starting_lru,
-                               pagination_path=None):
-        '''
+    def webentity_inorder_iter(self, starting_node, starting_lru, pagination_path=None):
+        """
         Note that it would be fairly easy to resume traversal from any given
         lru. It could simplify the pagination token scheme.
-        '''
+        """
 
         starting_lru = lru_dirname(starting_lru)
         pagination_lru = None
@@ -425,9 +411,9 @@ class LRUTrie(object):
             lru = starting_lru
 
             for op in p:
-                if op == '1':
+                if op == "1":
                     n.read_left()
-                elif op == '2':
+                elif op == "2":
                     lru += n.stem()
                     n.read_child()
                 else:
@@ -436,7 +422,9 @@ class LRUTrie(object):
             return lru + n.stem()
 
         if pagination_path is not None:
-            comparison_path = int_to_base4(pagination_path) if pagination_path != 0 else ''
+            comparison_path = (
+                int_to_base4(pagination_path) if pagination_path != 0 else ""
+            )
             pagination_lru = follow_path(comparison_path)
 
         def can_follow_path(current_path):
@@ -445,35 +433,42 @@ class LRUTrie(object):
 
             current_path = int_to_base4(current_path)
 
-            p = comparison_path[:len(current_path)]
+            p = comparison_path[: len(current_path)]
 
             return current_path >= p
 
         def inorder_traversal(node, lru, path=0):
-
             # NOTE: could be done before this call to avoid reading too much from file
             if pagination_path is not None and not can_follow_path(path):
                 return
 
             if node.block != starting_node.block:
                 if node.has_left():
-                    for item in inorder_traversal(node.left_node(), lru, base4_append(path, 1)):
+                    for item in inorder_traversal(
+                        node.left_node(), lru, base4_append(path, 1)
+                    ):
                         yield item
 
             current_lru = lru + node.stem()
-            relevant_node = node.block == starting_node.block or not node.has_webentity()
+            relevant_node = (
+                node.block == starting_node.block or not node.has_webentity()
+            )
 
             if relevant_node:
                 if pagination_path is None or current_lru > pagination_lru:
                     yield node, current_lru, path
 
                 if node.has_child():
-                    for item in inorder_traversal(node.child_node(), current_lru, base4_append(path, 2)):
+                    for item in inorder_traversal(
+                        node.child_node(), current_lru, base4_append(path, 2)
+                    ):
                         yield item
 
             if node.block != starting_node.block:
                 if node.has_right():
-                    for item in inorder_traversal(node.right_node(), lru, base4_append(path, 3)):
+                    for item in inorder_traversal(
+                        node.right_node(), lru, base4_append(path, 3)
+                    ):
                         yield item
 
         for item in inorder_traversal(starting_node, starting_lru):
@@ -545,75 +540,66 @@ class LRUTrie(object):
 
     def metrics(self):
         stats = {
-            'nb_nodes': 0,
-            'nb_pages': 0,
-            'nb_crawled_pages': 0,
-            'nb_tail_nodes': 0,
-            'nb_fragmented_nodes': 0,
-            'nb_stems': 0,
-            'avg_stem_filling': 0,
-            'max_tail': 0,
-            'avg_tail': 0
+            "nb_nodes": 0,
+            "nb_pages": 0,
+            "nb_crawled_pages": 0,
+            "nb_tail_nodes": 0,
+            "nb_fragmented_nodes": 0,
+            "nb_stems": 0,
+            "avg_stem_filling": 0,
+            "max_tail": 0,
+            "avg_tail": 0,
         }
 
         current_tail_size = 0
         last_tail_size = 0
 
         for node in self.nodes_iter():
-            stats['nb_nodes'] += 1
+            stats["nb_nodes"] += 1
 
             if node.is_page():
-                stats['nb_pages'] += 1
+                stats["nb_pages"] += 1
 
                 if node.is_crawled():
-                    stats['nb_crawled_pages'] += 1
+                    stats["nb_crawled_pages"] += 1
 
             if node.has_tail():
-                stats['nb_fragmented_nodes'] += 1
+                stats["nb_fragmented_nodes"] += 1
 
             if node.is_tail():
-                stats['nb_tail_nodes'] += 1
+                stats["nb_tail_nodes"] += 1
                 current_tail_size += 1
 
-                if current_tail_size > stats['max_tail']:
-                    stats['max_tail'] = current_tail_size
+                if current_tail_size > stats["max_tail"]:
+                    stats["max_tail"] = current_tail_size
 
                 last_tail_size = current_tail_size
             else:
                 current_tail_size = 0
                 filling = len(node.stem()) / float(LRU_TRIE_STEM_SIZE)
 
-                stats['nb_stems'] += 1
-                stats['avg_stem_filling'] = (
-                    stats['avg_stem_filling'] +
-                    (
-                        (filling - stats['avg_stem_filling']) /
-                        float(stats['nb_stems'])
-                    )
+                stats["nb_stems"] += 1
+                stats["avg_stem_filling"] = stats["avg_stem_filling"] + (
+                    (filling - stats["avg_stem_filling"]) / float(stats["nb_stems"])
                 )
 
                 if last_tail_size:
-                    stats['avg_tail'] = (
-                        stats['avg_tail'] + (
-                            (last_tail_size - stats['avg_tail']) /
-                            float(stats['nb_fragmented_nodes'])
-                        )
+                    stats["avg_tail"] = stats["avg_tail"] + (
+                        (last_tail_size - stats["avg_tail"])
+                        / float(stats["nb_fragmented_nodes"])
                     )
 
                     last_tail_size = 0
 
-        stats['ratio_fragmented_stems'] = (
-            stats['nb_fragmented_nodes'] / float(stats['nb_stems'])
+        stats["ratio_fragmented_stems"] = stats["nb_fragmented_nodes"] / float(
+            stats["nb_stems"]
         )
 
-        stats['page_block_density'] = (
-            stats['nb_pages'] / float(stats['nb_nodes'])
-        )
+        stats["page_block_density"] = stats["nb_pages"] / float(stats["nb_nodes"])
 
         return stats
 
     def bst_metrics(self):
-
         def is_bst_root(node):
             if not node.has_parent():
                 return True
@@ -684,11 +670,11 @@ class LRUTrie(object):
             sum_bst_ratio += ratio
 
         return {
-            'nb_bst': nb_bst,
-            'max_bst_height': max_bst_height,
-            'avg_bst_height': sum_bst_height / float(nb_bst),
-            'max_bst_size': max_bst_size,
-            'avg_bst_size': sum_bst_size / float(nb_bst),
-            'max_bst_ratio': max_bst_ratio,
-            'avg_bst_ratio': sum_bst_ratio / float(nb_bst)
+            "nb_bst": nb_bst,
+            "max_bst_height": max_bst_height,
+            "avg_bst_height": sum_bst_height / float(nb_bst),
+            "max_bst_size": max_bst_size,
+            "avg_bst_size": sum_bst_size / float(nb_bst),
+            "max_bst_ratio": max_bst_ratio,
+            "avg_bst_ratio": sum_bst_ratio / float(nb_bst),
         }

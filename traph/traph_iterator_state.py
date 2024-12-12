@@ -6,7 +6,6 @@
 
 
 class TraphIteratorState(object):
-
     def __init__(self):
         self.done = False
         self.result = None

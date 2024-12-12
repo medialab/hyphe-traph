@@ -5,11 +5,11 @@ from traph.helpers import explain_token, parse_pagination_token, int_to_base4
 WEBENTITY = [
     1,
     [
-        's:http|h:org|h:regardscitoyens|',
-        's:https|h:org|h:regardscitoyens|',
-        's:https|h:org|h:regardscitoyens|h:www|',
-        's:http|h:org|h:regardscitoyens|h:www|'
-    ]
+        "s:http|h:org|h:regardscitoyens|",
+        "s:https|h:org|h:regardscitoyens|",
+        "s:https|h:org|h:regardscitoyens|h:www|",
+        "s:http|h:org|h:regardscitoyens|h:www|",
+    ],
 ]
 
 traph = Traph(folder=sys.argv[1], debug=True)
@@ -21,28 +21,32 @@ results = []
 
 while True:
     result = traph.paginate_webentity_pagelinks(
-        *WEBENTITY,
-        source_page_count=10,
-        pagination_token=token
+        *WEBENTITY, source_page_count=10, pagination_token=token
     )
 
-    token = result.get('token')
+    token = result.get("token")
     results.append(result)
 
     if token is None:
         break
 
-    print('Token:', token, explain_token(token), int_to_base4(parse_pagination_token(token)[1]), parse_pagination_token(token))
+    print(
+        "Token:",
+        token,
+        explain_token(token),
+        int_to_base4(parse_pagination_token(token)[1]),
+        parse_pagination_token(token),
+    )
 
-print(sum(r['count_sourcepages'] for r in results))
-print(sum(r['count_pagelinks'] for r in results))
+print(sum(r["count_sourcepages"] for r in results))
+print(sum(r["count_pagelinks"] for r in results))
 # print sum(r['count'] for r in results)
 # print sum(len(r['pages']) for r in results)
 
 uniques = set()
 
 for r in results:
-    for p in r['pagelinks']:
+    for p in r["pagelinks"]:
         uniques.add((p[0], p[1]))
 
 print(len(uniques))

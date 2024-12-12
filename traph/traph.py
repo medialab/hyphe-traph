@@ -16,11 +16,7 @@ from .storage import FileStorage, MemoryStorage
 from .lru_trie import LRUTrie, LRU_TRIE_NODE_BLOCK_SIZE
 from .link_store import LinkStore, LINK_STORE_NODE_BLOCK_SIZE
 
-from .helpers import (
-    lru_variations,
-    build_pagination_token,
-    parse_pagination_token
-)
+from .helpers import lru_variations, build_pagination_token, parse_pagination_token
 
 
 # Exceptions
@@ -30,31 +26,36 @@ class TraphException(Exception):
 
 # Main class
 class Traph(object):
-
     # =========================================================================
     # Constructor
     # =========================================================================
-    def __init__(self, folder=None, overwrite=False, encoding='utf-8',
-                 debug=False, default_webentity_creation_rule=None,
-                 webentity_creation_rules=None):
-
+    def __init__(
+        self,
+        folder=None,
+        overwrite=False,
+        encoding="utf-8",
+        debug=False,
+        default_webentity_creation_rule=None,
+        webentity_creation_rules=None,
+    ):
         # Handling encoding
         self.encoding = encoding
 
         # Debugging mode
         if debug:
             if not default_webentity_creation_rule:
-                default_webentity_creation_rule = ''
+                default_webentity_creation_rule = ""
             if not webentity_creation_rules:
                 webentity_creation_rules = {}
         else:
-
             # Ensuring the creation rules are set
             if not isinstance(default_webentity_creation_rule, bytes):
-                raise TraphException('Given default webentity creation rule is not bytes!')
+                raise TraphException(
+                    "Given default webentity creation rule is not bytes!"
+                )
 
             if not isinstance(webentity_creation_rules, dict):
-                raise TraphException('Given webentity creation rules is not a dict!')
+                raise TraphException("Given webentity creation rules is not a dict!")
                 # TODO: check if each value is correctly a string
 
         # Files
@@ -70,8 +71,8 @@ class Traph(object):
         # Solving paths
         if not self.in_memory:
             assert folder is not None
-            self.lru_trie_path = os.path.join(folder, 'lru_trie.dat')
-            self.link_store_path = os.path.join(folder, 'link_store.dat')
+            self.lru_trie_path = os.path.join(folder, "lru_trie.dat")
+            self.link_store_path = os.path.join(folder, "link_store.dat")
 
             # Ensuring the given folder exists
             try:
@@ -89,42 +90,38 @@ class Traph(object):
             # Checking consistency
             if lru_trie_file_exists and not link_store_file_exists:
                 raise TraphException(
-                    'File inconsistency: `lru_trie.dat` file exists but not `link_store.dat`.'
+                    "File inconsistency: `lru_trie.dat` file exists but not `link_store.dat`."
                 )
 
             if not lru_trie_file_exists and link_store_file_exists:
                 raise TraphException(
-                    'File inconsistency: `link_store.dat` file exists but not `lru_trie.dat`.'
+                    "File inconsistency: `link_store.dat` file exists but not `lru_trie.dat`."
                 )
 
             # Do we need to create the files for the first time?
-            create = overwrite or (not lru_trie_file_exists and not link_store_file_exists)
+            create = overwrite or (
+                not lru_trie_file_exists and not link_store_file_exists
+            )
 
-            flags = 'wb+' if create else 'rb+'
+            flags = "wb+" if create else "rb+"
 
             self.lru_trie_file = open(self.lru_trie_path, flags)
             self.link_store_file = open(self.link_store_path, flags)
 
             self.lru_trie_storage = FileStorage(
-                LRU_TRIE_NODE_BLOCK_SIZE,
-                self.lru_trie_file
+                LRU_TRIE_NODE_BLOCK_SIZE, self.lru_trie_file
             )
 
             self.links_store_storage = FileStorage(
-                LINK_STORE_NODE_BLOCK_SIZE,
-                self.link_store_file
+                LINK_STORE_NODE_BLOCK_SIZE, self.link_store_file
             )
 
             # Checking for corruption
             if not create and self.lru_trie_storage.check_for_corruption():
-                raise TraphException(
-                    'File corrupted: `lru_trie.dat`'
-                )
+                raise TraphException("File corrupted: `lru_trie.dat`")
 
             if not create and self.links_store_storage.check_for_corruption():
-                raise TraphException(
-                    'File corrupted: `link_store.dat`'
-                )
+                raise TraphException("File corrupted: `link_store.dat`")
 
         else:
             self.lru_trie_storage = MemoryStorage(LRU_TRIE_NODE_BLOCK_SIZE)
@@ -139,8 +136,7 @@ class Traph(object):
         # Webentity creation rules are stored in RAM
         if not debug:
             self.default_webentity_creation_rule = re.compile(
-                default_webentity_creation_rule,
-                re.I
+                default_webentity_creation_rule, re.I
             )
 
             self.webentity_creation_rules = {}
@@ -170,7 +166,9 @@ class Traph(object):
         invalid_prefixes = []
 
         for prefix in prefixes:
-            node, history = self.lru_trie.add_lru(prefix, flag_can_have_child_webentities=True)
+            node, history = self.lru_trie.add_lru(
+                prefix, flag_can_have_child_webentities=True
+            )
 
             if node.has_webentity():
                 invalid_prefixes.append(prefix)
@@ -178,7 +176,9 @@ class Traph(object):
                 valid_prefixes_index.update({prefix: [node, history]})
 
         if len(invalid_prefixes) > 0 and not use_best_case:
-            raise TraphException('Some prefixes were already set: %s' % (invalid_prefixes))
+            raise TraphException(
+                "Some prefixes were already set: %s" % (invalid_prefixes)
+            )
 
         elif len(invalid_prefixes) == len(prefixes):
             # No prefix is valid!
@@ -201,7 +201,9 @@ class Traph(object):
             expanded_prefixes = [prefix]
 
         report = TraphWriteReport()
-        webentity_id, valid_prefixes = self.__add_prefixes(expanded_prefixes, use_best_case)
+        webentity_id, valid_prefixes = self.__add_prefixes(
+            expanded_prefixes, use_best_case
+        )
 
         if webentity_id:
             report.created_webentities[webentity_id] = valid_prefixes
@@ -218,7 +220,6 @@ class Traph(object):
         return match.group()
 
     def __apply_webentity_default_creation_rule(self, lru):
-
         regexp = self.default_webentity_creation_rule
         match = regexp.search(lru)
 
@@ -245,11 +246,13 @@ class Traph(object):
         #          -> apply the longest prefix as a new webentity
 
         # Retrieving the longest candidate prefix
-        longest_candidate_prefix = ''
+        longest_candidate_prefix = ""
         for rule_prefix in history.rules_to_apply():
             candidate_prefix = self.__apply_webentity_creation_rule(rule_prefix, lru)
 
-            if candidate_prefix and len(candidate_prefix) > len(longest_candidate_prefix):
+            if candidate_prefix and len(candidate_prefix) > len(
+                longest_candidate_prefix
+            ):
                 longest_candidate_prefix = candidate_prefix
 
         # In this case, the webentity already exists
@@ -269,8 +272,7 @@ class Traph(object):
         # If the default rule failed to find a prefix, we emit an error
         if not longest_candidate_prefix:
             warnings.warn(
-                'Default rule failed to find a prefix for "%s"!' % lru,
-                RuntimeWarning
+                'Default rule failed to find a prefix for "%s"!' % lru, RuntimeWarning
             )
         else:
             report += self.__create_webentity(longest_candidate_prefix, expand=True)
@@ -281,20 +283,19 @@ class Traph(object):
     # =========================================================================
     # Public interface
     # =========================================================================
-    def add_webentity_creation_rule_iter(self, rule_prefix, pattern, write_in_trie=True):
-        '''
+    def add_webentity_creation_rule_iter(
+        self, rule_prefix, pattern, write_in_trie=True
+    ):
+        """
         Note: write_in_trie has 2 effects: store the rule in the trie, and apply it to existing entities.
         write_in_trie=False is essentially for init on an existing traph.
 
         Note 2: it seems obvious from the api design but let's restate it:
         We can only have one rule for each prefix (or none).
-        '''
+        """
         rule_prefix = self.__encode(rule_prefix)
 
-        self.webentity_creation_rules[rule_prefix] = re.compile(
-            pattern,
-            re.I
-        )
+        self.webentity_creation_rules[rule_prefix] = re.compile(pattern, re.I)
 
         report = TraphWriteReport()
         state = TraphIteratorState()
@@ -302,11 +303,10 @@ class Traph(object):
         if write_in_trie:
             node, history = self.lru_trie.add_lru(rule_prefix)
             if not node:
-                raise TraphException(b'Prefix not in tree: ' + rule_prefix)
+                raise TraphException(b"Prefix not in tree: " + rule_prefix)
             node.flag_as_webentity_creation_rule()
             node.write()
             # Spawn necessary web entities
-            candidate_prefixes = set()
             for node2, lru in self.lru_trie.dfs_iter(node, rule_prefix):
                 if node2.is_page():
                     _, add_report = self.__add_page(lru)
@@ -318,40 +318,46 @@ class Traph(object):
         yield state.finalize(report)
 
     def add_webentity_creation_rule(self, rule_prefix, pattern, write_in_trie=True):
-        return run_iterator(self.add_webentity_creation_rule_iter(rule_prefix, pattern, write_in_trie=write_in_trie))
+        return run_iterator(
+            self.add_webentity_creation_rule_iter(
+                rule_prefix, pattern, write_in_trie=write_in_trie
+            )
+        )
 
     def remove_webentity_creation_rule(self, rule_prefix):
         rule_prefix = self.__encode(rule_prefix)
 
         if not self.webentity_creation_rules[rule_prefix]:
-            raise TraphException(b'Prefix not in creation rules: ' + rule_prefix)
+            raise TraphException(b"Prefix not in creation rules: " + rule_prefix)
         del self.webentity_creation_rules[rule_prefix]
 
         node = self.lru_trie.lru_node(rule_prefix)
         if not node:
-            raise TraphException(b'Prefix %s cannot be found' % (rule_prefix))
+            raise TraphException(b"Prefix %s cannot be found" % (rule_prefix))
         node.unflag_as_webentity_creation_rule()
         node.write()
 
         return True
 
     def create_webentity(self, prefixes):
-        '''
+        """
         Note: will raise an error if any of the prefixes is already defining an existing entity
-        '''
+        """
         prefixes = [self.__encode(prefix) for prefix in prefixes]
 
         report = TraphWriteReport()
         # Note: with use_best_case=False an error will be raised if any of the prefixes is invalid
-        webentity_id, valid_prefixes = self.__add_prefixes(prefixes, use_best_case=False)
+        webentity_id, valid_prefixes = self.__add_prefixes(
+            prefixes, use_best_case=False
+        )
         report.created_webentities[webentity_id] = valid_prefixes
         return report
 
     def delete_webentity(self, weid, weid_prefixes, check_for_corruption=True):
-        '''
+        """
         Note: weid is only useful to check data consistency, but not strictly necessary to the method.
         It there is no weid, a consistency check will be skipped but the method will execute regardless.
-        '''
+        """
         weid_prefixes = [self.__encode(weid_prefix) for weid_prefix in weid_prefixes]
 
         # Note: weid is ignored if no check for data consistency
@@ -360,10 +366,12 @@ class Traph(object):
             for prefix in weid_prefixes:
                 node = self.lru_trie.lru_node(prefix)
                 if not node:
-                    raise TraphException('Prefix %s cannot be found' % (prefix))
+                    raise TraphException("Prefix %s cannot be found" % (prefix))
                 prefix_index.update({prefix: node})
                 if not node.has_webentity() or node.webentity() != weid:
-                    raise TraphException('Prefix %s not attributed to webentity %s' % (prefix, weid))
+                    raise TraphException(
+                        "Prefix %s not attributed to webentity %s" % (prefix, weid)
+                    )
         else:
             prefix_index = {}
             for prefix in weid_prefixes:
@@ -380,9 +388,14 @@ class Traph(object):
         prefix = self.__encode(prefix)
 
         # check prefix
-        node, history = self.lru_trie.add_lru(prefix, flag_can_have_child_webentities=True)
+        node, history = self.lru_trie.add_lru(
+            prefix, flag_can_have_child_webentities=True
+        )
         if node.has_webentity():
-            raise TraphException('Prefix %s already attributed to webentity %s' % (prefix, node.webentity()))
+            raise TraphException(
+                "Prefix %s already attributed to webentity %s"
+                % (prefix, node.webentity())
+            )
         else:
             node.set_webentity(weid)
             node.write()
@@ -398,31 +411,35 @@ class Traph(object):
             node.write()
             return True
         else:
-            raise TraphException('Prefix %s not attributed to webentity %s' % (prefix, node.webentity()))
+            raise TraphException(
+                "Prefix %s not attributed to webentity %s" % (prefix, node.webentity())
+            )
 
     def move_prefix_to_webentity(self, prefix, weid_target, weid_source=False):
-        '''
+        """
         Note: pay attention to the unintuitive order of arguments.
         You may prefer the more explicit alias move_prefix_to_webentity_from_webentity
-        '''
+        """
         prefix = self.__encode(prefix)
 
         if self.remove_prefix_from_webentity(prefix, weid_source):
             return self.add_prefix_to_webentity(prefix, weid_target)
         return False
 
-    def move_prefix_to_webentity_from_webentity(self, prefix, weid_target, weid_source=False):
-        '''
+    def move_prefix_to_webentity_from_webentity(
+        self, prefix, weid_target, weid_source=False
+    ):
+        """
         A more explicit alias of move_prefix_to_webentity
-        '''
+        """
         return self.move_prefix_to_webentity(prefix, weid_target, weid_source)
 
     def retrieve_prefix(self, lru):
-        '''
+        """
         Returns the closest prefix to contain the LRU
         (the prefix defining the webentity that the LRU belongs to)
         Note: does not apply creation rules. For that feature see get_potential_prefix()
-        '''
+        """
         lru = self.__encode(lru)
 
         node, history = self.lru_trie.follow_lru(lru)
@@ -431,23 +448,25 @@ class Traph(object):
         # if not node:
         #     raise TraphException('LRU %s not in the traph' % (lru))
         if not history.webentity_prefix:
-            raise TraphException('No webentity prefix found for %s' % (lru))
+            raise TraphException("No webentity prefix found for %s" % (lru))
         return history.webentity_prefix
 
     def get_potential_prefix(self, lru):
-        '''
+        """
         Returns the longest of prefixes or "potential prefixes" ie. from creation rules.
         Very similar to internal method __add_page except it does not add the lru.
-        '''
+        """
         lru = self.__encode(lru)
         node, history = self.lru_trie.follow_lru(lru)
 
         # Retrieving the longest candidate prefix
-        longest_candidate_prefix = ''
+        longest_candidate_prefix = ""
         for rule_prefix in history.rules_to_apply():
             candidate_prefix = self.__apply_webentity_creation_rule(rule_prefix, lru)
 
-            if candidate_prefix and len(candidate_prefix) > len(longest_candidate_prefix):
+            if candidate_prefix and len(candidate_prefix) > len(
+                longest_candidate_prefix
+            ):
                 longest_candidate_prefix = candidate_prefix
 
         # If the longest rules prefix is shorter than the webentity prefix, or there is no rules prefix
@@ -464,18 +483,17 @@ class Traph(object):
         # If the default rule failed to find a prefix, we emit an error
         if not longest_candidate_prefix:
             warnings.warn(
-                'Default rule failed to find a prefix for "%s"!' % lru,
-                RuntimeWarning
+                'Default rule failed to find a prefix for "%s"!' % lru, RuntimeWarning
             )
             return False
         else:
             return longest_candidate_prefix
 
     def retrieve_webentity(self, lru):
-        '''
+        """
         Returns the closest webentity id to contain the LRU
         (the webentity it belongs to)
-        '''
+        """
         lru = self.__encode(lru)
 
         node, history = self.lru_trie.follow_lru(lru)
@@ -484,7 +502,7 @@ class Traph(object):
         # if not node:
         #     raise TraphException('LRU %s not in the traph' % (lru))
         if not history.webentity:
-            raise TraphException('No webentity found for %s' % (lru))
+            raise TraphException("No webentity found for %s" % (lru))
         return history.webentity
 
     def get_webentity_by_prefix(self, prefix):
@@ -492,22 +510,19 @@ class Traph(object):
 
         node = self.lru_trie.lru_node(prefix)
         if not node:
-            raise TraphException('LRU %s not in the traph' % (prefix))
+            raise TraphException("LRU %s not in the traph" % (prefix))
         if not node.has_webentity():
-            raise TraphException('LRU %s is not a webentity prefix' % (prefix))
+            raise TraphException("LRU %s is not a webentity prefix" % (prefix))
         return node.webentity()
 
     def get_webentity_pages_iter(self, weid, prefixes):
-        '''
+        """
         Note: the prefixes are supposed to match the webentity id. We do not check.
-        '''
+        """
         state = TraphIteratorState()
         pages = []
         for node, lru in self.webentity_page_nodes_iter(weid, prefixes):
-            pages.append({
-                'lru': lru,
-                'crawled': node.is_crawled()
-            })
+            pages.append({"lru": lru, "crawled": node.is_crawled()})
 
             if state.should_yield(2000):
                 yield state
@@ -517,10 +532,9 @@ class Traph(object):
     def get_webentity_pages(self, weid, prefixes):
         return run_iterator(self.get_webentity_pages_iter(weid, prefixes))
 
-    def paginate_webentity_pages(self, weid, prefixes,
-                                 page_count=None, pagination_token=None,
-                                 crawled_only=False):
-
+    def paginate_webentity_pages(
+        self, weid, prefixes, page_count=None, pagination_token=None, crawled_only=False
+    ):
         if page_count is not None:
             assert page_count > 0
 
@@ -546,12 +560,10 @@ class Traph(object):
             starting_node = self.lru_trie.lru_node(current_prefix)
 
             if not starting_node:
-                raise TraphException('LRU %s not in the traph' % (current_prefix))
+                raise TraphException("LRU %s not in the traph" % (current_prefix))
 
             generator = self.lru_trie.webentity_inorder_iter(
-                starting_node,
-                current_prefix,
-                pagination_path=pagination_path
+                starting_node, current_prefix, pagination_path=pagination_path
             )
 
             for node, lru, path in generator:
@@ -567,20 +579,17 @@ class Traph(object):
 
                 if k is not None and n >= k:
                     return {
-                        'done': False,
-                        'count': n - 1,
-                        'count_crawled': c,
-                        'pages': pages[:n - 1],
-                        'token': build_pagination_token(last_path_i, last_path)
+                        "done": False,
+                        "count": n - 1,
+                        "count_crawled": c,
+                        "pages": pages[: n - 1],
+                        "token": build_pagination_token(last_path_i, last_path),
                     }
 
                 if crawled:
                     c += 1
 
-                pages.append({
-                    'lru': lru,
-                    'crawled': crawled
-                })
+                pages.append({"lru": lru, "crawled": crawled})
 
                 last_path = path
                 last_path_i = i
@@ -588,27 +597,17 @@ class Traph(object):
             # We reset the pagination path for next prefix
             pagination_path = None
 
-        return {
-            'done': True,
-            'count': n,
-            'count_crawled': c,
-            'pages': pages
-        }
-
-        return result
+        return {"done": True, "count": n, "count_crawled": c, "pages": pages}
 
     def get_webentity_crawled_pages_iter(self, weid, prefixes):
-        '''
+        """
         Note: the prefixes are supposed to match the webentity id. We do not check.
-        '''
+        """
         state = TraphIteratorState()
         pages = []
         for node, lru in self.webentity_page_nodes_iter(weid, prefixes):
             if node.is_crawled():
-                pages.append({
-                    'lru': lru,
-                    'crawled': True
-                })
+                pages.append({"lru": lru, "crawled": True})
 
             if state.should_yield(2000):
                 yield state
@@ -618,11 +617,13 @@ class Traph(object):
     def get_webentity_crawled_pages(self, weid, prefixes):
         return run_iterator(self.get_webentity_crawled_pages_iter(weid, prefixes))
 
-    def get_webentity_most_linked_pages_iter(self, weid, prefixes, pages_count=10, max_depth=None):
-        '''
+    def get_webentity_most_linked_pages_iter(
+        self, weid, prefixes, pages_count=10, max_depth=None
+    ):
+        """
         Returns a list of objects {lru:, indegree:}
         Note: the prefixes are supposed to match the webentity id. We do not check.
-        '''
+        """
         state = TraphIteratorState()
         pages = []
         c = 0
@@ -631,11 +632,12 @@ class Traph(object):
 
             starting_node = self.lru_trie.lru_node(prefix)
             if not starting_node:
-                raise TraphException('LRU %s not in the traph' % (prefix))
+                raise TraphException("LRU %s not in the traph" % (prefix))
 
-            for node, lru in self.lru_trie.webentity_dfs_iter(starting_node, prefix, max_depth):
+            for node, lru in self.lru_trie.webentity_dfs_iter(
+                starting_node, prefix, max_depth
+            ):
                 if node.is_page():
-
                     # Iterate over link nodes
                     indegree = 0
 
@@ -656,25 +658,31 @@ class Traph(object):
 
         while len(pages):
             page = heapq.heappop(pages)
-            sorted_pages[i] = {'lru': page[2], 'indegree': page[0]} #type:ignore
+            sorted_pages[i] = {"lru": page[2], "indegree": page[0]}  # type:ignore
             i -= 1
 
         yield state.finalize(sorted_pages)
 
-    def get_webentity_most_linked_pages(self, weid, prefixes, pages_count=10, max_depth=None):
-        return run_iterator(self.get_webentity_most_linked_pages_iter(weid, prefixes, pages_count=pages_count, max_depth=max_depth))
+    def get_webentity_most_linked_pages(
+        self, weid, prefixes, pages_count=10, max_depth=None
+    ):
+        return run_iterator(
+            self.get_webentity_most_linked_pages_iter(
+                weid, prefixes, pages_count=pages_count, max_depth=max_depth
+            )
+        )
 
     def get_webentity_parent_webentities(self, weid, prefixes):
-        '''
+        """
         Note: the prefixes are supposed to match the webentity id. We do not check.
-        '''
+        """
         weids = set()
         for prefix in prefixes:
             prefix = self.__encode(prefix)
 
             starting_node = self.lru_trie.lru_node(prefix)
             if not starting_node:
-                raise TraphException('LRU %s not in the traph' % (prefix))
+                raise TraphException("LRU %s not in the traph" % (prefix))
 
             for node in self.lru_trie.node_parents_iter(starting_node):
                 weid2 = node.webentity()
@@ -684,9 +692,9 @@ class Traph(object):
         return list(weids)
 
     def get_webentity_child_webentities_iter(self, weid, prefixes):
-        '''
+        """
         Note: the prefixes are supposed to match the webentity id. We do not check.
-        '''
+        """
         state = TraphIteratorState()
         weids = set()
         for prefix in prefixes:
@@ -694,9 +702,11 @@ class Traph(object):
 
             starting_node = self.lru_trie.lru_node(prefix)
             if not starting_node:
-                raise TraphException('LRU %s not in the traph' % (prefix))
+                raise TraphException("LRU %s not in the traph" % (prefix))
 
-            for node, _ in self.lru_trie.dfs_iter(starting_node, prefix, skip_childless_paths=True):
+            for node, _ in self.lru_trie.dfs_iter(
+                starting_node, prefix, skip_childless_paths=True
+            ):
                 weid2 = node.webentity()
                 if weid2 and weid2 > 0 and weid2 != weid:
                     weids.add(weid2)
@@ -709,17 +719,26 @@ class Traph(object):
     def get_webentity_child_webentities(self, weid, prefixes):
         return run_iterator(self.get_webentity_child_webentities_iter(weid, prefixes))
 
-    def get_webentity_pagelinks_iter(self, weid, prefixes, include_inbound=False, include_internal=True, include_outbound=False):
-        '''
+    def get_webentity_pagelinks_iter(
+        self,
+        weid,
+        prefixes,
+        include_inbound=False,
+        include_internal=True,
+        include_outbound=False,
+    ):
+        """
         Returns all or part of: pagelinks to the entity, internal pagelinks, pagelinks out of the entity.
         Default is only internal pagelinks.
         Note: the prefixes are supposed to match the webentity id. We do not check.
-        '''
+        """
 
         # TODO: Can be optimized caching windups
 
         if not include_internal and not include_outbound and not include_inbound:
-            raise TraphException('At least one of include _internal or include_outbound or include_inbound should be true')
+            raise TraphException(
+                "At least one of include _internal or include_outbound or include_inbound should be true"
+            )
 
         state = TraphIteratorState()
         pagelinks = []
@@ -732,23 +751,27 @@ class Traph(object):
 
             starting_node = self.lru_trie.lru_node(prefix)
             if not starting_node:
-                raise TraphException('LRU %s not in the traph' % (prefix))
+                raise TraphException("LRU %s not in the traph" % (prefix))
 
             for node, lru in self.lru_trie.webentity_dfs_iter(starting_node, prefix):
-
                 if not node.is_page():
                     continue
 
                 # Iterating over the page's outlinks
                 if node.has_outlinks() and (include_outbound or include_internal):
                     links_block = node.outlinks()
-                    for target, weight in self.link_store.weighted_link_nodes_iter(links_block):
-
+                    for target, weight in self.link_store.weighted_link_nodes_iter(
+                        links_block
+                    ):
                         target_node.read(target)
                         target_lru = self.lru_trie.windup_lru(target_node.block)
-                        target_webentity = self.lru_trie.windup_lru_for_webentity(target_node)
+                        target_webentity = self.lru_trie.windup_lru_for_webentity(
+                            target_node
+                        )
 
-                        if (include_outbound and target_webentity != weid) or (include_internal and target_webentity == weid):
+                        if (include_outbound and target_webentity != weid) or (
+                            include_internal and target_webentity == weid
+                        ):
                             pagelinks.append([lru, target_lru, weight])
 
                         if state.should_yield(5000):
@@ -757,11 +780,14 @@ class Traph(object):
                 # Iterating over the page's inlinks
                 if node.has_inlinks() and include_inbound:
                     links_block = node.inlinks()
-                    for target, weight in self.link_store.weighted_link_nodes_iter(links_block):
-
+                    for target, weight in self.link_store.weighted_link_nodes_iter(
+                        links_block
+                    ):
                         source_node.read(target)
                         source_lru = self.lru_trie.windup_lru(source_node.block)
-                        source_webentity = self.lru_trie.windup_lru_for_webentity(source_node)
+                        source_webentity = self.lru_trie.windup_lru_for_webentity(
+                            source_node
+                        )
 
                         if source_webentity != weid:
                             pagelinks.append([source_lru, lru, weight])
@@ -771,25 +797,46 @@ class Traph(object):
 
         yield state.finalize(pagelinks)
 
-    def get_webentity_pagelinks(self, weid, prefixes, include_inbound=False, include_internal=True, include_outbound=False):
-        return run_iterator(self.get_webentity_pagelinks_iter(weid, prefixes, include_inbound=include_inbound, include_internal=include_internal, include_outbound=include_outbound))
+    def get_webentity_pagelinks(
+        self,
+        weid,
+        prefixes,
+        include_inbound=False,
+        include_internal=True,
+        include_outbound=False,
+    ):
+        return run_iterator(
+            self.get_webentity_pagelinks_iter(
+                weid,
+                prefixes,
+                include_inbound=include_inbound,
+                include_internal=include_internal,
+                include_outbound=include_outbound,
+            )
+        )
 
-    def paginate_webentity_pagelinks(self, weid, prefixes,
-                                     include_internal=True, include_outbound=False,
-                                     source_page_count=None, pagination_token=None):
-
+    def paginate_webentity_pagelinks(
+        self,
+        weid,
+        prefixes,
+        include_internal=True,
+        include_outbound=False,
+        source_page_count=None,
+        pagination_token=None,
+    ):
         if source_page_count is not None:
             assert source_page_count > 0
 
         if not include_internal and not include_outbound:
-            raise TraphException('At least one of include_internal or include_outbound should be true')
+            raise TraphException(
+                "At least one of include_internal or include_outbound should be true"
+            )
 
         target_node = self.lru_trie.node()
         start_i = 0
         pagination_path = None
         pagelinks = []
         n = 0
-        c = 0
         last_path = None
         last_path_i = None
 
@@ -802,12 +849,10 @@ class Traph(object):
             starting_node = self.lru_trie.lru_node(current_prefix)
 
             if not starting_node:
-                raise TraphException('LRU %s not in the traph' % (current_prefix))
+                raise TraphException("LRU %s not in the traph" % (current_prefix))
 
             generator = self.lru_trie.webentity_inorder_iter(
-                starting_node,
-                current_prefix,
-                pagination_path=pagination_path
+                starting_node, current_prefix, pagination_path=pagination_path
             )
 
             # Iterating over the prefix's lrus in order
@@ -823,11 +868,17 @@ class Traph(object):
                 links_block = node.outlinks()
                 newlinks = []
 
-                for target, weight in self.link_store.weighted_link_nodes_iter(links_block):
+                for target, weight in self.link_store.weighted_link_nodes_iter(
+                    links_block
+                ):
                     target_node.read(target)
-                    target_webentity = self.lru_trie.windup_lru_for_webentity(target_node)
+                    target_webentity = self.lru_trie.windup_lru_for_webentity(
+                        target_node
+                    )
 
-                    if (include_outbound and target_webentity != weid) or (include_internal and target_webentity == weid):
+                    if (include_outbound and target_webentity != weid) or (
+                        include_internal and target_webentity == weid
+                    ):
                         target_lru = self.lru_trie.windup_lru(target_node.block)
                         newlinks.append([lru, target_lru, weight])
 
@@ -836,11 +887,11 @@ class Traph(object):
 
                     if source_page_count is not None and n > source_page_count:
                         return {
-                            'done': False,
-                            'count_sourcepages': n - 1,
-                            'count_pagelinks': len(pagelinks),
-                            'pagelinks': pagelinks,
-                            'token': build_pagination_token(last_path_i, last_path)
+                            "done": False,
+                            "count_sourcepages": n - 1,
+                            "count_pagelinks": len(pagelinks),
+                            "pagelinks": pagelinks,
+                            "token": build_pagination_token(last_path_i, last_path),
                         }
 
                     pagelinks += newlinks
@@ -852,17 +903,17 @@ class Traph(object):
             pagination_path = None
 
         return {
-            'done': True,
-            'count_sourcepages': n,
-            'count_pagelinks': len(pagelinks),
-            'pagelinks': pagelinks
+            "done": True,
+            "count_sourcepages": n,
+            "count_pagelinks": len(pagelinks),
+            "pagelinks": pagelinks,
         }
 
     def get_webentity_outlinks_iter(self, weid, prefixes):
-        '''
+        """
         Returns the list of cited web entities
         Note: the prefixes are supposed to match the webentity id. We do not check.
-        '''
+        """
 
         state = TraphIteratorState()
         done_blocks = set()
@@ -875,10 +926,9 @@ class Traph(object):
 
             starting_node = self.lru_trie.lru_node(prefix)
             if not starting_node:
-                raise TraphException('LRU %s not in the traph' % (prefix))
+                raise TraphException("LRU %s not in the traph" % (prefix))
 
             for node, lru in self.lru_trie.webentity_dfs_iter(starting_node, prefix):
-
                 if not node.is_page():
                     continue
 
@@ -888,7 +938,9 @@ class Traph(object):
                     for target in self.link_store.deduped_link_nodes_iter(links_block):
                         target_node.read(target)
                         if target_node.block not in done_blocks:
-                            target_webentity = self.lru_trie.windup_lru_for_webentity(target_node)
+                            target_webentity = self.lru_trie.windup_lru_for_webentity(
+                                target_node
+                            )
                             done_blocks.add(target_node.block)
                             weids.add(target_webentity)
 
@@ -901,19 +953,19 @@ class Traph(object):
         return run_iterator(self.get_webentity_outlinks_iter(weid, prefixes))
 
     def get_webentity_outdegree(self, weid, prefixes):
-        '''
+        """
         Convenience method relying on get_webentity_outlinks (thus NOT more efficient)
         Note: the prefixes are supposed to match the webentity id. We do not check.
-        '''
+        """
         # TODO: optimize
 
-        return len(self.get_webentity_outlinks(weid, prefixes)) #type:ignore
+        return len(self.get_webentity_outlinks(weid, prefixes))  # type:ignore
 
     def get_webentity_inlinks_iter(self, weid, prefixes):
-        '''
+        """
         Returns the list of citing web entities
         Note: the prefixes are supposed to match the webentity id. We do not check.
-        '''
+        """
 
         state = TraphIteratorState()
         done_blocks = set()
@@ -926,10 +978,9 @@ class Traph(object):
 
             starting_node = self.lru_trie.lru_node(prefix)
             if not starting_node:
-                raise TraphException('LRU %s not in the traph' % (prefix))
+                raise TraphException("LRU %s not in the traph" % (prefix))
 
             for node, lru in self.lru_trie.webentity_dfs_iter(starting_node, prefix):
-
                 if not node.is_page():
                     continue
 
@@ -939,7 +990,9 @@ class Traph(object):
                     for target in self.link_store.deduped_link_nodes_iter(links_block):
                         source_node.read(target)
                         if source_node.block not in done_blocks:
-                            source_webentity = self.lru_trie.windup_lru_for_webentity(source_node)
+                            source_webentity = self.lru_trie.windup_lru_for_webentity(
+                                source_node
+                            )
                             done_blocks.add(source_node.block)
                             weids.add(source_webentity)
 
@@ -952,24 +1005,28 @@ class Traph(object):
         return run_iterator(self.get_webentity_inlinks_iter(weid, prefixes))
 
     def get_webentity_indegree(self, weid, prefixes):
-        '''
+        """
         Convenience method relying on get_webentity_inlinks (thus NOT more efficient)
         Note: the prefixes are supposed to match the webentity id. We do not check.
-        '''
+        """
         # TODO: optimize
 
-        return len(self.get_webentity_inlinks(weid, prefixes)) #type:ignore
+        return len(self.get_webentity_inlinks(weid, prefixes))  # type:ignore
 
     def get_webentity_degree(self, weid, prefixes):
-        '''
+        """
         Note: relies on get_webentity_inlinks() and get_webentity_outlinks(),
         thus not more efficient than calling these.
-        '''
+        """
         # TODO: optimize
 
-        return self.get_webentity_indegree(weid, prefixes) + self.get_webentity_outdegree(weid, prefixes)
+        return self.get_webentity_indegree(
+            weid, prefixes
+        ) + self.get_webentity_outdegree(weid, prefixes)
 
-    def get_page_links(self, lru, include_inbound=True, include_internal=True, include_outbound=True):
+    def get_page_links(
+        self, lru, include_inbound=True, include_internal=True, include_outbound=True
+    ):
         lru = self.__encode(lru)
         node = self.lru_trie.lru_node(lru)
 
@@ -985,18 +1042,18 @@ class Traph(object):
         if node.has_outlinks() and (include_outbound or include_internal):
             links_block = node.outlinks()
             for target, weight in self.link_store.weighted_link_nodes_iter(links_block):
-
                 target_node.read(target)
                 target_lru = self.lru_trie.windup_lru(target_node.block)
 
-                if (include_outbound and target_lru != lru) or (include_internal and target_lru == lru):
+                if (include_outbound and target_lru != lru) or (
+                    include_internal and target_lru == lru
+                ):
                     pagelinks.append([lru, target_lru, weight])
 
         # Iterating over the page's inlinks
         if node.has_inlinks() and include_inbound:
             links_block = node.inlinks()
             for target, weight in self.link_store.weighted_link_nodes_iter(links_block):
-
                 source_node.read(target)
                 source_lru = self.lru_trie.windup_lru(source_node.block)
 
@@ -1006,47 +1063,80 @@ class Traph(object):
         return pagelinks
 
     def get_page_indegree(self, lru, weighted=False):
-        '''
+        """
         Convenience method relying on get_page_links (thus NOT more efficient)
-        '''
+        """
         if weighted:
             total = 0
-            for _, _, weight in self.get_page_links(lru, include_inbound=True, include_internal=False, include_outbound=False):
+            for _, _, weight in self.get_page_links(
+                lru,
+                include_inbound=True,
+                include_internal=False,
+                include_outbound=False,
+            ):
                 total += weight
             return total
         else:
-            return len(self.get_page_links(lru, include_inbound=True, include_internal=False, include_outbound=False))
+            return len(
+                self.get_page_links(
+                    lru,
+                    include_inbound=True,
+                    include_internal=False,
+                    include_outbound=False,
+                )
+            )
 
     def get_page_outdegree(self, lru, weighted=False):
-        '''
+        """
         Convenience method relying on get_page_links (thus NOT more efficient)
-        '''
+        """
         if weighted:
             total = 0
-            for _, _, weight in self.get_page_links(lru, include_inbound=False, include_internal=False, include_outbound=True):
+            for _, _, weight in self.get_page_links(
+                lru,
+                include_inbound=False,
+                include_internal=False,
+                include_outbound=True,
+            ):
                 total += weight
             return total
         else:
-            return len(self.get_page_links(lru, include_inbound=False, include_internal=False, include_outbound=True))
+            return len(
+                self.get_page_links(
+                    lru,
+                    include_inbound=False,
+                    include_internal=False,
+                    include_outbound=True,
+                )
+            )
 
     def get_page_degree(self, lru, weighted=False):
-        '''
+        """
         Convenience method relying on get_page_links (thus NOT more efficient)
-        '''
+        """
         if weighted:
             total = 0
-            for _, _, weight in self.get_page_links(lru, include_inbound=True, include_internal=True, include_outbound=True):
+            for _, _, weight in self.get_page_links(
+                lru, include_inbound=True, include_internal=True, include_outbound=True
+            ):
                 total += weight
             return total
         else:
-            return len(self.get_page_links(lru, include_inbound=True, include_internal=True, include_outbound=True))
+            return len(
+                self.get_page_links(
+                    lru,
+                    include_inbound=True,
+                    include_internal=True,
+                    include_outbound=True,
+                )
+            )
 
     def get_webentities_links_slow_iter(self, out=True, include_auto=False):
-        '''
+        """
         This method should be slower than the regular version but lighter in
         memory as it does not retain a full map of pages association to
         webentities but only the least recently used ones.
-        '''
+        """
         graph = defaultdict(Counter)
         page_to_webentity = dict()
         state = TraphIteratorState()
@@ -1054,7 +1144,6 @@ class Traph(object):
 
         # Iterating over all pages
         for node, source_webentity in self.lru_trie.dfs_with_webentity_iter():
-
             if not node.is_page() or not node.has_links(out=out):
                 continue
 
@@ -1065,12 +1154,16 @@ class Traph(object):
 
             # Iterating over the page's links
             links_block = node.links(out=out)
-            for target_block, weight in self.link_store.weighted_link_nodes_iter(links_block):
+            for target_block, weight in self.link_store.weighted_link_nodes_iter(
+                links_block
+            ):
                 target_webentity = page_to_webentity.get(target_block)
 
                 if target_webentity is None:
                     target_node.read(target_block)
-                    target_webentity = self.lru_trie.windup_lru_for_webentity(target_node)
+                    target_webentity = self.lru_trie.windup_lru_for_webentity(
+                        target_node
+                    )
 
                     # Beware: it's possible that we could not find a webentity
                     if not target_webentity:
@@ -1091,13 +1184,13 @@ class Traph(object):
         yield state.finalize(graph)
 
     def get_webentities_links_iter(self, out=True, include_auto=False):
-        '''
+        """
         This method should be faster than the slow version because it avoids
         unnecessary upward traversal.
 
         Note that it is also possible to solve the links right away and store
         them to solve their webentities later but this is most costly in RAM.
-        '''
+        """
         graph = defaultdict(Counter)
         page_to_webentity = dict()
         link_pointers = []
@@ -1111,8 +1204,8 @@ class Traph(object):
             if not source_webentity:
                 continue
 
-            crawled_status = 'crawled' if node.is_crawled() else 'uncrawled'
-            graph[source_webentity]['pages_' + crawled_status] += 1
+            crawled_status = "crawled" if node.is_crawled() else "uncrawled"
+            graph[source_webentity]["pages_" + crawled_status] += 1
 
             page_to_webentity[node.block] = source_webentity
 
@@ -1124,7 +1217,6 @@ class Traph(object):
 
         # Computing the links
         for source_webentity, links_block in link_pointers:
-
             for target, weight in self.link_store.weighted_link_nodes_iter(links_block):
                 target_webentity = page_to_webentity.get(target)
 
@@ -1150,10 +1242,14 @@ class Traph(object):
         return self.get_webentities_links_iter(out=True, include_auto=include_auto)
 
     def get_webentities_links(self, out=True, include_auto=False):
-        return run_iterator(self.get_webentities_links_iter(out=out, include_auto=include_auto))
+        return run_iterator(
+            self.get_webentities_links_iter(out=out, include_auto=include_auto)
+        )
 
     def get_webentities_links_slow(self, out=True, include_auto=False):
-        return run_iterator(self.get_webentities_links_slow_iter(out=out, include_auto=include_auto))
+        return run_iterator(
+            self.get_webentities_links_slow_iter(out=out, include_auto=include_auto)
+        )
 
     def get_webentities_inlinks(self, include_auto=False):
         return self.get_webentities_links(out=False, include_auto=include_auto)
@@ -1167,9 +1263,9 @@ class Traph(object):
         return lru_variations(prefix)
 
     def add_page(self, lru, crawled=False):
-        '''
+        """
         Returns a webentity creation report as {created_webentities: {weid:[prefixes], ...}}
-        '''
+        """
         lru = self.__encode(lru)
 
         node, report = self.__add_page(lru, crawled=crawled)
@@ -1177,7 +1273,6 @@ class Traph(object):
         return report
 
     def add_pages(self, lrus, crawled=False):
-
         report = TraphWriteReport()
 
         for lru in lrus:
@@ -1236,9 +1331,9 @@ class Traph(object):
         return report
 
     def index_batch_crawl_iter(self, data, yield_frequency):
-        '''
+        """
         data must be a multimap 'source_lru' => 'target_lrus'
-        '''
+        """
         store = self.link_store
         state = TraphIteratorState()
         report = TraphWriteReport()
@@ -1250,7 +1345,9 @@ class Traph(object):
 
             # We need to add the page
             if source_page not in pages:
-                source_node, source_page_report = self.__add_page(source_page, crawled=True)
+                source_node, source_page_report = self.__add_page(
+                    source_page, crawled=True
+                )
                 report += source_page_report
                 pages[source_page] = source_node
             else:
@@ -1299,7 +1396,6 @@ class Traph(object):
         return run_iterator(self.index_batch_crawl_iter(data, yield_frequency))
 
     def close(self):
-
         # Cleanup
         if self.lru_trie_file:
             self.lru_trie_file.close()
@@ -1307,15 +1403,17 @@ class Traph(object):
         if self.link_store_file:
             self.link_store_file.close()
 
-    def clear(self, default_webentity_creation_rule=None, webentity_creation_rules=None):
+    def clear(
+        self, default_webentity_creation_rule=None, webentity_creation_rules=None
+    ):
         self.close()
 
         if self.in_memory:
             self.lru_trie_storage.clear()
             self.links_store_storage.clear()
         else:
-            self.lru_trie_file = open(self.lru_trie_path, 'wb+')
-            self.link_store_file = open(self.link_store_path, 'wb+')
+            self.lru_trie_file = open(self.lru_trie_path, "wb+")
+            self.link_store_file = open(self.link_store_path, "wb+")
 
             self.lru_trie_storage.file = self.lru_trie_file
             self.links_store_storage.file = self.link_store_file
@@ -1330,8 +1428,7 @@ class Traph(object):
         # TODO: this code is basically duplicated from __init__ maybe refactor?
         if default_webentity_creation_rule is not None:
             self.default_webentity_creation_rule = re.compile(
-                default_webentity_creation_rule,
-                re.I
+                default_webentity_creation_rule, re.I
             )
 
         if webentity_creation_rules is not None:
@@ -1348,7 +1445,9 @@ class Traph(object):
             if not page_node.links(out=out):
                 continue
 
-            for target in self.link_store.deduped_link_nodes_iter(page_node.links(out=out)):
+            for target in self.link_store.deduped_link_nodes_iter(
+                page_node.links(out=out)
+            ):
                 yield lru, self.lru_trie.windup_lru(target)
 
     def pages_iter(self):
@@ -1359,16 +1458,16 @@ class Traph(object):
 
     # TODO: weid arg useless
     def webentity_page_nodes_iter(self, weid, prefixes):
-        '''
+        """
         Note: the prefixes are supposed to match the webentity id. We do not check.
-        '''
+        """
         for prefix in prefixes:
             prefix = self.__encode(prefix)
 
             starting_node = self.lru_trie.lru_node(prefix)
 
             if not starting_node:
-                raise TraphException('LRU %s not in the traph' % (prefix))
+                raise TraphException("LRU %s not in the traph" % (prefix))
 
             for node, lru in self.lru_trie.webentity_dfs_iter(starting_node, prefix):
                 if node.is_page():
@@ -1413,16 +1512,16 @@ class Traph(object):
                 max_outlinks_lru = self.lru_trie.windup_lru(node.block)
 
         return {
-            'max_inlinks_len': max_inlinks_len,
-            'max_inlinks_lru': max_inlinks_lru,
-            'max_outlinks_len': max_outlinks_len,
-            'max_outlinks_lru': max_outlinks_lru
+            "max_inlinks_len": max_inlinks_len,
+            "max_inlinks_lru": max_inlinks_lru,
+            "max_outlinks_len": max_outlinks_len,
+            "max_outlinks_lru": max_outlinks_lru,
         }
 
     def metrics(self):
         return {
-            'lru_trie': self.lru_trie.metrics(),
-            'link_store': self.link_store.metrics(),
-            'bst': self.lru_trie.bst_metrics(),
-            'links': self.links_metrics()
+            "lru_trie": self.lru_trie.metrics(),
+            "link_store": self.link_store.metrics(),
+            "bst": self.lru_trie.bst_metrics(),
+            "links": self.links_metrics(),
         }

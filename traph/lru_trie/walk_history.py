@@ -8,15 +8,13 @@
 
 # Class representing the history of a simple walk into the Trie
 class LRUTrieWalkHistory(object):
-
     def __init__(self, lru):
-
         # Properties
 
         # TODO: this should become a list
         self.lru = lru
         self.webentity = None
-        self.webentity_prefix = ''
+        self.webentity_prefix = ""
         self.webentity_position = -1
         self.webentity_creation_rules = []
         self.page_was_created = False
@@ -26,13 +24,15 @@ class LRUTrieWalkHistory(object):
 
         return (
             '<%(class_name)s prefix="%(prefix)s"'
-            ' weid=%(weid)s position=%(position)s wecr=%(wecr)s>'
+            " weid=%(weid)s position=%(position)s wecr=%(wecr)s>"
         ) % {
-            'class_name': class_name,
-            'prefix': self.webentity_prefix,
-            'weid': self.webentity,
-            'position': self.webentity_position,
-            'wecr': '/'.join(str(wecr) for wecr in self.webentity_creation_rules) if self.webentity_creation_rules else None
+            "class_name": class_name,
+            "prefix": self.webentity_prefix,
+            "weid": self.webentity,
+            "position": self.webentity_position,
+            "wecr": "/".join(str(wecr) for wecr in self.webentity_creation_rules)
+            if self.webentity_creation_rules
+            else None,
         }
 
     def update_webentity(self, weid, prefix, position):
@@ -46,7 +46,6 @@ class LRUTrieWalkHistory(object):
     def rules_to_apply(self):
         for position in reversed(self.webentity_creation_rules):
             if position >= 0:
-
                 prefix = self.lru[0:position]
 
                 # Note that it remains to the user to apply default rule if
