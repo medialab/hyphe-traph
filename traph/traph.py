@@ -141,7 +141,7 @@ class Traph(object):
 
             self.webentity_creation_rules = {}
 
-            for prefix, pattern in list(webentity_creation_rules.items()):
+            for prefix, pattern in webentity_creation_rules.items():
                 self.add_webentity_creation_rule(prefix, pattern, create)
 
     # =========================================================================
@@ -187,7 +187,7 @@ class Traph(object):
         else:
             webentity_id = self.__generated_web_entity_id()
 
-            for prefix, [node, history] in list(valid_prefixes_index.items()):
+            for prefix, [node, history] in valid_prefixes_index.items():
                 node.refresh()  # node update necessary
                 node.set_webentity(webentity_id)
                 node.write()
@@ -378,7 +378,7 @@ class Traph(object):
                 node = self.lru_trie.lru_node(prefix)
                 prefix_index.update({prefix: node})
 
-        for prefix, node in list(prefix_index.items()):
+        for prefix, node in prefix_index.items():
             node.unset_webentity()
             node.write()
 
@@ -1312,7 +1312,7 @@ class Traph(object):
             outlinks[source_page].append(target_page)
             inlinks[target_page].append(source_page)
 
-        for source_page, target_pages in list(outlinks.items()):
+        for source_page, target_pages in outlinks.items():
             source_node = pages[source_page]
 
             # Refreshing node's data
@@ -1320,7 +1320,7 @@ class Traph(object):
             target_blocks = (pages[target_page].block for target_page in target_pages)
             store.add_outlinks(source_node, target_blocks)
 
-        for target_page, source_pages in list(inlinks.items()):
+        for target_page, source_pages in inlinks.items():
             target_node = pages[target_page]
 
             # Refreshing node's data
@@ -1340,7 +1340,7 @@ class Traph(object):
         pages = dict()
         inlinks = defaultdict(list)
 
-        for source_page, target_pages in list(data.items()):
+        for source_page, target_pages in data.items():
             source_page = self.__encode(source_page)
 
             # We need to add the page
@@ -1381,7 +1381,7 @@ class Traph(object):
             source_node.refresh()
             store.add_outlinks(source_node, target_blocks)
 
-        for target_page, source_pages in list(inlinks.items()):
+        for target_page, source_pages in inlinks.items():
             target_node = pages[target_page]
             target_node.refresh()
             source_blocks = (pages[source_page].block for source_page in source_pages)
@@ -1434,7 +1434,7 @@ class Traph(object):
         if webentity_creation_rules is not None:
             self.webentity_creation_rules = {}
 
-            for prefix, pattern in list(webentity_creation_rules.items()):
+            for prefix, pattern in webentity_creation_rules.items():
                 self.add_webentity_creation_rule(prefix, pattern, True)
 
     # =========================================================================

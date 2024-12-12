@@ -19,7 +19,7 @@ class CustomAssertionsTestCase(unittest.TestCase):
         if len(map1) != len(map2):
             raise AssertionError("Maps have different lengths.")
 
-        for source, targets1 in list(map1.items()):
+        for source, targets1 in map1.items():
             if source not in map2:
                 raise AssertionError(
                     "The %s key does not exist in the second map." % source

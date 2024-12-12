@@ -18,7 +18,7 @@ def webentity_label_from_prefixes(prefixes):
 def legible_network(webentities, network):
     new_network = defaultdict(list)
 
-    for source, targets in list(network.items()):
+    for source, targets in network.items():
         new_network[webentities[source]] = [
             webentities[target]
             for target in targets

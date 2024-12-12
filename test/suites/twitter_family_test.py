@@ -71,7 +71,7 @@ class TestTwitterFamily(TraphTestCase):
         # Inserting pages
         for page in PAGES:
             report = traph.add_page(page)
-            for weid, prefixes in list(report.created_webentities.items()):
+            for weid, prefixes in report.created_webentities.items():
                 webentities[weid] = webentity_label_from_prefixes(prefixes)
 
         self.assertEqual(len(webentities), 16)
@@ -96,11 +96,11 @@ class TestTwitterFamily(TraphTestCase):
         self.assertEqual(sum(len(targets) for targets in list(legible.values())), 21)
         self.assertEqual(len(legible), len(NETWORK))
 
-        for source, targets in list(legible.items()):
+        for source, targets in legible.items():
             self.assertTrue(source in NETWORK)
             self.assertEqual(set(targets), set(NETWORK[source]))
 
-        for source, targets in list(network.items()):
+        for source, targets in network.items():
             for weight in list(targets.values()):
                 self.assertEqual(weight, 1)
 

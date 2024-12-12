@@ -31,7 +31,7 @@ class TestNetwork(TraphTestCase):
                 }
             )
 
-            for weid, prefixes in list(report.created_webentities.items()):
+            for weid, prefixes in report.created_webentities.items():
                 webentities[weid] = webentity_label_from_prefixes(prefixes)
 
             # Normal network
@@ -100,7 +100,7 @@ class TestNetwork(TraphTestCase):
                 ]
             )
 
-            for weid, prefixes in list(report.created_webentities.items()):
+            for weid, prefixes in report.created_webentities.items():
                 webentities[weid] = webentity_label_from_prefixes(prefixes)
 
             traph.add_links(
@@ -227,7 +227,7 @@ class TestNetwork(TraphTestCase):
                 }
             )
 
-            for weid, prefixes in list(report.created_webentities.items()):
+            for weid, prefixes in report.created_webentities.items():
                 webentities[weid] = webentity_label_from_prefixes(prefixes)
 
             # Normal network
