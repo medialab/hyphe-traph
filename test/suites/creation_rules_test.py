@@ -199,3 +199,64 @@ class TestCreationRules(TraphTestCase):
         ]))
 
         traph.close()
+        self.tearDown()
+
+        '''
+        Step 10: Test a traph with the "subdomain" default creation rule
+        Expected: Webentities are created at the subdomain level
+        '''
+        traph = self.get_traph(default_webentity_creation_rule=WEBENTITY_CREATION_RULES_REGEXES['subdomain'])
+        webentities = {}
+        report = traph.add_page('s:http|h:com|h:world|h:europe|p:spain|p:barcelona|')
+        webentities.update(report.created_webentities)
+
+        self.assertWebentities(webentities, [
+            's:http|h:com|h:world|h:europe|'
+        ])
+
+        # Testing the inserted pages
+        pages_in_traph = set(lru for _, lru in traph.pages_iter())
+
+        self.assertTrue(pages_in_traph == set([
+            's:http|h:com|h:world|h:europe|p:spain|p:barcelona|'
+        ]))
+
+        report = traph.add_page('s:http|h:com|h:world|p:sea|')
+        webentities.update(report.created_webentities)
+
+        self.assertWebentities(webentities, [
+            's:http|h:com|h:world|h:europe|',
+            's:http|h:com|h:world|'
+        ])
+
+        report = traph.add_page('s:http|h:com|h:world|h:asia|p:china|')
+        webentities.update(report.created_webentities)
+
+        self.assertWebentities(webentities, [
+            's:http|h:com|h:world|h:europe|',
+            's:http|h:com|h:world|',
+            's:http|h:com|h:world|h:asia|'
+        ])
+
+        report = traph.index_batch_crawl({
+            's:http|h:com|h:world|h:europe|p:neighbors|': [
+                's:https|h:com|h:world|h:unitedkingdom|p:london|',
+                's:http|h:com|h:world|h:oceania|p:australia|',
+                's:http|h:com|h:world|p:sea|',
+                's:https|h:com|h:world|',
+                's:http|h:com|h:world|h:asia|p:russia|',
+                's:https|h:com|h:world|h:africa|p:senegal|',
+                's:http|h:com|h:world|h:africa|h:maghreb|p:morocco|'
+            ]
+        })
+
+        self.assertTrue(report.nb_created_pages == 7)
+
+        self.assertWebentities(report.created_webentities, [
+            's:http|h:com|h:world|h:unitedkingdom|',
+            's:http|h:com|h:world|h:oceania|',
+            's:http|h:com|h:world|h:africa|',
+            's:http|h:com|h:world|h:africa|h:maghreb|'
+        ])
+
+        traph.close()
